@@ -1,0 +1,73 @@
+.status-select-todo {
+  background-color: #f1f5f9;
+  /* gray-100 */
+  color: #4b5563;
+  /* gray-700 */
+  border-color: #cbd5e1;
+  /* gray-300 */
+}
+
+.status-select-in-progress {
+  background-color: #e0f2fe;
+  /* blue-100 */
+  color: #1d4ed8;
+  /* blue-700 */
+  border-color: #93c5fd;
+  /* blue-300 */
+}
+
+.status-select-completed {
+  background-color: #d1fae5;
+  /* green-100 */
+  color: #047857;
+  /* green-700 */
+  border-color: #6ee7b7;
+  /* green-300 */
+}
+
+.status-select-overdue {
+  background-color: #fee2e2;
+  /* red-100 */
+  color: #b91c1c;
+  /* red-700 */
+  border-color: #fca5a5;
+  /* red-300 */
+}
+
+/* Custom styles for input/select with icon */
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon input,
+.input-with-icon select {
+  padding-left: 2.5rem;
+  /* Make space for the icon */
+  -webkit-appearance: none;
+  /* Remove default arrow for selects */
+  -moz-appearance: none;
+  appearance: none;
+  /* Add custom arrow for selects if needed, for example using background-image */
+}
+
+.input-with-icon .icon {
+  position: absolute;
+  left: 0.75rem;
+  /* Position the icon */
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  /* gray-400 */
+  pointer-events: none;
+  /* Make icon not clickable */
+  z-index: 10;
+  /* Ensure icon is above the input/select */
+}
+
+/* Specific custom arrow for filter selects to match status-select */
+.filter-select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1.5em;
+}

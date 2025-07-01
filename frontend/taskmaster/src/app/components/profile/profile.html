@@ -1,0 +1,100 @@
+<div class="container mx-auto max-w-3xl">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Hồ sơ của bạn</h1>
+
+  <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+    <h2 class="text-xl font-semibold text-gray-700 mb-4">Thông tin cá nhân</h2>
+
+    <div class="flex items-center mb-6">
+      <div class="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mr-6">
+        <img id="profileImage" src="https://via.placeholder.com/96x96?text=Avatar" alt="Ảnh đại diện"
+          class="w-full h-full object-cover">
+      </div>
+      <div>
+        <button id="changeAvatarBtn" class="text-blue-600 hover:underline font-medium">Đổi ảnh đại
+          diện</button>
+        <p class="text-sm text-gray-500">Ảnh ngẫu nhiên từ picsum.photos</p>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="fullName" class="block text-gray-700 text-sm font-semibold mb-2">Họ và tên</label>
+      <input type="text" id="fullName"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" value="Alice Wonderland">
+    </div>
+    <div class="mb-4">
+      <label for="email" class="block text-gray-700 text-sm font-semibold mb-2">Địa chỉ Email</label>
+      <input type="email" id="email" class="w-full px-4 py-2 border rounded-lg bg-gray-50 cursor-not-allowed"
+        value="alice@example.com" readonly>
+      <p class="text-xs text-gray-500 mt-1">Email không thể thay đổi</p>
+    </div>
+    <div class="mb-4">
+      <label for="phone" class="block text-gray-700 text-sm font-semibold mb-2">Số điện thoại</label>
+      <input type="tel" id="phone" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+        value="0987654321">
+    </div>
+    <div class="mb-6">
+      <label for="address" class="block text-gray-700 text-sm font-semibold mb-2">Địa chỉ</label>
+      <textarea id="address" rows="3"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">123 Đường ABC, Quận XYZ, TP.HCM</textarea>
+    </div>
+
+    <button id="saveProfileBtn"
+      class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Lưu
+      thay đổi</button>
+  </div>
+
+  <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+    <h2 class="text-xl font-semibold text-gray-700 mb-4">Thay đổi mật khẩu</h2>
+
+    <div class="mb-4">
+      <label for="currentPassword" class="block text-gray-700 text-sm font-semibold mb-2">Mật khẩu
+        hiện tại</label>
+      <input type="password" id="currentPassword"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+        placeholder="Nhập mật khẩu hiện tại của bạn">
+    </div>
+    <div class="mb-4">
+      <label for="newPassword" class="block text-gray-700 text-sm font-semibold mb-2">Mật khẩu
+        mới</label>
+      <input type="password" id="newPassword"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+        placeholder="Nhập mật khẩu mới">
+    </div>
+    <div class="mb-6">
+      <label for="confirmNewPassword" class="block text-gray-700 text-sm font-semibold mb-2">Xác nhận
+        mật khẩu mới</label>
+      <input type="password" id="confirmNewPassword"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+        placeholder="Xác nhận mật khẩu mới">
+    </div>
+
+    <button id="changePasswordBtn"
+      class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">Cập
+      nhật mật khẩu</button>
+  </div>
+
+  <div class="bg-white p-6 rounded-lg shadow-sm">
+    <h2 class="text-xl font-semibold text-gray-700 mb-4">Cài đặt thông báo</h2>
+
+    <div class="flex items-center justify-between mb-4">
+      <span class="text-gray-700">Nhận thông báo qua Email</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="pushNotificationsToggle" disabled>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="flex items-center justify-between mb-4">
+      <span class="text-gray-700">Nhận thông báo đẩy</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="pushNotificationsToggle" disabled>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <p class="text-sm text-gray-500 mt-4">
+      Bạn có thể điều chỉnh cài đặt này bất cứ lúc nào.
+    </p>
+  </div>
+
+</div>

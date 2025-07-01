@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar for better aesthetics if needed */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  /* slate-300 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f1f5f9;
+  /* slate-100 */
+}
+
+.blur-effect {
+  filter: blur(10px);
+  /* Adjust blur strength as needed */
+  transition: filter 0.3s ease-out;
+  /* Smooth transition for blur */
+  pointer-events: none;
+  /* Disable interaction with blurred elements */
+}
+
+.logo,
+.nav-menu,
+.title {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+h2,
+h3 {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}

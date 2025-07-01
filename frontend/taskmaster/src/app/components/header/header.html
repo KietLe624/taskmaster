@@ -1,0 +1,68 @@
+<header class="bg-gray-50 shadow-sm py-6 px-4 md:px-40 flex items-center justify-between z-40">
+  <!-- Nút mở sidebar trên mobile -->
+  <div class="flex items-center md:hidden">
+    <button (click)="toggleSidebar()" class="text-gray-600 hover:text-blue-600 focus:outline-none mr-4">
+      <i class="fas fa-bars text-xl"></i>
+    </button>
+  </div>
+  <div class="hidden md:block w-8"></div>
+
+  <!-- Logo -->
+  <div class="flex-grow flex justify-center md:flex-none md:ml-0 md:mr-12">
+    <div class="text-blue-600 font-bold text-3xl logo">TaskMaster</div>
+  </div>
+
+  <!-- Menu chính cho desktop -->
+  <nav class="hidden md:flex flex-grow justify-center nav-menu">
+    <div class="flex space-x-8 text-gray-600 text-base">
+      <a routerLink="/dashboards"
+        class="flex items-center font-medium py-2 px-3 rounded-lg hover:bg-blue-100 hover:text-black transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+        <i class="fas fa-table mr-2 text-xl"></i>
+        <span>Trang Chủ</span>
+      </a>
+      <!-- Thêm các routerLink cho routing trong Angular -->
+      <a routerLink="/projects"
+        class="flex items-center font-medium py-2 px-3 rounded-lg hover:bg-blue-50 hover:text-black transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+        <i class="fas fa-folder-closed mr-2 text-xl"></i> Dự Án
+      </a>
+      <a routerLink="/tasks"
+        class="flex items-center font-medium py-2 px-3 rounded-lg hover:bg-blue-50 hover:text-black transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+        <i class="fas fa-briefcase mr-2 text-xl"></i> Công Việc
+      </a>
+      <a routerLink="/reports"
+        class="flex items-center font-medium py-2 px-3 rounded-lg hover:bg-blue-50 hover:text-black transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+        <i class="fas fa-chart-simple mr-2 text-xl"></i> Báo Cáo
+      </a>
+    </div>
+  </nav>
+
+  <!-- Icons bên phải -->
+  <div class="flex items-center space-x-6 text-lg nav-menu">
+    <a routerLink="/notifications" class="relative text-gray-600 hover:text-black group">
+      <!-- Sử dụng async pipe để lấy dữ liệu từ unreadCount$ -->
+      <ng-container *ngIf="unreadCount$ | async as count">
+        <div ngIf*="count > 0">
+          <span
+            class="absolute top-0 right-0 h-3 w-3 rounded-full bg-red-400 group-hover:animate-none group-hover:hidden transition-all duration-300">
+            <span class="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping"></span>
+          </span>
+          <span
+            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+
+          </span>
+        </div>
+      </ng-container>
+      <i class="fas fa-bell text-2xl"></i>
+    </a>
+    <a routerLink="/profile" class="flex items-center font-medium text-gray-600 hover:text-black">
+      <i class="fas fa-user-circle mr-2 text-2xl"></i>
+      <span class="hidden md:inline">Hồ sơ</span>
+    </a>
+    <a href="#" class="flex items-center font-medium text-gray-600 hover:text-red-500 group relative">
+      <i class="fas fa-sign-out-alt mr-2 text-xl group-hover:opacity-0 transition-opacity duration-500 ease-in-out"></i>
+      <i
+        class="fas fa-person-walking mr-2 text-2xl absolute left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out"></i>
+      <span class="ml-auto hidden md:inline">Đăng xuất</span>
+    </a>
+  </div>
+</header>

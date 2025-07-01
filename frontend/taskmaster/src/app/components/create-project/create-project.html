@@ -1,0 +1,71 @@
+<div *ngIf="show"
+     class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 transition-opacity duration-300 ease-in-out"
+     (click)="closeModal()">
+
+  <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 relative"
+       (click)="$event.stopPropagation()">
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+      Tạo dự án mới
+    </h2>
+
+    <button (click)="closeModal()"
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-3xl focus:outline-none">
+      &times;
+    </button>
+
+    <!-- 4. Sử dụng [(ngModel)] để binding dữ liệu -->
+    <form #projectForm="ngForm" (ngSubmit)="saveProject()">
+      <div class="space-y-4">
+        <div>
+          <label for="projectName" class="block text-gray-700 text-sm font-bold mb-2">Tên dự án:</label>
+          <input type="text" id="projectName" name="projectName" required
+                 [(ngModel)]="projectData.name"
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                 placeholder="Nhập tên dự án">
+        </div>
+        <div>
+          <label for="projectDescription" class="block text-gray-700 text-sm font-bold mb-2">Mô tả:</label>
+          <textarea id="projectDescription" name="projectDescription" rows="4"
+                    [(ngModel)]="projectData.description"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    placeholder="Mô tả chi tiết dự án"></textarea>
+        </div>
+        <div>
+          <label for="projectManager" class="block text-gray-700 text-sm font-bold mb-2">Quản lý dự án:</label>
+          <select id="projectManager" name="projectManager" required
+                  [(ngModel)]="projectData.manager"
+                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            <option value="" disabled>Chọn người quản lý</option>
+            <option value="Alice Wonderland">Alice Wonderland</option>
+            <option value="Bob The Builder">Bob The Builder</option>
+            <option value="Charlie Chaplin">Charlie Chaplin</option>
+          </select>
+        </div>
+        <div>
+          <label for="projectStartDate" class="block text-gray-700 text-sm font-bold mb-2">Ngày bắt đầu:</label>
+          <input type="date" id="projectStartDate" name="projectStartDate" required
+                 [(ngModel)]="projectData.startDate"
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div>
+          <label for="projectEndDate" class="block text-gray-700 text-sm font-bold mb-2">Ngày kết thúc:</label>
+          <input type="date" id="projectEndDate" name="projectEndDate"
+                 [(ngModel)]="projectData.endDate"
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+      </div>
+
+      <div class="mt-8 flex items-center justify-end gap-x-3">
+        <button type="button" (click)="closeModal()"
+                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200">
+          Hủy
+        </button>
+        <button type="submit"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200">
+          Lưu dự án
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
