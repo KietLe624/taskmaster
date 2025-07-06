@@ -6,13 +6,9 @@ import { App } from './app';
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        RouterModule.forRoot([])
-      ],
-      declarations: [
-        App
-      ],
-      providers: [provideZonelessChangeDetection()]
+      imports: [RouterModule.forRoot([])],
+      declarations: [App],
+      providers: [provideZonelessChangeDetection()],
     }).compileComponents();
   });
 
@@ -26,6 +22,8 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, taskmaster');
+    expect(compiled.querySelector('h1')?.textContent).toContain(
+      'Hello, taskmaster'
+    );
   });
 });
