@@ -1,0 +1,38 @@
+<div class="bg-white p-8 rounded-lg shadow-xl w-full">
+  <div class="text-center mb-6">
+    <h1 class="text-blue-600 font-bold text-4xl mb-2">TaskMaster</h1>
+    <p class="text-gray-600">Quản lý công việc hiệu quả</p>
+  </div>
+
+  <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="space-y-4">
+    <div>
+      <label for="login" class="block text-gray-700 text-sm font-semibold mb-2">Email hoặc Tên đăng nhập</label>
+      <input type="text" id="login" name="login" required [(ngModel)]="credentials.login"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" />
+    </div>
+    <div>
+      <label for="password" class="block text-gray-700 text-sm font-semibold mb-2">Mật khẩu</label>
+      <input type="password" id="password" name="password" required [(ngModel)]="credentials.password"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="********" />
+    </div>
+    <!-- Hiển thị thông báo lỗi -->
+    <div *ngIf="errorMessage" class="mt-4 text-sm text-red-600">
+      {{ errorMessage }}
+    </div>
+
+    <div class="text-right text-sm">
+      <a href="#" class="text-blue-600 hover:underline">Quên mật khẩu?</a>
+    </div>
+    <button type="submit" [disabled]="!loginForm.form.valid"
+      class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-semibold">
+      Đăng nhập
+    </button>
+  </form>
+
+  <div class="mt-6 text-center text-gray-600">
+    <p>
+      Chưa có tài khoản?
+      <a routerLink="/register" class="text-blue-600 hover:underline font-semibold">Đăng ký ngay</a>
+    </p>
+  </div>
+</div>

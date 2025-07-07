@@ -15,21 +15,21 @@
   <!-- Menu chính cho desktop -->
   <nav class="hidden md:flex flex-grow justify-center nav-menu">
     <div class="flex space-x-8 text-gray-600 text-base">
-      <a routerLink="/dashboards"
+      <a routerLink="/app/dashboards"
         class="flex items-center font-medium py-2 px-3 rounded-lg hover:bg-blue-100 hover:text-black transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
         <i class="fas fa-table mr-2 text-xl"></i>
         <span>Trang Chủ</span>
       </a>
       <!-- Thêm các routerLink cho routing trong Angular -->
-      <a routerLink="/projects"
+      <a routerLink="/app/projects"
         class="flex items-center font-medium py-2 px-3 rounded-lg hover:bg-blue-50 hover:text-black transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
         <i class="fas fa-folder-closed mr-2 text-xl"></i> Dự Án
       </a>
-      <a routerLink="/tasks"
+      <a routerLink="/app/tasks"
         class="flex items-center font-medium py-2 px-3 rounded-lg hover:bg-blue-50 hover:text-black transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
         <i class="fas fa-briefcase mr-2 text-xl"></i> Công Việc
       </a>
-      <a routerLink="/reports"
+      <a routerLink="/app/reports"
         class="flex items-center font-medium py-2 px-3 rounded-lg hover:bg-blue-50 hover:text-black transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
         <i class="fas fa-chart-simple mr-2 text-xl"></i> Báo Cáo
       </a>
@@ -37,32 +37,28 @@
   </nav>
 
   <!-- Icons bên phải -->
-  <div class="flex items-center space-x-6 text-lg nav-menu">
-    <a routerLink="/notifications" class="relative text-gray-600 hover:text-black group">
-      <!-- Sử dụng async pipe để lấy dữ liệu từ unreadCount$ -->
-      <ng-container *ngIf="unreadCount$ | async as count">
-        <div ngIf*="count > 0">
-          <span
-            class="absolute top-0 right-0 h-3 w-3 rounded-full bg-red-400 group-hover:animate-none group-hover:hidden transition-all duration-300">
-            <span class="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping"></span>
-          </span>
-          <span
-            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+  <!-- Các nút hành động bên phải -->
+  <div class="flex items-center space-x-6 text-lg">
+    <!-- Hiển thị khi đã đăng nhập -->
+    <ng-container *ngIf="isLoggedIn$ | async">
+      <a routerLink="/app/notifications" class="relative text-gray-600 hover:text-black">
+        <i class="fas fa-bell text-2xl"></i>
+      </a>
+      <a routerLink="/app/profile" class="flex items-center font-medium text-gray-600 hover:text-black">
+        <i class="fas fa-user-circle mr-2 text-2xl"></i>
+        <span class="hidden md:inline">Hồ sơ</span>
+      </a>
+      <!-- Nút Đăng xuất -->
+      <button (click)="logout()" class="flex items-center font-medium text-gray-600 hover:text-red-500 group relative">
+        <i class="fas fa-sign-out-alt mr-2 text-xl"></i>
+        <span class="hidden md:inline">Đăng xuất</span>
+      </button>
+    </ng-container>
 
-          </span>
-        </div>
-      </ng-container>
-      <i class="fas fa-bell text-2xl"></i>
-    </a>
-    <a routerLink="/profile" class="flex items-center font-medium text-gray-600 hover:text-black">
-      <i class="fas fa-user-circle mr-2 text-2xl"></i>
-      <span class="hidden md:inline">Hồ sơ</span>
-    </a>
-    <a href="#" class="flex items-center font-medium text-gray-600 hover:text-red-500 group relative">
-      <i class="fas fa-sign-out-alt mr-2 text-xl group-hover:opacity-0 transition-opacity duration-500 ease-in-out"></i>
-      <i
-        class="fas fa-person-walking mr-2 text-2xl absolute left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out"></i>
-      <span class="ml-auto hidden md:inline">Đăng xuất</span>
-    </a>
+    <!-- Hiển thị khi chưa đăng nhập -->
+    <ng-container *ngIf="!(isLoggedIn$ | async)">
+      <a routerLink="/login" class="font-medium text-gray-600 hover:text-blue-600">Đăng nhập</a>
+      <a routerLink="/register" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Đăng ký</a>
+    </ng-container>
   </div>
 </header>

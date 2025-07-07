@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       username: { type: DataTypes.TEXT, allowNull: false },
       email: { type: DataTypes.TEXT, allowNull: false },
       password: { type: DataTypes.TEXT, allowNull: false },
-      full_name: { type: DataTypes.TEXT, allowNull: false },
+      full_name: { type: DataTypes.TEXT, allowNull: true },
       address: { type: DataTypes.TEXT, allowNull: true },
       phone_number: { type: DataTypes.TEXT, allowNull: true },
     },

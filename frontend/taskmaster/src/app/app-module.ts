@@ -25,6 +25,10 @@ import { Notifications } from './components/notifications/notifications';
 import { ProjectDetail } from './components/project-detail/project-detail';
 import { CreateProject } from './components/create-project/create-project';
 import { CreateTask } from './components/create-task/create-task';
+import { Login } from './components/login/login';
+import { Register } from './components/register/register';
+import { AuthLayout } from './layouts/auth-layout/auth-layout';
+import { PublicLayout } from './layouts/public-layout/public-layout';
 
 @NgModule({
   declarations: [
@@ -41,6 +45,10 @@ import { CreateTask } from './components/create-task/create-task';
     ProjectDetail,
     CreateProject,
     CreateTask,
+    Login,
+    Register,
+    AuthLayout,
+    PublicLayout,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule],
 
@@ -52,4 +60,4 @@ import { CreateTask } from './components/create-task/create-task';
   ],
   bootstrap: [App],
 })
-export class AppModule {}
+export class AppModule { }

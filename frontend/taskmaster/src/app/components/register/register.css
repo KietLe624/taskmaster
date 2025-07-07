@@ -1,0 +1,11 @@
+body {
+  background-image: linear-gradient(
+    to right top,
+    #d1d5db,
+    #d1d9e0,
+    #d1dee4,
+    #d2e2e7,
+    #d3e7eb
+  );
+  /* Subtle gradient */
+}

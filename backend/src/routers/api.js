@@ -19,7 +19,10 @@ const {
   getDashboardData,
   countProjectsDashboard,
 } = require("../controllers/dashboard.controller");
+// Import các controller cho auth
+const { register, login } = require("../controllers/auth.controller");
 
+// ============================================= //
 router.use(cors()); // Sử dụng cors cho tất cả các route
 router.use(bodyParser.urlencoded({ extended: true })); // Phân tích dữ liệu từ form
 
@@ -34,10 +37,20 @@ router.get("/users", getAllUsers);
 router.get("/users/:id", getUserById);
 // Route để đếm số lượng dự án mà người dùng đang quản lý
 router.get("/users/:id/countManagedProjects", getManagedProjectCount);
-// =============================================
+// ============================================= // 
 
 router.get("/projects", getAllProjects); // Route để lấy tất cả dự án
 router.get("/projects/count", countProjects); // Route để đếm số lượng dự án
-// =============================================
+// ============================================= //
+// Route đăng ký người dùng
+router.post("/auth/register", register);
+// Route đăng nhập người dùng 
+router.post("/auth/signin", login);
+
+
+
+
+
+
 
 module.exports = router;
