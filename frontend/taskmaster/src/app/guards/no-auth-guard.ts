@@ -8,7 +8,7 @@ export class NoAuthGuard implements CanActivate {
   constructor(
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+  ) { }
 
   canActivate(): boolean | UrlTree {
     if (isPlatformBrowser(this.platformId)) {

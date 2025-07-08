@@ -14,21 +14,11 @@ export class AuthGuard implements CanActivate {
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) { }
-
-  // canActivate(): boolean {
-  //   // Chỉ kiểm tra nếu đang ở môi trường trình duyệt
-  //   if (isPlatformBrowser(this.platformId)) {
-  //     const token = localStorage.getItem('auth_token');
-
-  //     if (token) {
-  //       // Nếu có token, cho phép truy cập
-  //       return true;
-  //     }
-  //   }
-  //   // Nếu không có token hoặc không ở trên trình duyệt, chuyển về trang login
-  //   this.router.navigate(['/login']);
-  //   return false;
-  // }
+  /**
+   * Kiểm tra xem người dùng đã đăng nhập hay chưa.
+   * Nếu đã đăng nhập, cho phép truy cập vào route.
+   * Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập.
+   */
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
@@ -39,12 +29,12 @@ export class AuthGuard implements CanActivate {
           if (isLoggedIn) {
             return true;
           }
-          this.router.navigate(['/login'], {replaceUrl : true});
+          this.router.navigate(['/login'], { replaceUrl: true });
           return false;
         })
       );
     }
-     this.router.navigate(['/login'], {replaceUrl : true});
+    this.router.navigate(['/login'], { replaceUrl: true });
     return false;
   }
 }

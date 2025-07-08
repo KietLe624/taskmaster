@@ -5,6 +5,8 @@ import { AuthGuard } from './guards/auth-guard';
 import { NoAuthGuard } from './guards/no-auth-guard';
 import { AuthLayout } from './layouts/auth-layout/auth-layout';
 import { PublicLayout } from './layouts/public-layout/public-layout';
+import { authInterceptor } from './interceptor/auth-interceptor'; // Import interceptor dạng hàm của bạn
+
 
 // Define the routes for the application
 import { Dashboard } from './components/dashboard/dashboard';
@@ -64,4 +66,5 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes, { enableTracing: false })],
   exports: [RouterModule],
 })
+
 export class AppRoutingModule {}

@@ -13,4 +13,5 @@ export interface Projects {
   created_at: string;
   updated_at: string;
   manager: ProjectManager; // Đối tượng người quản lý được join từ backend
+
 }

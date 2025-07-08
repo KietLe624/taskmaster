@@ -2,13 +2,15 @@ import { Projects } from './projects';
 import { Users } from './users';
 
 export interface DashboardModel {
-  managedProjects: number;
-  inProgressTasks: number;
-  dueSoonTasks: number;
-  overdueTasks: number;
-  completedThisWeek: number;
-  avgTimePerTask: string;
-  onTimeCompletionRate: string;
+  manageProjectsCount: number;
+  manageTasksCount: number;
+  inProgressTasksCount: number;
+  dueSoonTasksCount: number;
+  completedTasksCount: number;
+  overdueTasksCount: number;
+  completedThisWeekCount: number;
+  avgTimePerTask: number;
+  onTimeCompletionRate: number;
 }
 
 export interface DashboardData {

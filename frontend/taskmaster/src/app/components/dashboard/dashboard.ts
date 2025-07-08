@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DashboardService } from '../../services/dashboard/dashboard';
 import { DashboardModel } from '../../models/dashboard';
 import { Projects } from '../../models/projects';
 import { Users } from '../../models/users'; // Assuming you have a User model defined
-
 
 @Component({
   selector: 'app-dashboard',
@@ -17,22 +16,26 @@ export class Dashboard implements OnInit {
   public stats: DashboardModel | undefined;
   public recentProjects: Projects[] = [];
   public isLoading = true;
-
-  constructor(private dashboardService: DashboardService) {}
+  dashboardData: any;
+  constructor(private dashboardService: DashboardService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    this.isLoading = true;
     this.dashboardService.getDashboardData().subscribe({
       next: (data) => {
-        console.log('Dữ liệu được gán trong Component:', data);
         this.currentUser = data.currentUser;
         this.stats = data.stats;
         this.recentProjects = data.recentProjects;
         this.isLoading = false;
+        console.log('Dữ liệu từ backend:', data);
+        this.dashboardData = data; // Gán dữ liệu để hiển thị ra template
+        // Báo cho Angular cập nhật lại giao diện
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Lỗi khi tải dữ liệu dashboard:', err);
-        this.isLoading = false;
+        this.isLoading = false; // Đặt isLoading thành false khi có lỗi
+        // Báo cho Angular cập nhật lại giao diện
+        this.cdr.detectChanges();
       }
     });
   }

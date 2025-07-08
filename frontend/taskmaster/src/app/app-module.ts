@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   NgModule,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
@@ -16,7 +17,7 @@ import { Header } from './components/header/header';
 import { Sidebar } from './components/sidebar/sidebar';
 import { Footer } from './components/footer/footer';
 import { Dashboard } from './components/dashboard/dashboard';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { Projects } from './components/projects/projects';
 import { Tasks } from './components/tasks/tasks';
 import { Reports } from './components/reports/reports';
@@ -29,6 +30,7 @@ import { Login } from './components/login/login';
 import { Register } from './components/register/register';
 import { AuthLayout } from './layouts/auth-layout/auth-layout';
 import { PublicLayout } from './layouts/public-layout/public-layout';
+import { authInterceptor } from './interceptor/auth-interceptor';
 
 @NgModule({
   declarations: [
@@ -57,6 +59,7 @@ import { PublicLayout } from './layouts/public-layout/public-layout';
     provideZonelessChangeDetection(),
     provideClientHydration(withEventReplay()),
     provideHttpClient(withFetch()),
+    provideHttpClient(withInterceptors([authInterceptor]))
   ],
   bootstrap: [App],
 })

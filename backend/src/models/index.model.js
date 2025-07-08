@@ -60,5 +60,9 @@ Object.keys(db).forEach((modelName) => {
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+// db.sequelize
+//   .sync({ alter: true }) // Cập nhật bảng mà không xóa dữ liệu
+//   .then(() => console.log("[DB] Database synchronized"))
+//   .catch((err) => console.error("[DB] Sync error:", err));
 
 module.exports = db;
