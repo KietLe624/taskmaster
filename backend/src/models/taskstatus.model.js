@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
   const TaskStatus = sequelize.define(
     "TaskStatus",
     {
+      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true }, // Khóa chính
       task_id: { type: DataTypes.INTEGER, allowNull: false },
       old_status: {
         type: DataTypes.STRING,
@@ -32,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
   TaskStatus.associate = (models) => {
     // Một TaskStatus có nhiều Task
     TaskStatus.hasMany(models.Task, {
-      foreignKey: "id",
+      foreignKey: "task_id",
       as: "tasks",
     });
   };

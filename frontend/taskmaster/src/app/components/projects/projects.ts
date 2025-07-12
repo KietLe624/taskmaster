@@ -1,20 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit, } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { ProjectsData } from '../../models/projects';
+import { ProjectService } from '../../services/project/project';
+import { ProjectFrom } from '../create-project/create-project';
 
-// Định nghĩa kiểu dữ liệu cho một dự án để code an toàn và dễ quản lý hơn
-export interface Project {
-  id: string;
-  name: string;
-  description: string;
-  manager: string;
-  members: number;
-  startDate: string;
-  endDate: string;
-  progress: number; // Tiến độ từ 0 đến 100
-  tasksCompleted: number;
-  totalTasks: number;
-}
 
 @Component({
   selector: 'app-projects',
@@ -23,74 +12,107 @@ export interface Project {
   styleUrl: './projects.css',
 })
 export class Projects implements OnInit {
-  // 1. Tạo một mảng chứa dữ liệu các dự án.
-  // Sau này, bạn sẽ thay thế mảng này bằng một lời gọi API từ service.
-  public projects: Project[] = [];
+  public projects: ProjectsData[] = [];
+  public isLoading = true; // Biến để kiểm soát trạng thái tải dữ liệu
+  public showModal = false;
+  public isEditMode = false;
+  public projectToEdit: ProjectsData | null = null;
 
-  constructor() {}
+
+  constructor(private projectService: ProjectService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    // Giả lập việc lấy dữ liệu từ backend
-    this.projects = [
-      {
-        id: 'proj1',
-        name: 'Thiết kế lại Website',
-        description: 'Làm mới hoàn toàn giao diện website của công ty.',
-        manager: 'Alice Wonderland',
-        members: 2,
-        startDate: '2024-07-01',
-        endDate: '2024-09-30',
-        progress: 50,
-        tasksCompleted: 1,
-        totalTasks: 2,
+    this.projectService.getProjects().subscribe({
+      next: (data) => {
+        this.projects = Array.isArray(data) ? data : data.data || [];
+        this.isLoading = false;
+        console.log('Dữ liệu dự án:', data);
+        this.cdr.detectChanges();
       },
-      {
-        id: 'proj2',
-        name: 'Ứng dụng Di động',
-        description: 'Phát triển ứng dụng di động cho cả iOS và Android.',
-        manager: 'Bob Builder',
-        members: 5,
-        startDate: '2024-08-15',
-        endDate: '2024-12-20',
-        progress: 10,
-        tasksCompleted: 1,
-        totalTasks: 10,
-      },
-      {
-        id: 'proj3',
-        name: 'Tích hợp Hệ thống CRM',
-        description: 'Kết nối hệ thống bán hàng với phần mềm CRM mới.',
-        manager: 'Charlie Chocolate',
-        members: 3,
-        startDate: '2024-09-01',
-        endDate: '2024-11-15',
-        progress: 0,
-        tasksCompleted: 0,
-        totalTasks: 8,
-      },
-    ];
+      error: (err) => {
+        console.error('Lỗi khi tải dữ liệu dự án:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
+
   public isCreateModalVisible = false;
   // Các hàm xử lý sự kiện (sẽ được thêm sau)
   openCreateModal(): void {
-    this.isCreateModalVisible = true;
+    this.isEditMode = false;
+    this.projectToEdit = null;
+    this.showModal = true;
   }
 
-  editProject(project: Project): void {
-    console.log('Chỉnh sửa dự án:', project.name);
+  openEditModal(project: ProjectsData): void {
+    this.isEditMode = true;
+    this.projectToEdit = project;
+    this.showModal = true;
+  }
+  closeModal(): void {
+    this.showModal = false;
+    this.reloadProjects(); // Tải lại danh sách dự án sau khi đóng modal
+  }
+  // edit project/ new project
+  handleSave(formData: ProjectFrom): void {
+    if (this.isEditMode && this.projectToEdit) {
+      // Cập nhật dự án đã có
+      this.projectService.updateProject(this.projectToEdit.id, formData).subscribe({
+        next: (updatedProject) => {
+
+          this.closeModal(); // Đóng modal sau khi cập nhật thành công
+        },
+        error: (err) => {
+          this.closeModal(); // Đóng modal ngay cả khi có lỗi
+        }
+      });
+    } else {
+      // Tạo dự án mới
+      this.projectService.createProject(formData).subscribe({
+        next: (newProject) => {
+        },
+        error: (err) => {
+        }
+      });
+    }
   }
 
-  deleteProject(project: Project): void {
-    console.log('Xóa dự án:', project.name);
-    // Logic xóa dự án khỏi mảng (và gọi API xóa ở backend)
+  deleteProject(projectId: number): void {
+    // Sử dụng confirm() để xác nhận đơn giản
+    const confirmation = confirm('Bạn có chắc chắn muốn xóa dự án này không? Hành động này không thể hoàn tác.');
+    if (confirmation) {
+      this.projectService.deleteProject(projectId).subscribe({
+        next: () => {
+          this.reloadProjects();
+        },
+        error: (err) => {
+          const errorMessage = err.error?.message || 'Đã có lỗi không xác định xảy ra.';
+        }
+      });
+    }
   }
-  saveProject(project: Project): void {
+  saveProject(project: ProjectsData): void {
     console.log('Lưu dự án:', project.name);
-    // Logic để lưu dự án mới hoặc cập nhật dự án hiện tại
+
   }
   // Hàm này sẽ được gọi khi người dùng muốn xem chi tiết dự án
-  viewProjectDetails(project: Project): void {
-    console.log('Xem chi tiết dự án:', project.name);
-    // Logic để điều hướng đến trang chi tiết dự án
+  viewProjectDetails(project: ProjectsData): void {
+  }
+  // load lại danh sách dự án sau khi tạo hoặc cập nhật
+  reloadProjects(): void {
+    this.isLoading = true; // Đặt trạng thái tải lại
+    this.projectService.getProjects().subscribe({
+      next: (data) => {
+        this.projects = Array.isArray(data) ? data : data.data || [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Lỗi khi tải lại dữ liệu dự án:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

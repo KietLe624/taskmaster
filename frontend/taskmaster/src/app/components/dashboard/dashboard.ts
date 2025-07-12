@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DashboardService } from '../../services/dashboard/dashboard';
 import { DashboardModel } from '../../models/dashboard';
-import { Projects } from '../../models/projects';
+import { ProjectsData } from '../../models/projects';
 import { Users } from '../../models/users'; // Assuming you have a User model defined
 
 @Component({
@@ -14,9 +14,10 @@ import { Users } from '../../models/users'; // Assuming you have a User model de
 export class Dashboard implements OnInit {
   public currentUser: Users | undefined;
   public stats: DashboardModel | undefined;
-  public recentProjects: Projects[] = [];
+  public recentProjects: ProjectsData[] = [];
   public isLoading = true;
   dashboardData: any;
+
   constructor(private dashboardService: DashboardService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {

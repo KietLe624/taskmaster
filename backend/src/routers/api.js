@@ -12,8 +12,11 @@ const {
 } = require("../controllers/users.controller");
 // Import các controller cho projects
 const {
-  countProjects,
-  getAllProjects,
+  getProjects,
+  getProjectById,
+  createProject,
+  updateProject,
+  deleteProject,
 } = require("../controllers/projects.controller");
 // Import các controller cho dashboard
 const { getDashboardData } = require("../controllers/dashboard.controller");
@@ -37,9 +40,11 @@ router.get("/users/:id", getUserById);
 // Route để đếm số lượng dự án mà người dùng đang quản lý
 router.get("/users/:id/countManagedProjects", getManagedProjectCount);
 // ============================================= //
-
-router.get("/projects", getAllProjects); // Route để lấy tất cả dự án
-router.get("/projects/count", countProjects); // Route để đếm số lượng dự án
+router.get("/projects", authenticateToken, getProjects); // Lấy danh sách dự án
+router.get("/projects/:id", authenticateToken, getProjectById); // Lấy dự án theo ID
+router.post("/projects", authenticateToken, createProject); // Tạo dự án mới
+router.put("/projects/:id", authenticateToken, updateProject); // Cập nhật dự án
+router.delete("/projects/:id", authenticateToken, deleteProject); // Xóa dự án
 // ============================================= //
 // Route đăng ký người dùng
 router.post("/auth/register", register);

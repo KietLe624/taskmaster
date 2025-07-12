@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      due_date: { type: DataTypes.DATE, allowNull: false }, // Đổi thành DATE để khớp TIMESTAMP
+      due_date: { type: DataTypes.DATE, allowNull: false },
       createdAt: {
         type: DataTypes.DATE,
         field: "created_at", // Ánh xạ đến cột created_at trong DB
@@ -23,9 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       tableName: "tasks",
-      // Giữ lại underscored để nó xử lý các khóa ngoại nếu cần
       underscored: true,
-      // Không cần Sequelize tự động quản lý timestamps nữa vì chúng ta đã định nghĩa ở trên
       timestamps: true,
     }
   );
@@ -38,13 +36,13 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     // Một Task có thể được giao cho nhiều User (Many-to-Many)
-    // Task.belongsToMany(models.User, {
-    //   through: "TaskAssignments", // Tên bảng trung gian
-    //   foreignKey: "id",
-    //   otherKey: "user_id",
-    //   as: "assignees",
-    // });
-    
+    Task.belongsToMany(models.User, {
+      through: "TaskAssignments", // Tên bảng trung gian
+      foreignKey: "task_id",
+      otherKey: "user_id",
+      as: "assignees",
+    });
+
     // Một Task có thể có nhiều TaskAssignments
     Task.hasMany(models.TaskAssignment, {
       foreignKey: "task_id",

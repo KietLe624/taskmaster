@@ -46,6 +46,5 @@ module.exports = (sequelize, DataTypes) => {
       as: "assignedTasks",
     });
   };
-
   return User;
 };

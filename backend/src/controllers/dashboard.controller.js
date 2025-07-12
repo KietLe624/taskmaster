@@ -1,16 +1,16 @@
-const db = require("../models/index.model"); // Import file index trung tâm
-const User = db.User; // Lấy model User từ đối tượng db
-const Project = db.Project; // Lấy model Projects từ đối tượng db
-const Task = db.Task; // Lấy model Tasks từ đối tượng db
-const TaskAssignment = db.TaskAssignment; // Lấy model TaskAssignments từ đối tượng db
+const db = require("../models/index.model");
+const User = db.User;
+const Project = db.Project; 
+const Task = db.Task; 
+const TaskAssignment = db.TaskAssignment; 
 
 // Hàm chính để lấy tất cả dữ liệu cho Dashboard
 const getDashboardData = async (req, res) => {
   try {
     // Kiểm tra xem người dùng đã đăng nhập hay chưa
-    const currentUserId = req.user.id; // Lấy ID của người dùng hiện tại từ token
+    const currentUserId = req.user?.id; // Lấy ID của người dùng hiện tại từ token
     console.log("[DASHBOARD DEBUG] currentUserId:", currentUserId); // In ra ID người dùng
-
+    
     if (!req.user || !req.user.id) {
       console.error(
         "[DASHBOARD DEBUG] LỖI: Người dùng chưa đăng nhập hoặc không có ID người dùng."
@@ -134,19 +134,6 @@ const getDashboardData = async (req, res) => {
       }),
       // Khởi tạo mảng để chứa các Promise
     ]);
-    // In ra kết quả của từng truy vấn để kiểm tra
-    console.log("[DASHBOARD DEBUG] Kết quả các truy vấn:");
-    console.log(`  - managedProjectsCount: ${manageProjectsCount}`);
-    console.log(`  - inProgressTasksCount: ${inProgressTasksCount}`);
-    console.log(`  - dueSoonTasksCount: ${dueSoonTasksCount}`);
-    console.log(`  - overdueTasksCount: ${overdueTasksCount}`);
-    console.log(`  - completedThisWeekCount: ${completedThisWeekCount}`);
-    console.log(`  - currentUser:`, currentUser ? currentUser.toJSON() : null);
-    console.log(
-      `  - recentProjects:`,
-      recentProjects.map((p) => p.toJSON())
-    );
-
     res.status(200).json({
       currentUser, // Thông tin người dùng hiện tại
       stats: {

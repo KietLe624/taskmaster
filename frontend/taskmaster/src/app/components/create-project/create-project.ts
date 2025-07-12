@@ -1,66 +1,79 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { ProjectsData } from '../../models/projects'; // Điều chỉnh đường dẫn nếu cần
 
 export interface ProjectFrom {
   id: string | null;
   name: string;
   description: string;
-  manager: string;
   startDate: string;
   endDate: string;
+  manager_name: string;
+  user_name: string;
 }
 
 @Component({
   selector: 'app-create-project',
-  standalone: false,
   templateUrl: './create-project.html',
-  styleUrl: './create-project.css'
+  styleUrls: ['./create-project.css'],
+  standalone: false, 
 })
 export class CreateProject implements OnChanges {
-    @Input() show: boolean = false;
+  @Input() show = false;
+  @Input() isEditMode = false;
+  @Input() projectToEdit: ProjectsData | null = null; // --- INPUT MỚI ---
 
-  // 2. Output 'save' giờ sẽ gửi đi dữ liệu của form
   @Output() save = new EventEmitter<ProjectFrom>();
   @Output() close = new EventEmitter<void>();
 
-  // 3. Tạo một đối tượng để binding với các input trong form
   public projectData: ProjectFrom = this.resetForm();
+  public modalTitle = 'Tạo dự án mới';
 
   constructor() {}
 
-  // Hàm này sẽ chạy mỗi khi giá trị Input (ví dụ: 'show') thay đổi
   ngOnChanges(changes: SimpleChanges): void {
-    // Nếu modal được mở (từ false -> true), reset form
-    if (changes['show'] && changes['show'].currentValue === true) {
-      this.projectData = this.resetForm();
+    // Nếu modal được hiển thị, kiểm tra xem có phải chế độ sửa không
+    if (changes['show'] && this.show) {
+      if (this.isEditMode && this.projectToEdit) {
+        // --- CHẾ ĐỘ SỬA ---
+        this.modalTitle = 'Chỉnh sửa dự án';
+        this.projectData = {
+          id: this.projectToEdit.id.toString(),
+          name: this.projectToEdit.name,
+          description: this.projectToEdit.description,
+          // Định dạng ngày cho input type="date" (YYYY-MM-DD)
+          startDate: this.formatDate(this.projectToEdit.start_date),
+          endDate: this.formatDate(this.projectToEdit.end_date),
+          manager_name: '', // Các trường này không thuộc form sửa
+          user_name: ''
+        };
+      } else {
+        // --- CHẾ ĐỘ TẠO MỚI ---
+        this.modalTitle = 'Tạo dự án mới';
+        this.projectData = this.resetForm();
+      }
     }
   }
 
-  // Hàm để reset form về trạng thái ban đầu
+  private formatDate(dateString: string): string {
+    if (!dateString) return '';
+    // new Date(dateString).toISOString() trả về "2025-12-20T00:00:00.000Z"
+    // .split('T')[0] sẽ lấy "2025-12-20"
+    return new Date(dateString).toISOString().split('T')[0];
+  }
+
   private resetForm(): ProjectFrom {
-    return {
-      id: null,
-      name: '',
-      description: '',
-      manager: '',
-      startDate: '',
-      endDate: ''
-    };
+    return { id: null, name: '', description: '', startDate: '', endDate: '', manager_name: '', user_name: '' };
   }
 
   closeModal(): void {
     this.close.emit();
   }
 
-  // Hàm xử lý khi form được submit
   saveProject(): void {
-    // Kiểm tra tính hợp lệ của form (bạn có thể thêm logic phức tạp hơn)
     if (!this.projectData.name || !this.projectData.startDate) {
       alert('Vui lòng điền các trường bắt buộc!');
       return;
     }
-
-    // Gửi dữ liệu form ra component cha
     this.save.emit(this.projectData);
-    this.closeModal(); // Đóng modal sau khi lưu
   }
 }

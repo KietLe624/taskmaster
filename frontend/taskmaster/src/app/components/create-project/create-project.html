@@ -14,7 +14,6 @@
       &times;
     </button>
 
-    <!-- 4. Sử dụng [(ngModel)] để binding dữ liệu -->
     <form #projectForm="ngForm" (ngSubmit)="saveProject()">
       <div class="space-y-4">
         <div>
@@ -31,16 +30,13 @@
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     placeholder="Mô tả chi tiết dự án"></textarea>
         </div>
+
         <div>
           <label for="projectManager" class="block text-gray-700 text-sm font-bold mb-2">Quản lý dự án:</label>
-          <select id="projectManager" name="projectManager" required
-                  [(ngModel)]="projectData.manager"
-                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            <option value="" disabled>Chọn người quản lý</option>
-            <option value="Alice Wonderland">Alice Wonderland</option>
-            <option value="Bob The Builder">Bob The Builder</option>
-            <option value="Charlie Chaplin">Charlie Chaplin</option>
-          </select>
+          <input type="text" id="projectManager" name="projectManager" required [defaultValue]="projectData.user_name"
+                 [(ngModel)]="projectData.manager_name"
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                 placeholder="Nhập tên người quản lý">
         </div>
         <div>
           <label for="projectStartDate" class="block text-gray-700 text-sm font-bold mb-2">Ngày bắt đầu:</label>

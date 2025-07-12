@@ -1,4 +1,4 @@
-import { Projects } from './projects';
+import { ProjectsData } from './projects';
 import { Users } from './users';
 
 export interface DashboardModel {
@@ -16,5 +16,5 @@ export interface DashboardModel {
 export interface DashboardData {
   currentUser: Users;
   stats: DashboardModel;
-  recentProjects: Projects[];
+  recentProjects: ProjectsData[];
 }

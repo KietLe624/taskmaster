@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
   const ProjectMember = sequelize.define(
     "ProjectMember",
     {
+      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true }, // Khóa chính
       user_id: { type: DataTypes.INTEGER, allowNull: false },
       project_id: { type: DataTypes.INTEGER, allowNull: false },
       role: { type: DataTypes.STRING, allowNull: false }, // Ví dụ: 'member', 'admin'

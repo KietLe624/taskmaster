@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
   const Notification = sequelize.define(
     "Notification",
     {
+      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true }, // Khóa chính
       user_id: { type: DataTypes.INTEGER, allowNull: false },
       message: { type: DataTypes.TEXT, allowNull: false },
       status_read: { type: DataTypes.BOOLEAN, defaultValue: false },

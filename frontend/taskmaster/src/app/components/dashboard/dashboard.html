@@ -1,6 +1,10 @@
 <div class="container mx-auto p-4 md:p-6">
   <div *ngIf="isLoading" class="text-center p-10">
-    <p>Đang tải dữ liệu Dashboard...</p>
+    <!-- From Uiverse.io by vk-uiux -->
+    <div class="card">
+      <div class="card__skeleton card__title"></div>
+      <div class="card__skeleton card__description"> </div>
+    </div>
   </div>
 
   <div *ngIf="!isLoading && currentUser && stats">
@@ -8,7 +12,7 @@
     <div class="bg-white p-6 rounded-lg shadow-sm mb-6 flex flex-col md:flex-row md:items-start justify-between">
       <div>
         <h1 class="text-2xl font-semibold text-gray-800 mb-2 title">
-          Chào mừng trở lại, {{ currentUser.username }}!
+          Chào mừng trở lại, {{ currentUser.full_name }}!
         </h1>
         <p class="text-gray-600 text-sm">
           Đây là tổng quan nhanh về công việc và dự án của bạn.
@@ -30,7 +34,7 @@
             <p class="text-3xl font-bold text-gray-800">{{ stats.manageProjectsCount }}</p>
           </div>
         </div>
-        <a routerLink="/projects" class="text-purple-600 text-sm flex items-center hover:underline mt-auto">
+        <a routerLink="/app/projects" class="text-purple-600 text-sm flex items-center hover:underline mt-auto">
           Xem chi tiết <i class="fas fa-arrow-right ml-1 text-xs"></i>
         </a>
       </div>

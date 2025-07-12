@@ -10,7 +10,7 @@ import {
   withEventReplay,
 } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-
+import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { Header } from './components/header/header';
@@ -51,8 +51,9 @@ import { authInterceptor } from './interceptor/auth-interceptor';
     Register,
     AuthLayout,
     PublicLayout,
+
   ],
-  imports: [BrowserModule, AppRoutingModule, FormsModule],
+  imports: [BrowserModule, AppRoutingModule, FormsModule, CommonModule],
 
   providers: [
     provideBrowserGlobalErrorListeners(),

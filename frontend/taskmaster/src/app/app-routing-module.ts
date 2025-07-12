@@ -45,7 +45,7 @@ const routes: Routes = [
       },
       { path: 'projects', component: Projects, title: 'TaskMaster - Dự Án' },
       {
-        path: 'project-detail',
+        path: 'projects/:id',
         component: ProjectDetail,
         title: 'TaskMaster - Chi Tiết Dự Án',
       },
@@ -67,4 +67,4 @@ const routes: Routes = [
   exports: [RouterModule],
 })
 
-export class AppRoutingModule {}
+export class AppRoutingModule { }

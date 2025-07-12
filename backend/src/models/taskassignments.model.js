@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     "TaskAssignment",
     {
       // Tên model là 'TaskAssignment' (viết hoa)
+      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       task_id: { type: DataTypes.INTEGER, allowNull: false },
       user_id: { type: DataTypes.INTEGER, allowNull: false },
       assigned_at: {

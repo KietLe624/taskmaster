@@ -1,17 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-
-export interface Tasks {
-  id: string; // ID của công việc
-  projectId: string; // ID của dự án mà công việc này thuộc về
-  name: string; // Tên công việc
-  description: string; // Mô tả công việc
-  status: string; // Trạng thái của công việc (ví dụ: "Đang làm", "Hoàn thành", "Chưa bắt đầu")
-  priority: string; // Mức độ ưu tiên (ví dụ: "Thấp", "Trung bình", "Cao")
-  dueDate: string; // Ngày hết hạn
-  assignedTo: string; // Người được giao công việc
-  createdAt: string; // Ngày tạo công việc
-  updatedAt: string; // Ngày cập nhật công việc
-}
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { ProjectService } from '../../services/project/project';
+import { ProjectsData } from '../../models/projects';
+import { ProjectDetailData, Task, User } from '../../models/project-detail';
+import { ProjectFrom } from '../create-project/create-project';
 
 @Component({
   selector: 'app-project-detail',
@@ -20,96 +13,160 @@ export interface Tasks {
   styleUrl: './project-detail.css',
 })
 export class ProjectDetail implements OnInit {
-  ngOnInit(): void {}
-  public projectDetails: any = {};
-  // 1. Tạo một mảng chứa dữ liệu các công việc(mẫu).
-  public tasks: Tasks[] = [
-    {
-      id: 'task1',
-      projectId: 'proj1',
-      name: 'Thiết kế giao diện chính',
-      description: 'Thiết kế giao diện người dùng cho trang chủ.',
-      status: 'Đang làm',
-      priority: 'Cao',
-      dueDate: '2024-08-15',
-      assignedTo: 'Alice Wonderland',
-      createdAt: '2024-07-01',
-      updatedAt: '2024-07-10',
-    },
-    {
-      id: 'task2',
-      projectId: 'proj1',
-      name: 'Phát triển chức năng đăng nhập',
-      description: 'Xây dựng chức năng đăng nhập và đăng ký người dùng.',
-      status: 'Chưa bắt đầu',
-      priority: 'Trung bình',
-      dueDate: '2024-08-30',
-      assignedTo: 'Bob Builder',
-      createdAt: '2024-07-05',
-      updatedAt: '2024-07-12',
-    },
-  ];
-  // 2. Tạo một mảng chứa dữ liệu các dự án(mẫu).
-  public projects = [
-    {
-      id: 'proj1',
-      name: 'Thiết kế lại Website',
-      description: 'Làm mới hoàn toàn giao diện website của công ty.',
-      manager: 'Alice Wonderland',
-      members: 2,
-      startDate: '2024-07-01',
-      endDate: '2024-09-30',
-      progress: 50,
-      tasksCompleted: 1,
-      totalTasks: 2,
-    },
-    {
-      id: 'proj2',
-      name: 'Ứng dụng Di động',
-      description: 'Phát triển ứng dụng di động cho cả iOS và Android.',
-      manager: 'Bob Builder',
-      members: 5,
-      startDate: '2024-08-15',
-      endDate: '2024-12-20',
-      progress: 10,
-      tasksCompleted: 1,
-      totalTasks: 10,
-    },
-  ];
 
-  // 3. Hàm để lấy thông tin dự án theo ID
-  getProjectById(projectId: string) {
-    return this.projects.find((project) => project.id === projectId);
-  }
-  // 4. Hàm để lấy danh sách công việc theo ID dự án
-  getTasksByProjectId(projectId: string) {
-    return this.tasks.filter((task) => task.projectId === projectId);
-  }
-  // 5. Hàm để thêm công việc mới vào dự án
-  addTask(newTask: Tasks) {
-    this.tasks.push(newTask);
-  }
-  editProject() {
-    console.log('Edit task button clicked');
-  }
-  // 6. Hàm để cập nhật công việc
-  updateTask(updatedTask: Tasks) {
-    const index = this.tasks.findIndex((task) => task.id === updatedTask.id);
-    if (index !== -1) {
-      this.tasks[index] = updatedTask;
+  project: ProjectDetailData | null = null;
+  tasks: Task[] = [];
+  members: User[] = [];
+  isLoading = true;
+
+  public projects: ProjectsData[] = [];
+  showEditModal = false;
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private projectService: ProjectService,
+    private location: Location,
+    private cdr: ChangeDetectorRef
+
+  ) { }
+
+  ngOnInit(): void {
+    this.loadProjectDetails();
+    const projectId = this.route.snapshot.paramMap.get('id');
+
+    if (projectId) {
+      this.projectService.getProjectById(+projectId).subscribe({
+        next: (data: ProjectDetailData) => { // 3. Sử dụng kiểu dữ liệu mới
+          // 4. Gán và xử lý dữ liệu nhận được
+          this.project = data;
+          this.tasks = data.tasks || [];
+          // Trích xuất thông tin User từ mảng members
+          this.members = data.members?.map(member => member.users);
+          console.log('Members:', this.members);
+          this.isLoading = false;
+          console.log('Dữ liệu chi tiết dự án đã được xử lý:', this.project);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Lỗi khi tải chi tiết dự án:', err);
+          this.isLoading = false;
+          alert('Không tìm thấy dự án hoặc có lỗi xảy ra.');
+          this.router.navigate(['/projects']);
+        }
+      });
+    } else {
+      console.error('Không tìm thấy ID dự án trong URL.');
+      this.router.navigate(['/projects']);
+      this.cdr.detectChanges();
     }
   }
-  // 7. Hàm để xóa công việc
-  deleteTask(taskId: string) {
-    this.tasks = this.tasks.filter((task) => task.id !== taskId);
+
+    loadProjectDetails(): void {
+    this.isLoading = true;
+    const projectId = this.route.snapshot.paramMap.get('id');
+    if (!projectId) {
+      console.error('Không tìm thấy ID dự án trong URL.');
+      this.router.navigate(['/projects']);
+      return;
+    }
+
+    this.projectService.getProjectById(+projectId).subscribe({
+      next: (data) => {
+        this.project = data;
+        this.tasks = data.tasks || [];
+        this.members = data.members?.map(member => member.users).filter(user => user) || [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        alert('Không thể tải chi tiết dự án.');
+        this.router.navigate(['/projects']);
+      }
+    });
   }
-  // 8. Hàm để tính tổng số công việc và số công việc hoàn thành trong dự án
-  getProjectProgress(projectId: string) {
-    const projectTasks = this.getTasksByProjectId(projectId);
-    const totalTasks = projectTasks.length;
-    const completedTasks = projectTasks.filter(
-      (task) => task.status === 'Hoàn thành'
-    ).length;
-    return totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+  // --- Các hàm xử lý sự kiện cho modal ---
+  openEditModal(): void {
+    if (this.project) {
+      this.showEditModal = true;
+    }
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+  }
+
+  // Hàm được gọi khi form trong modal được lưu
+  handleUpdateProject(formData: ProjectFrom): void {
+    if (!this.project) return;
+
+    this.projectService.updateProject(this.project.id, formData).subscribe({
+      next: (updatedProject) => {
+        alert(`Dự án "${updatedProject.name}" đã được cập nhật thành công!`);
+        this.showEditModal = false; // Đóng modal
+        this.loadProjectDetails(); // Tải lại dữ liệu để hiển thị thông tin mới nhất
+      },
+      error: (err) => {
+        const errorMessage = err.error?.message || 'Đã có lỗi không xác định xảy ra.';
+        alert(`Cập nhật dự án thất bại: ${errorMessage}`);
+      }
+    });
+  }
+
+
+  getStatusClass(status: string): string {
+    if (!status) return 'bg-gray-100 text-gray-800';
+    // Chuyển trạng thái về chữ thường và xóa khoảng trắng thừa để so sánh chính xác
+    const formattedStatus = status.toLowerCase().trim();
+    switch (formattedStatus) {
+      case 'hoàn thành':
+      case 'completed':
+        return 'bg-green-100 text-green-800'; // Xanh lá: Hoàn thành
+
+      case 'đang tiến hành':
+      case 'in_progress': // Sửa lại để khớp với dữ liệu từ ảnh
+      case 'in-progress':
+        return 'bg-yellow-100 text-yellow-800'; // Vàng: Đang làm
+
+      case 'quá hạn':
+      case 'overdue':
+        return 'bg-red-100 text-red-800'; // Đỏ: Trễ hạn
+
+      case 'cần làm':
+      case 'todo':
+        return 'bg-blue-100 text-blue-800'; // Xanh dương: Cần làm (thay cho màu xám)
+
+      default:
+        return 'bg-gray-100 text-gray-800'; // Xám: Mặc định
+    }
+  }
+
+  // Chuyển trạng thái về chữ thường và xóa khoảng trắng thừa để so sánh chính xác
+  translateStatus(status: string): string {
+    if (!status) return 'Không xác định';
+    const formattedStatus = status.toLowerCase().trim();
+    switch (formattedStatus) {
+      case 'completed': return 'Hoàn thành';
+      case 'in_progress':
+      case 'in-progress': return 'Đang tiến hành';
+      case 'overdue': return 'Quá hạn';
+      case 'todo': return 'Cần làm';
+      default: return status; // Trả về trạng thái gốc nếu không khớp
+    }
+  }
+
+  goBack(): void {
+    this.location.back();
+  }
+
+  formatDate(dateString: string): string {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
 }

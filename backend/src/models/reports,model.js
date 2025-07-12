@@ -4,7 +4,8 @@ const { sequelize } = require("../config/db.config");
 module.exports = (sequelize, DataTypes) => {
     const Report = sequelize.define(
         "Report",
-    {
+    {   
+        id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true }, // Khóa chính
         content: { type: DataTypes.TEXT, allowNull: false },
         // status: { type: DataTypes.STRING, allowNull: false },
         project_id: { type: DataTypes.INTEGER, allowNull: false },
