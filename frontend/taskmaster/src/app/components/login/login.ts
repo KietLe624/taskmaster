@@ -15,20 +15,6 @@ export class Login {
 
   constructor(private authService: Auth, private router: Router) { }
 
-  // onLogin(): void {
-  //   this.authService.login(this.credentials).subscribe({
-  //     next: (response) => {
-  //       // Khối lệnh này chỉ chạy sau khi service đã cập nhật trạng thái isLoggedIn
-  //       console.log('Login successful, token saved:', response.accessToken);
-  //       this.router.navigate(['/app/dashboards']);
-  //       console.log(`Đăng nhập thành công với username: ${this.credentials.login}`);
-  //     },
-  //     error: (err) => {
-  //       this.errorMessage = err.error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
-  //     }
-  //   });
-  // }
-
   onLogin(): void {
     console.log('[LOGIN] Credentials:', this.credentials);
     this.authService.login(this.credentials).subscribe({

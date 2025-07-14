@@ -79,7 +79,7 @@ export class Auth {
   }
 
   register(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/signup`, userData);
+    return this.http.post(`${this.apiUrl}/register`, userData);
   }
 
   logout(): void {

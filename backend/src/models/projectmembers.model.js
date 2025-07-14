@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       user_id: { type: DataTypes.INTEGER, allowNull: false },
       project_id: { type: DataTypes.INTEGER, allowNull: false },
       role: { type: DataTypes.STRING, allowNull: false }, // Ví dụ: 'member', 'admin'
-      add_at: { type: DataTypes.DATE, allowNull: false }, // Ngày thêm thành viên
+      added_at: { type: DataTypes.DATE, allowNull: false }, // Ngày thêm thành viên
     },
     {
       tableName: "projectmembers",

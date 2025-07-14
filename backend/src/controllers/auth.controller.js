@@ -34,7 +34,7 @@ const register = async (req, res) => {
     // Trả về thông tin người dùng mới
     res.status(201).json({
       message: "Đăng ký thành công",
-      id: newUser.id,
+      user_id: newUser.user_id,
     });
   } catch (error) {
     res.status(500).send({ message: "Lỗi khi đăng ký", error: error.message });
@@ -47,7 +47,7 @@ const login = async (req, res) => {
   const { Op } = require("sequelize"); // Import Op từ sequelize để sử dụng trong truy vấn
   try {
     const { login, password } = req.body;
-     console.log(`[AUTH DEBUG] Đang thử đăng nhập cho: ${login}`);
+    console.log(`[AUTH DEBUG] Đang thử đăng nhập cho: ${login}`);
     // Tìm người dùng theo email hoặc tên đăng nhập
     const user = await User.findOne({
       where: {
@@ -73,12 +73,16 @@ const login = async (req, res) => {
       algorithm: "HS256", // Thuật toán mã hóa (mặc định)
     };
     // Tạo token
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, options);
+    const token = jwt.sign(
+      { user_id: user.user_id },
+      process.env.JWT_SECRET,
+      options
+    );
     // Trả về thông tin người dùng và token
     res.status(200).json({
       message: "Đăng nhập thành công",
       user: {
-        id: user.id,
+        user_id: user.user_id,
         username: user.username,
         email: user.email,
         full_name: user.full_name,

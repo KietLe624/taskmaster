@@ -18,7 +18,6 @@ export class Projects implements OnInit {
   public isEditMode = false;
   public projectToEdit: ProjectsData | null = null;
 
-
   constructor(private projectService: ProjectService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
@@ -50,6 +49,7 @@ export class Projects implements OnInit {
     this.projectToEdit = project;
     this.showModal = true;
   }
+
   closeModal(): void {
     this.showModal = false;
     this.reloadProjects(); // Tải lại danh sách dự án sau khi đóng modal
@@ -60,8 +60,8 @@ export class Projects implements OnInit {
       // Cập nhật dự án đã có
       this.projectService.updateProject(this.projectToEdit.id, formData).subscribe({
         next: (updatedProject) => {
-
           this.closeModal(); // Đóng modal sau khi cập nhật thành công
+          this.reloadProjects(); // Tải lại danh sách dự án sau khi cập nhật
         },
         error: (err) => {
           this.closeModal(); // Đóng modal ngay cả khi có lỗi
@@ -71,8 +71,14 @@ export class Projects implements OnInit {
       // Tạo dự án mới
       this.projectService.createProject(formData).subscribe({
         next: (newProject) => {
+          alert('Dự án' + newProject + 'đã được tạo thành công!');
+          this.closeModal(); // Đóng modal sau khi tạo thành công
+          this.reloadProjects(); // Tải lại danh sách dự án sau khi tạo mới
         },
         error: (err) => {
+          const errorMessage = err.error?.message || 'Đã có lỗi không xác định xảy ra.';
+          alert(errorMessage);
+          this.closeModal(); // Đóng modal ngay cả khi có lỗi
         }
       });
     }
@@ -85,6 +91,7 @@ export class Projects implements OnInit {
       this.projectService.deleteProject(projectId).subscribe({
         next: () => {
           this.reloadProjects();
+
         },
         error: (err) => {
           const errorMessage = err.error?.message || 'Đã có lỗi không xác định xảy ra.';
@@ -94,14 +101,13 @@ export class Projects implements OnInit {
   }
   saveProject(project: ProjectsData): void {
     console.log('Lưu dự án:', project.name);
-
   }
   // Hàm này sẽ được gọi khi người dùng muốn xem chi tiết dự án
   viewProjectDetails(project: ProjectsData): void {
   }
   // load lại danh sách dự án sau khi tạo hoặc cập nhật
   reloadProjects(): void {
-    this.isLoading = true; // Đặt trạng thái tải lại
+    this.isLoading = true; // Đặt trạng thái tải dữ liệu
     this.projectService.getProjects().subscribe({
       next: (data) => {
         this.projects = Array.isArray(data) ? data : data.data || [];

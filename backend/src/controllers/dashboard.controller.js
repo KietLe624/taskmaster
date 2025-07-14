@@ -1,17 +1,17 @@
 const db = require("../models/index.model");
 const User = db.User;
-const Project = db.Project; 
-const Task = db.Task; 
-const TaskAssignment = db.TaskAssignment; 
+const Project = db.Project;
+const Task = db.Task;
+const TaskAssignment = db.TaskAssignment;
 
 // Hàm chính để lấy tất cả dữ liệu cho Dashboard
 const getDashboardData = async (req, res) => {
   try {
     // Kiểm tra xem người dùng đã đăng nhập hay chưa
-    const currentUserId = req.user?.id; // Lấy ID của người dùng hiện tại từ token
+    const currentUserId = req.user?.user_id; // Lấy ID của người dùng hiện tại từ token
     console.log("[DASHBOARD DEBUG] currentUserId:", currentUserId); // In ra ID người dùng
-    
-    if (!req.user || !req.user.id) {
+
+    if (!req.user || !req.user.user_id) {
       console.error(
         "[DASHBOARD DEBUG] LỖI: Người dùng chưa đăng nhập hoặc không có ID người dùng."
       );

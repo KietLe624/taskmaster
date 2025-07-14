@@ -5,57 +5,75 @@ const Project = db.Project;
 const Task = db.Task;
 const ProjectMember = db.ProjectMember;
 
-
 console.log("Các models đã được nạp:", Object.keys(db));
 
 const getProjects = async (req, res) => {
   try {
-    const currentUserId = req.user?.id;
+    const currentUserId = req.user?.user_id;
     if (!currentUserId) {
       return res
         .status(401)
         .json({ message: "Bạn cần đăng nhập để truy cập dữ liệu dự án." });
     }
 
-    if (!Project || !User || !ProjectMember) {
-      return res.status(500).json({
-        message:
-          "Lỗi server: Model Project, User hoặc ProjectMember chưa được khởi tạo.",
-        troubleshooting:
-          "Kiểm tra lại file index.model.js, project.model.js, user.model.js và projectmember.model.js.",
-      });
-    }
-
+    // Lấy tất cả dự án và bao gồm các model liên quan.
+    // Cách tiếp cận này không dùng GROUP BY trong SQL để tránh lỗi only_full_group_by.
     const projects = await Project.findAll({
       where: { manager_id: currentUserId },
       include: [
         {
           model: User,
           as: "manager",
-          attributes: ["full_name", "email"],
-          required: true,
+          attributes: ["full_name"],
+        },
+        {
+          model: Task,
+          as: "tasks", // Quan hệ để tính tiến độ
+          attributes: ["status"],
         },
         {
           model: ProjectMember,
-          as: "members",
-          attributes: [],
+          as: "members", // Quan hệ để đếm thành viên
+          attributes: ["id"], // Chỉ cần lấy id để đếm
         },
       ],
-      attributes: {
-        include: [
-          [
-            db.sequelize.fn("COUNT", db.sequelize.col("members.id")),
-            "countMember",
-          ],
-        ],
-      },
-      group: ["Project.id", "manager.id", "members.project_id"],
+      order: [["createdAt", "DESC"]], // Sắp xếp dự án mới nhất lên đầu
     });
 
-    console.log("[PROJECTS DEBUG] Dự án:", projects);
-    return res.status(200).json(projects);
+    // Xử lý dữ liệu trong JavaScript để thêm trường 'progress' và 'countMember'
+    const projectsWithDetails = projects.map((project) => {
+      const plainProject = project.get({ plain: true });
+
+      // Đếm số lượng thành viên
+      plainProject.countMember = plainProject.members?.length || 0;
+
+      // Tính toán tiến độ
+      const totalTasks = plainProject.tasks?.length || 0;
+      if (totalTasks === 0) {
+        plainProject.progress = 0;
+      } else {
+        const completedTasks = plainProject.tasks.filter(
+          (task) =>
+            task.status &&
+            (task.status.toLowerCase() === "completed" ||
+              task.status.toLowerCase() === "hoàn thành")
+        ).length;
+        plainProject.progress = Math.round((completedTasks / totalTasks) * 100);
+      }
+
+      // Xóa các mảng không cần thiết khỏi đối tượng trả về để giữ response gọn nhẹ
+      delete plainProject.tasks;
+      delete plainProject.members;
+
+      return plainProject;
+    });
+
+    return res.status(200).json({
+      message: "Lấy danh sách dự án thành công",
+      data: projectsWithDetails,
+    });
   } catch (error) {
-    console.error("[PROJECTS ERROR] Stack trace:", error.stack);
+    console.error("[GET PROJECTS ERROR]", error);
     return res
       .status(500)
       .json({ message: "Lỗi khi lấy danh sách dự án", error: error.message });
@@ -65,17 +83,16 @@ const getProjects = async (req, res) => {
 const getProjectById = async (req, res) => {
   try {
     const projectId = req.params.id;
+    const currentUserId = req.user?.user_id;
+
     if (!projectId) {
       return res.status(400).json({ message: "Thiếu ID dự án." });
     }
-
-    const currentUserId = req.user?.id;
     if (!currentUserId) {
       return res.status(401).json({ message: "Yêu cầu đăng nhập." });
     }
 
-    const project = await Project.findOne({
-      where: { id: projectId, manager_id: currentUserId },
+    const project = await Project.findByPk(projectId, {
       include: [
         {
           model: User,
@@ -85,7 +102,7 @@ const getProjectById = async (req, res) => {
         {
           model: ProjectMember,
           as: "members",
-          attributes: ["user_id"],
+          attributes: ["id", "user_id"],
           include: [
             {
               model: User,
@@ -97,19 +114,16 @@ const getProjectById = async (req, res) => {
         {
           model: Task,
           as: "tasks",
-          attributes: ["id", "name", "description", "due_date", "status", "priority"],
+          attributes: ["task_id", "name", "status", "priority", "due_date"],
           include: [
             {
               model: User,
               as: "assignees",
-              attributes: ["id", "full_name", "email"],
-              // Thêm lại fix để tránh lỗi "Unknown column" trên bảng trung gian TaskAssignments
-              through: {
-                attributes: []
-              },
+              attributes: ["user_id", "full_name"],
+              through: { attributes: [] },
             },
           ],
-        }
+        },
       ],
     });
 
@@ -117,13 +131,31 @@ const getProjectById = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy dự án." });
     }
 
-    console.log("[GET PROJECT BY ID DEBUG] Dự án:", project);
-    return res.status(200).json(project);
+    // Chuyển sang object thuần để thêm các thuộc tính tính toán
+    const plainProject = project.get({ plain: true });
+
+    // Tính toán tiến độ
+    const totalTasks = plainProject.tasks?.length || 0;
+    let completedTasks = 0;
+
+    if (totalTasks > 0) {
+      completedTasks = plainProject.tasks.filter(
+        (task) =>
+          task.status &&
+          (task.status.toLowerCase() === "completed" ||
+            task.status.toLowerCase() === "hoàn thành")
+      ).length;
+      plainProject.progress = Math.round((completedTasks / totalTasks) * 100);
+    } else {
+      plainProject.progress = 0;
+    }
+
+    plainProject.completedTasksCount = completedTasks;
+    plainProject.totalTasksCount = totalTasks;
+
+    return res.status(200).json(plainProject);
   } catch (error) {
     console.error("[GET PROJECT BY ID ERROR]", error);
-    if (error instanceof TokenExpiredError) {
-      return res.status(401).json({ message: "Phiên đăng nhập đã hết hạn." });
-    }
     return res
       .status(500)
       .json({ message: "Lỗi khi lấy dự án", error: error.message });

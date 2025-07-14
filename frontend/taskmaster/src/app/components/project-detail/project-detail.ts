@@ -18,7 +18,6 @@ export class ProjectDetail implements OnInit {
   tasks: Task[] = [];
   members: User[] = [];
   isLoading = true;
-
   public projects: ProjectsData[] = [];
   showEditModal = false;
 
@@ -62,7 +61,7 @@ export class ProjectDetail implements OnInit {
     }
   }
 
-    loadProjectDetails(): void {
+  loadProjectDetails(): void {
     this.isLoading = true;
     const projectId = this.route.snapshot.paramMap.get('id');
     if (!projectId) {
@@ -114,7 +113,6 @@ export class ProjectDetail implements OnInit {
     });
   }
 
-
   getStatusClass(status: string): string {
     if (!status) return 'bg-gray-100 text-gray-800';
     // Chuyển trạng thái về chữ thường và xóa khoảng trắng thừa để so sánh chính xác
@@ -142,7 +140,6 @@ export class ProjectDetail implements OnInit {
     }
   }
 
-  // Chuyển trạng thái về chữ thường và xóa khoảng trắng thừa để so sánh chính xác
   translateStatus(status: string): string {
     if (!status) return 'Không xác định';
     const formattedStatus = status.toLowerCase().trim();
@@ -152,7 +149,26 @@ export class ProjectDetail implements OnInit {
       case 'in-progress': return 'Đang tiến hành';
       case 'overdue': return 'Quá hạn';
       case 'todo': return 'Cần làm';
-      default: return status; // Trả về trạng thái gốc nếu không khớp
+      default: return status;
+    }
+  }
+
+  // Hiển thị độ ưu tiên
+  getPriorityInfo(priority: string): { text: string; colorClass: string } {
+    if (!priority) {
+      return { text: 'Không rõ', colorClass: 'text-gray-500' };
+    }
+    const formattedPriority = priority.toLowerCase().trim(); // Chuyển đổi về chữ thường và xóa khoảng trắng thừa
+    switch (formattedPriority) {
+      case 'high':
+        return { text: 'Cao', colorClass: 'text-red-500' };
+      case 'medium':
+        return { text: 'Trung bình', colorClass: 'text-yellow-500' };
+      case 'low':
+        return { text: 'Thấp', colorClass: 'text-green-500' };
+      default:
+        // Trả về giá trị gốc nếu không khớp
+        return { text: priority, colorClass: 'text-gray-500' };
     }
   }
 

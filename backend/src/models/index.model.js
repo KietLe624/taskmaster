@@ -4,54 +4,45 @@ const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
 const basename = path.basename(__filename);
+
 const dbConfig = require("../config/db.config.js");
 const db = {};
 
-if (!dbConfig.dialect) {
+if (!dbConfig || !dbConfig.dialect) {
   throw new Error(
-    "Lỗi cấu hình: Dialect của database chưa được định nghĩa trong file .env (DB_DIALECT)"
+    "Lỗi cấu hình: db.config.js không hợp lệ hoặc thiếu dialect."
   );
 }
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
+  pool: { // Thêm cấu hình pool để quản lý kết nối tốt hơn
+    max: dbConfig.pool ? dbConfig.pool.max : 5,
+    min: dbConfig.pool ? dbConfig.pool.min : 0,
+    acquire: dbConfig.pool ? dbConfig.pool.acquire : 30000,
+    idle: dbConfig.pool ? dbConfig.pool.idle : 10000
+  }
 });
 
-// Tự động đọc tất cả các file model trong thư mục này
+// Đọc tất cả các file model trong thư mục hiện tại
 fs.readdirSync(__dirname)
   .filter((file) => {
     return (
       file.indexOf(".") !== 0 &&
       file !== basename &&
-      file.slice(-9) === ".model.js"
+      file.slice(-3) === ".js" &&
+      file.indexOf(".test.js") === -1
     );
   })
   .forEach((file) => {
-    console.log(`[DEBUG] Đang nạp model từ file: ${file}`); // LOG GỠ LỖI
-    try {
-      const modelDefinition = require(path.join(__dirname, file));
-
-      if (typeof modelDefinition !== "function") {
-        // Nếu file không export ra một hàm, báo lỗi ngay lập tức
-        throw new Error(
-          `File model '${file}' không export ra một hàm! Vui lòng kiểm tra lại cấu trúc file.`
-        );
-      }
-
-      const model = modelDefinition(sequelize, Sequelize.DataTypes);
-      db[model.name] = model;
-    } catch (error) {
-      console.error(`\n!!!!!!!!!! LỖI KHI NẠP FILE MODEL: ${file} !!!!!!!!!!`);
-      console.error(error);
-      // Dừng server và báo lỗi để bạn có thể sửa
-      throw new Error(
-        `Không thể nạp model từ file ${file}. Chi tiết lỗi ở trên.`
-      );
-    }
+    const model = require(path.join(__dirname, file))(
+      sequelize,
+      Sequelize.DataTypes
+    );
+    db[model.name] = model;
   });
 
-// Gọi hàm 'associate' cho từng model (nếu có) để thiết lập mối quan hệ
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
@@ -60,9 +51,5 @@ Object.keys(db).forEach((modelName) => {
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
-// db.sequelize
-//   .sync({ alter: true }) // Cập nhật bảng mà không xóa dữ liệu
-//   .then(() => console.log("[DB] Database synchronized"))
-//   .catch((err) => console.error("[DB] Sync error:", err));
 
 module.exports = db;

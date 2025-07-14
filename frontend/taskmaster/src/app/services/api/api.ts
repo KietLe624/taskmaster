@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
   private apiUrl = 'http://localhost:3000/api'; // URL của backend API
-  
+
   constructor(private http: HttpClient) {}
   // Lấy dữ liệu dashboard
   getDashboardData(): Observable<any> {

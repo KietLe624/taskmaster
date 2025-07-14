@@ -2,7 +2,7 @@ module.exports = (sequelize, DataTypes) => {
   const Task = sequelize.define(
     "Task",
     {
-      id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true }, // Khớp với schema
+      task_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true},
       project_id: { type: DataTypes.INTEGER, allowNull: false },
       name: { type: DataTypes.TEXT, allowNull: false },
       description: { type: DataTypes.TEXT, allowNull: false },
@@ -37,10 +37,10 @@ module.exports = (sequelize, DataTypes) => {
 
     // Một Task có thể được giao cho nhiều User (Many-to-Many)
     Task.belongsToMany(models.User, {
-      through: "TaskAssignments", // Tên bảng trung gian
+      through: "TaskAssignments",
+      as: "assignees",
       foreignKey: "task_id",
       otherKey: "user_id",
-      as: "assignees",
     });
 
     // Một Task có thể có nhiều TaskAssignments

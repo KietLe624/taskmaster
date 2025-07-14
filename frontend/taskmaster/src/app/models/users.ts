@@ -1,12 +1,12 @@
 export interface User {
-  id: number;
+  user_id: number;
   username: string;
   full_name: string;
   email: string;
 }
 
 export interface Users {
-  id: number;
+  user_id: number;
   username: string;
   full_name: string;
   email: string;

@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     "User",
     {
       // Tên model là 'User' (viết hoa)
-      id: {
+      user_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true, // Khóa chính
@@ -33,17 +33,17 @@ module.exports = (sequelize, DataTypes) => {
   );
   // Định nghĩa các quan hệ giữa User và các model khác
   User.associate = (models) => {
-    // Một User có thể quản lý nhiều Project
     User.hasMany(models.Project, {
       foreignKey: "manager_id",
       as: "managedProjects",
     });
-    // Một User có thể là có nhiều Task
+
+    // Quan hệ nhiều-nhiều với Task qua bảng TaskAssignments
     User.belongsToMany(models.Task, {
       through: "TaskAssignments",
+      as: "assignedTasks",
       foreignKey: "user_id",
       otherKey: "task_id",
-      as: "assignedTasks",
     });
   };
   return User;

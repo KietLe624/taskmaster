@@ -17,8 +17,8 @@ export interface Task {
 }
 
 export interface ProjectMember {
-    user_id: number;
-    users: User;
+  user_id: number;
+  users: User;
 }
 
 // Dữ liệu chi tiết của một dự án
@@ -31,6 +31,11 @@ export interface ProjectDetailData {
   manager_id: number;
   created_at: string;
   updated_at: string;
+  priority?: string;
+  progress: number;
+  completedTasksCount?: number;
+  totalTasksCount?: number;
+  countMember?: number; // Số lượng thành viên tham gia dự án
   manager: User; // Người quản lý là một User
   members: ProjectMember[]; // Mảng các thành viên
   tasks: Task[]; // Mảng các công việc

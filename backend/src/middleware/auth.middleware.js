@@ -21,7 +21,7 @@ const authenticateToken = async (req, res, next) => {
 
     // Token hợp lệ, gắn thông tin payload vào request
     // Payload khi tạo token nên chứa id, ví dụ: { id: userId, username: username }
-    const user = await User.findByPk(userPayload.id);
+    const user = await User.findByPk(userPayload.user_id);
     if (!user) {
         return res.status(404).json({ message: "Người dùng không tồn tại." });
     }
