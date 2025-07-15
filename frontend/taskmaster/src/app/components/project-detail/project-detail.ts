@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { ProjectService } from '../../services/project/project';
@@ -11,15 +11,16 @@ import { ProjectFrom } from '../create-project/create-project';
   standalone: false,
   templateUrl: './project-detail.html',
   styleUrl: './project-detail.css',
+  changeDetection: ChangeDetectionStrategy.OnPush, // Sử dụng OnPush để tối ưu hiệu suất
 })
 export class ProjectDetail implements OnInit {
-
   project: ProjectDetailData | null = null;
   tasks: Task[] = [];
   members: User[] = [];
   isLoading = true;
   public projects: ProjectsData[] = [];
   showEditModal = false;
+  isColumnOpen: { [key: string]: boolean } = { todo: false, 'inprogress': false, inreview: false, done: false, overdue: false };
 
   constructor(
     private route: ActivatedRoute,
@@ -27,7 +28,6 @@ export class ProjectDetail implements OnInit {
     private projectService: ProjectService,
     private location: Location,
     private cdr: ChangeDetectorRef
-
   ) { }
 
   ngOnInit(): void {
@@ -36,13 +36,10 @@ export class ProjectDetail implements OnInit {
 
     if (projectId) {
       this.projectService.getProjectById(+projectId).subscribe({
-        next: (data: ProjectDetailData) => { // 3. Sử dụng kiểu dữ liệu mới
-          // 4. Gán và xử lý dữ liệu nhận được
+        next: (data: ProjectDetailData) => {
           this.project = data;
           this.tasks = data.tasks || [];
-          // Trích xuất thông tin User từ mảng members
-          this.members = data.members?.map(member => member.users);
-          console.log('Members:', this.members);
+          this.members = data.members?.map(member => member.users) || [];
           this.isLoading = false;
           console.log('Dữ liệu chi tiết dự án đã được xử lý:', this.project);
           this.cdr.detectChanges();
@@ -51,7 +48,7 @@ export class ProjectDetail implements OnInit {
           console.error('Lỗi khi tải chi tiết dự án:', err);
           this.isLoading = false;
           alert('Không tìm thấy dự án hoặc có lỗi xảy ra.');
-          this.router.navigate(['/projects']);
+          this.router.navigate(['/app/projects']);
         }
       });
     } else {
@@ -85,6 +82,7 @@ export class ProjectDetail implements OnInit {
       }
     });
   }
+
   // --- Các hàm xử lý sự kiện cho modal ---
   openEditModal(): void {
     if (this.project) {
@@ -96,15 +94,14 @@ export class ProjectDetail implements OnInit {
     this.showEditModal = false;
   }
 
-  // Hàm được gọi khi form trong modal được lưu
   handleUpdateProject(formData: ProjectFrom): void {
     if (!this.project) return;
 
     this.projectService.updateProject(this.project.id, formData).subscribe({
       next: (updatedProject) => {
         alert(`Dự án "${updatedProject.name}" đã được cập nhật thành công!`);
-        this.showEditModal = false; // Đóng modal
-        this.loadProjectDetails(); // Tải lại dữ liệu để hiển thị thông tin mới nhất
+        this.showEditModal = false;
+        this.loadProjectDetails();
       },
       error: (err) => {
         const errorMessage = err.error?.message || 'Đã có lỗi không xác định xảy ra.';
@@ -113,52 +110,90 @@ export class ProjectDetail implements OnInit {
     });
   }
 
+  drag(event: DragEvent, task_id: number): void {
+    if (event && event.dataTransfer && task_id !== undefined && task_id !== null) {
+      try {
+        event.dataTransfer.setData('text/plain', task_id.toString());
+        this.cdr.detectChanges(); // Cập nhật view sau khi set dataTransfer
+      } catch (e) {
+        console.error('Error setting dataTransfer:', e);
+      }
+    } else {
+      console.error('Drag failed: event, dataTransfer, or taskId is invalid', { event, task_id });
+    }
+  }
+
+  allowDrop(event: DragEvent): void {
+    if (event) {
+      event.preventDefault();
+      console.log('Allowing drop');
+    }
+  }
+
+  drop(event: DragEvent, newStatus: string): void {
+    event.preventDefault();
+
+    if (event.dataTransfer) {
+      const taskId = event.dataTransfer.getData('text/plain');
+      console.log('Dropped task ID:', taskId);
+      if (taskId && this.project) {
+        const taskIndex = this.tasks.findIndex(t => t.task_id === +taskId);
+        if (taskIndex !== -1) {
+          const updatedTasks = [...this.tasks];
+          updatedTasks[taskIndex].status = newStatus;
+          this.tasks = updatedTasks; // Gán lại mảng mới
+          this.updateTaskStatus(+taskId, newStatus);
+          this.cdr.detectChanges(); // Đảm bảo giao diện cập nhật
+        } else {
+          console.error('Task not found for ID:', taskId);
+        }
+      }
+    } else {
+      console.error('dataTransfer is undefined during drop');
+    }
+  }
+
+  updateTaskStatus(taskId: number, newStatus: string): void {
+    if (this.project) {
+      this.projectService.updateTask(taskId, { status: newStatus }).subscribe({
+        next: () => {
+          console.log(`Cập nhật trạng thái công việc ${taskId} thành ${newStatus} thành công`);
+          // Không cần gọi loadProjectDetails, vì đã cập nhật trực tiếp trong drop
+        },
+        error: (err) => {
+          console.error('Lỗi khi cập nhật trạng thái:', err);
+          alert('Cập nhật trạng thái thất bại. Vui lòng thử lại.');
+          // Nếu thất bại, khôi phục trạng thái cũ (tùy chọn)
+          const taskIndex = this.tasks.findIndex(t => t.task_id === taskId);
+          if (taskIndex !== -1) {
+            this.loadProjectDetails(); // Tải lại nếu có lỗi
+          }
+        }
+      });
+    }
+  }
   getStatusClass(status: string): string {
     if (!status) return 'bg-gray-100 text-gray-800';
-    // Chuyển trạng thái về chữ thường và xóa khoảng trắng thừa để so sánh chính xác
     const formattedStatus = status.toLowerCase().trim();
     switch (formattedStatus) {
-      case 'hoàn thành':
       case 'completed':
         return 'bg-green-100 text-green-800'; // Xanh lá: Hoàn thành
-
-      case 'đang tiến hành':
-      case 'in_progress': // Sửa lại để khớp với dữ liệu từ ảnh
-      case 'in-progress':
+      case 'in_progress':
         return 'bg-yellow-100 text-yellow-800'; // Vàng: Đang làm
-
-      case 'quá hạn':
       case 'overdue':
         return 'bg-red-100 text-red-800'; // Đỏ: Trễ hạn
-
-      case 'cần làm':
       case 'todo':
-        return 'bg-blue-100 text-blue-800'; // Xanh dương: Cần làm (thay cho màu xám)
-
+        return 'bg-blue-100 text-blue-800'; // Xanh dương
       default:
         return 'bg-gray-100 text-gray-800'; // Xám: Mặc định
     }
   }
 
-  translateStatus(status: string): string {
-    if (!status) return 'Không xác định';
-    const formattedStatus = status.toLowerCase().trim();
-    switch (formattedStatus) {
-      case 'completed': return 'Hoàn thành';
-      case 'in_progress':
-      case 'in-progress': return 'Đang tiến hành';
-      case 'overdue': return 'Quá hạn';
-      case 'todo': return 'Cần làm';
-      default: return status;
-    }
-  }
-
-  // Hiển thị độ ưu tiên
   getPriorityInfo(priority: string): { text: string; colorClass: string } {
     if (!priority) {
       return { text: 'Không rõ', colorClass: 'text-gray-500' };
     }
-    const formattedPriority = priority.toLowerCase().trim(); // Chuyển đổi về chữ thường và xóa khoảng trắng thừa
+    const formattedPriority = priority.toLowerCase().trim();
     switch (formattedPriority) {
       case 'high':
         return { text: 'Cao', colorClass: 'text-red-500' };
@@ -167,7 +202,6 @@ export class ProjectDetail implements OnInit {
       case 'low':
         return { text: 'Thấp', colorClass: 'text-green-500' };
       default:
-        // Trả về giá trị gốc nếu không khớp
         return { text: priority, colorClass: 'text-gray-500' };
     }
   }
@@ -184,5 +218,9 @@ export class ProjectDetail implements OnInit {
       month: '2-digit',
       year: 'numeric'
     });
+  }
+
+  toggleColumn(columnId: string): void {
+    this.isColumnOpen[columnId] = !this.isColumnOpen[columnId];
   }
 }

@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
+      cate : { type: DataTypes.TEXT, allowNull: false },
       due_date: { type: DataTypes.DATE, allowNull: false },
       createdAt: {
         type: DataTypes.DATE,

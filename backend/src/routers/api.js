@@ -23,7 +23,7 @@ const { getDashboardData } = require("../controllers/dashboard.controller");
 // Import các controller cho auth
 const { register, login } = require("../controllers/auth.controller");
 // controller cho tasks
-const { getTasks } = require("../controllers/tasks.controller");
+const { getTasks,updateStatusTask } = require("../controllers/tasks.controller");
 
 // ============================================= //
 router.use(cors()); // Sử dụng cors cho tất cả các route
@@ -53,7 +53,7 @@ router.post("/auth/signin", login);
 
 // ============================================= //
 router.get("/tasks", authenticateToken, getTasks); // Route để lấy task theo ID
-
+router.put("/tasks/:id", authenticateToken, updateStatusTask); // Route để cập nhật trạng thái task
 
 
 

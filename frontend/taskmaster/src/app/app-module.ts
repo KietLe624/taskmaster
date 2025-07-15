@@ -31,6 +31,7 @@ import { Register } from './components/register/register';
 import { AuthLayout } from './layouts/auth-layout/auth-layout';
 import { PublicLayout } from './layouts/public-layout/public-layout';
 import { authInterceptor } from './interceptor/auth-interceptor';
+import { FilterPipe } from './services/filter/filer';
 
 @NgModule({
   declarations: [
@@ -51,9 +52,8 @@ import { authInterceptor } from './interceptor/auth-interceptor';
     Register,
     AuthLayout,
     PublicLayout,
-
   ],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, CommonModule],
+  imports: [BrowserModule, AppRoutingModule, FormsModule, CommonModule, FilterPipe],
 
   providers: [
     provideBrowserGlobalErrorListeners(),

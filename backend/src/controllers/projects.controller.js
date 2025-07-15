@@ -114,7 +114,7 @@ const getProjectById = async (req, res) => {
         {
           model: Task,
           as: "tasks",
-          attributes: ["task_id", "name", "status", "priority", "due_date"],
+          attributes: ["task_id", "name", "status","cate", "priority", "due_date"],
           include: [
             {
               model: User,
@@ -261,6 +261,8 @@ const deleteProject = async (req, res) => {
       .json({ message: "Lỗi khi xóa dự án", error: error.message });
   }
 };
+
+
 
 module.exports = {
   getProjects,

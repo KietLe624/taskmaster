@@ -7,6 +7,7 @@ import { TaskDetailData } from '../../models/tasks'; // Sử dụng lại model 
   standalone: false,
   templateUrl: './tasks.html',
   styleUrl: './tasks.css',
+  
 })
 export class Tasks implements OnInit {
   tasks: TaskDetailData[] = [];

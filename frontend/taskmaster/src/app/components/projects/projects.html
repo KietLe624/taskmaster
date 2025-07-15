@@ -1,89 +1,75 @@
-<div class="container mx-auto">
-   <!--hiệu ứng loading  -->
-  <div *ngIf="isLoading" class="text-center p-10">
-    <!-- From Uiverse.io by vk-uiux -->
-    <div class="card">
-      <div class="card__skeleton card__title"></div>
-      <div class="card__skeleton card__description"> </div>
-    </div>
-  </div>
-
-  <!-- Hiển thị danh sách dự án -->
-  <div *ngIf="!isLoading" class="p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between">
-    <h1 class="text-3xl font-semibold text-gray-800 mb-4 md:mb-0 title">
-      Quản lý dự án
-    </h1>
+<div class="container mx-auto p-4">
+  <!-- Tiêu đề và nút thêm -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-3xl font-bold text-gray-900">Quản Lý Dự Án</h2>
     <button (click)="openCreateModal()" id="openCreateProjectModal"
-      class="px-4 py-3 md:px-6 md:py-3 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center self-end md:self-auto min-w-[50px] md:min-w-[180px]">
-      <i class="fas fa-plus mr-0 md:mr-2"></i>
-      <span class="hidden md:inline">Tạo Dự án Mới</span>
+      class="px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-200 flex items-center">
+      <i class="fas fa-plus"></i>
+      <span class="ml-2 hidden md:inline">Thêm Dự Án Mới</span>
     </button>
   </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-    <!-- Card -->
+  <!-- Hiệu ứng loading -->
+  <div *ngIf="isLoading" class="text-center p-10">
+    <div class="card">
+      <div class="card__skeleton card__title bg-gray-300 animate-pulse"></div>
+      <div class="card__skeleton card__description bg-gray-300 animate-pulse"></div>
+    </div>
+  </div>
+  <!-- Danh sách dự án -->
+  <div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Card dự án -->
     <div *ngFor="let project of projects"
-      class="bg-white p-6 rounded-2xl shadow-sm relative border border-gray-200 hover:shadow-lg transition-shadow duration-200">
-       <!--button update, delete  -->
+      class="bg-white p-6 rounded-xl shadow-md border-gray-200 hover:shadow-lg transition-all duration-200 relative">
+      <!-- Nút chỉnh sửa và xóa -->
       <div class="flex justify-end space-x-2 mb-4 absolute top-4 right-4">
-        <button (click)="openEditModal(project)" class="text-gray-400 hover:text-blue-600 focus:outline-none">
+        <button (click)="openEditModal(project)" class="text-gray-500 hover:text-blue-600 text-lg focus:outline-none">
           <i class="fas fa-edit"></i>
         </button>
-        <button (click)="deleteProject(project.id)" class="text-gray-400 hover:text-red-500 focus:outline-none">
+        <button (click)="deleteProject(project.id)" class="text-gray-500 hover:text-red-600 focus:outline-none">
           <i class="fas fa-trash-alt"></i>
         </button>
+      </div>
 
+      <!-- Tiêu đề dự án với giới hạn chiều rộng -->
+      <div class="pr-16">
+        <h2 class="text-xl font-semibold text-gray-900 mb-2 truncate max-w-full">
+          {{ project.name || 'Chưa có tên' }}
+        </h2>
       </div>
-      <!-- Tiêu đề dự án -->
-      <h2 class="text-2xl text-gray-800 mb-2 mt-4">{{ project.name || 'Chưa có tên' }}</h2>
-      <p class="text-gray-600 text-base mb-4">
-        {{ project.description || 'Chưa có mô tả' }}
-      </p>
-      <!-- nội dung card -->
-      <div class="text-black text-base space-y-1 mb-4">
-        <p><span class="font-medium">Quản lý:</span> {{ project.manager.full_name || 'Chưa có thông tin' }}</p>
-        <p>
-          <span class="font-medium">Thành viên: </span>
-          {{ project.countMember}}
+      <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ project.description || 'Chưa có mô tả' }}</p>
+
+      <!-- Thông tin dự án -->
+      <div class="text-gray-700 text-sm space-y-1 mb-4">
+        <p><span class="font-medium text-gray-900">Quản lý:</span> {{ project.manager.full_name || 'Chưa có thông tin'
+          }}</p>
+        <p><span class="font-medium text-gray-900">Thành viên:</span> {{ project.countMember }}</p>
+        <p><span class="font-medium text-gray-900">Ngày bắt đầu:</span> {{ project.start_date | date: 'dd/MM/yyyy' }}
         </p>
-        <p>
-          <span class="font-medium">Ngày bắt đầu:</span>
-          {{ project.start_date | date: "dd/MM/yyyy"}}
-        </p>
-        <p>
-          <span class="font-medium">Ngày kết thúc:</span>
-          {{ project.end_date | date: "dd/MM/yyyy"}}
-        </p>
+        <p><span class="font-medium text-gray-900">Ngày kết thúc:</span> {{ project.end_date | date: 'dd/MM/yyyy' }}</p>
       </div>
+
+      <!-- Tiến độ -->
       <div class="mb-4">
-        <p class="text-gray-700 text-base font-medium mb-1">Tiến độ: {{project.progress}}%</p>
-        <div class="w-full bg-gray-200 rounded-full h-2.5">
-          <div class="bg-blue-500 h-2.5 rounded-full" *ngIf="project.progress" [style.width.%]="project.progress"
+        <p class="text-gray-900 text-sm font-medium mb-1">Tiến độ: {{ project.progress || 0 }}%</p>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="h-2 rounded-full transition-all duration-300" [style.width]="(project.progress || 0) + '%'"
             [ngClass]="{
-              'bg-green-500': project.progress === 100,
-              'bg-blue-500': project.progress < 100
+              'bg-green-500': (project.progress || 0) === 100,
+              'bg-blue-500': (project.progress || 0) < 100
             }"></div>
         </div>
-        <p class="text-gray-600 text-sm mt-1">
-          <!-- Loại bỏ tasksCompleted/totalTasks vì không có trong dữ liệu -->
-        </p>
       </div>
-      <a [routerLink]="['/app/projects', project.id]" class="text-blue-600 text-sm flex items-center hover:underline"
-        (click)="viewProjectDetails(project)">
-        Xem chi tiết dự án
+
+      <!-- Nút xem chi tiết -->
+      <a [routerLink]="['/app/projects', project.id]" (click)="viewProjectDetails(project)"
+        class="text-blue-600 text-sm font-medium flex items-center hover:underline">
+        Xem chi tiết
         <i class="fas fa-arrow-right ml-1 text-xs"></i>
       </a>
     </div>
   </div>
-<!-- form tạo mới  -->
-<app-create-project
-  [show]="showModal"
-  [isEditMode]="isEditMode"
-  [projectToEdit]="projectToEdit"
-  (save)="handleSave($event)"
-  (close)="closeModal()">
-</app-create-project>
-
-
-
+  <!-- Form tạo mới -->
+  <app-create-project [show]="showModal" [isEditMode]="isEditMode" [projectToEdit]="projectToEdit"
+    (save)="handleSave($event)" (close)="closeModal()">
+  </app-create-project>
 </div>

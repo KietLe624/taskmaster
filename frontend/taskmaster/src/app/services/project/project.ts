@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 import { ProjectsData } from '../../models/projects';
 import { ProjectDetailData } from '../../models/project-detail';
 import { ProjectFrom } from '../../components/create-project/create-project';
@@ -9,7 +9,12 @@ import { ProjectFrom } from '../../components/create-project/create-project';
   providedIn: 'root',
 })
 export class ProjectService {
-  private apiUrl = 'http://localhost:3000/api/projects'; // URL cho lấy danh sách dự án
+  private apiUrl = 'http://localhost:3000/api/projects';
+  private apiUrlTasks = 'http://localhost:3000/api/tasks';
+
+  httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  };
   constructor(private http: HttpClient) { }
 
   getProjects(): Observable<{ data: ProjectsData[]; count: number; message: string }> {
@@ -34,6 +39,7 @@ export class ProjectService {
     };
     return this.http.post<ProjectsData>(this.apiUrl, payload);
   }
+
   updateProject(id: number, projectData: ProjectFrom): Observable<ProjectsData> {
     const payload = {
       name: projectData.name,
@@ -43,7 +49,22 @@ export class ProjectService {
     };
     return this.http.put<ProjectsData>(`${this.apiUrl}/${id}`, payload);
   }
+
   deleteProject(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  updateTask(taskId: number, updateData: { status: string }): Observable<any> {
+    const url = `${this.apiUrlTasks}/${taskId}`;
+    return this.http.put(url, updateData, this.httpOptions).pipe(
+      tap(_ => console.log(`Cập nhật trạng thái task ${taskId} thành công`)),
+      catchError(this.handleError<any>(`updateTask id=${taskId}`))
+    );
+  }
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+      console.error(`${operation} failed: ${error.message}`);
+      return of(result as T);
+    };
   }
 }

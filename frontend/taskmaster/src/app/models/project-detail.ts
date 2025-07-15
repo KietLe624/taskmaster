@@ -7,12 +7,15 @@ export interface User {
 
 // Dữ liệu công việc
 export interface Task {
-  id: number;
+  task_id: number;
   name: string;
   description: string;
   due_date: string;
   status: string;
   priority: string;
+  cate : string; // Thêm trường cate
+  createdAt: string;
+  updatedAt: string;
   assignees: User[];
 }
 
