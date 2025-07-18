@@ -18,6 +18,7 @@ export class Projects implements OnInit {
   public isEditMode = false;
   public projectToEdit: ProjectsData | null = null;
 
+
   constructor(private projectService: ProjectService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
@@ -25,7 +26,6 @@ export class Projects implements OnInit {
       next: (data) => {
         this.projects = Array.isArray(data) ? data : data.data || [];
         this.isLoading = false;
-        console.log('Dữ liệu dự án:', data);
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -53,18 +53,26 @@ export class Projects implements OnInit {
   closeModal(): void {
     this.showModal = false;
     this.reloadProjects(); // Tải lại danh sách dự án sau khi đóng modal
+    this.cdr.detectChanges();
   }
   // edit project/ new project
-  handleSave(formData: ProjectFrom): void {
+  onSaveProject(formData: ProjectFrom): void {
     if (this.isEditMode && this.projectToEdit) {
       // Cập nhật dự án đã có
+      if (!formData || !formData.name) {
+        alert('Dữ liệu form không hợp lệ. Vui lòng kiểm tra các trường.');
+        return;
+      }
       this.projectService.updateProject(this.projectToEdit.id, formData).subscribe({
         next: (updatedProject) => {
+          alert('Dự án ' + updatedProject.name + ' đã được cập nhật thành công!');
           this.closeModal(); // Đóng modal sau khi cập nhật thành công
           this.reloadProjects(); // Tải lại danh sách dự án sau khi cập nhật
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.closeModal(); // Đóng modal ngay cả khi có lỗi
+          alert('Cập nhật dự án thất bại: ' + (err.error?.message || 'Lỗi không xác định'));
         }
       });
     } else {
@@ -74,6 +82,7 @@ export class Projects implements OnInit {
           alert('Dự án' + newProject + 'đã được tạo thành công!');
           this.closeModal(); // Đóng modal sau khi tạo thành công
           this.reloadProjects(); // Tải lại danh sách dự án sau khi tạo mới
+          this.cdr.detectChanges();
         },
         error: (err) => {
           const errorMessage = err.error?.message || 'Đã có lỗi không xác định xảy ra.';
@@ -91,7 +100,8 @@ export class Projects implements OnInit {
       this.projectService.deleteProject(projectId).subscribe({
         next: () => {
           this.reloadProjects();
-
+          alert('Dự án đã được xóa thành công!');
+          this.cdr.detectChanges();
         },
         error: (err) => {
           const errorMessage = err.error?.message || 'Đã có lỗi không xác định xảy ra.';

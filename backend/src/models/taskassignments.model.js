@@ -9,10 +9,13 @@ module.exports = (sequelize, DataTypes) => {
       id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       task_id: { type: DataTypes.INTEGER, allowNull: false },
       user_id: { type: DataTypes.INTEGER, allowNull: false },
-      assigned_at: {
+      createdAt: {
         type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
+        field: "created_at", // Ánh xạ đến cột created_at trong DB
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        field: "updated_at", // Ánh xạ đến cột updated_at trong DB
       },
     },
     {

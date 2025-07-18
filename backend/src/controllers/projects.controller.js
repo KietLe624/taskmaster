@@ -7,6 +7,22 @@ const ProjectMember = db.ProjectMember;
 
 console.log("Các models đã được nạp:", Object.keys(db));
 
+const getAllProjects = async (req, res) => {
+  try {
+    const projects = await Project.findAll({
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.status(200).json(projects);
+  } catch (error) {
+    console.error("[GET ALL PROJECTS ERROR]", error);
+    res.status(500).json({
+      message: "Lỗi khi lấy danh sách dự án",
+      error: error.message,
+    });
+  }
+};
+
 const getProjects = async (req, res) => {
   try {
     const currentUserId = req.user?.user_id;
@@ -16,8 +32,6 @@ const getProjects = async (req, res) => {
         .json({ message: "Bạn cần đăng nhập để truy cập dữ liệu dự án." });
     }
 
-    // Lấy tất cả dự án và bao gồm các model liên quan.
-    // Cách tiếp cận này không dùng GROUP BY trong SQL để tránh lỗi only_full_group_by.
     const projects = await Project.findAll({
       where: { manager_id: currentUserId },
       include: [
@@ -28,19 +42,26 @@ const getProjects = async (req, res) => {
         },
         {
           model: Task,
-          as: "tasks", // Quan hệ để tính tiến độ
+          as: "tasks",
           attributes: ["status"],
         },
         {
           model: ProjectMember,
-          as: "members", // Quan hệ để đếm thành viên
-          attributes: ["id"], // Chỉ cần lấy id để đếm
+          as: "members",
+          attributes: ["id"], // Chỉ lấy thông tin thành viên, không cần thuộc tính cụ thể
+          include: [
+            {
+              model: User,
+              as: "users",
+              attributes: ["user_id", "full_name"],
+            },
+          ],
         },
       ],
-      order: [["createdAt", "DESC"]], // Sắp xếp dự án mới nhất lên đầu
+      order: [["createdAt", "DESC"]],
     });
 
-    // Xử lý dữ liệu trong JavaScript để thêm trường 'progress' và 'countMember'
+    // Xử lý dữ liệu để thêm 'progress' và định dạng lại 'members'
     const projectsWithDetails = projects.map((project) => {
       const plainProject = project.get({ plain: true });
 
@@ -61,9 +82,18 @@ const getProjects = async (req, res) => {
         plainProject.progress = Math.round((completedTasks / totalTasks) * 100);
       }
 
-      // Xóa các mảng không cần thiết khỏi đối tượng trả về để giữ response gọn nhẹ
+      // *** THAY ĐỔI 2: Xử lý lại mảng members thay vì xóa nó đi ***
+      // Biến đổi mảng `members` để chỉ chứa thông tin `full_name` của user.
+      if (plainProject.members) {
+        plainProject.members = plainProject.members.map(
+          (member) => member.users
+        );
+      } else {
+        plainProject.members = []; // Đảm bảo members luôn là một mảng
+      }
+
+      // Xóa mảng tasks không cần thiết để giữ response gọn nhẹ
       delete plainProject.tasks;
-      delete plainProject.members;
 
       return plainProject;
     });
@@ -79,7 +109,6 @@ const getProjects = async (req, res) => {
       .json({ message: "Lỗi khi lấy danh sách dự án", error: error.message });
   }
 };
-
 const getProjectById = async (req, res) => {
   try {
     const projectId = req.params.id;
@@ -107,14 +136,21 @@ const getProjectById = async (req, res) => {
             {
               model: User,
               as: "users",
-              attributes: ["full_name", "email"],
+              attributes: ["username", "full_name", "email"],
             },
           ],
         },
         {
           model: Task,
           as: "tasks",
-          attributes: ["task_id", "name", "status","cate", "priority", "due_date"],
+          attributes: [
+            "task_id",
+            "name",
+            "status",
+            "cate",
+            "priority",
+            "due_date",
+          ],
           include: [
             {
               model: User,
@@ -164,7 +200,7 @@ const getProjectById = async (req, res) => {
 
 const createProject = async (req, res) => {
   try {
-    const currentUserId = req.user?.id;
+    const currentUserId = req.user?.user_id;
     if (!currentUserId) {
       return res.status(401).json({ message: "Yêu cầu đăng nhập." });
     }
@@ -199,7 +235,7 @@ const createProject = async (req, res) => {
 const updateProject = async (req, res) => {
   try {
     const projectId = req.params.id; // SỬA: Lấy ID từ URL params
-    const currentUserId = req.user?.id;
+    const currentUserId = req.user?.user_id;
 
     if (!currentUserId) {
       return res.status(401).json({ message: "Yêu cầu đăng nhập." });
@@ -232,7 +268,7 @@ const updateProject = async (req, res) => {
 const deleteProject = async (req, res) => {
   try {
     console.log("[DELETE PROJECT DEBUG] Request params:", req.params); // Thêm log để debug
-    const currentUserId = req.user?.id;
+    const currentUserId = req.user?.user_id;
     if (!currentUserId) {
       return res.status(401).json({ message: "Yêu cầu đăng nhập." });
     }
@@ -262,9 +298,8 @@ const deleteProject = async (req, res) => {
   }
 };
 
-
-
 module.exports = {
+  getAllProjects,
   getProjects,
   getProjectById,
   createProject,

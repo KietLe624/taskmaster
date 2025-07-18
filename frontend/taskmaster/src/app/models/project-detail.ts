@@ -1,6 +1,7 @@
 
 export interface User {
   id: number;
+  username: string;
   full_name: string;
   email: string;
 }
@@ -42,4 +43,5 @@ export interface ProjectDetailData {
   manager: User; // Người quản lý là một User
   members: ProjectMember[]; // Mảng các thành viên
   tasks: Task[]; // Mảng các công việc
+  
 }

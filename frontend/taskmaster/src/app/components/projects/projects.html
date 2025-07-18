@@ -39,17 +39,12 @@
       <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ project.description || 'Chưa có mô tả' }}</p>
 
       <!-- Thông tin dự án -->
-      <div class="text-gray-700 text-sm space-y-1 mb-4">
+      <div class="text-gray-700 text-sm space-y-1 mb-6">
         <p><span class="font-medium text-gray-900">Quản lý:</span> {{ project.manager.full_name || 'Chưa có thông tin'
           }}</p>
-        <p><span class="font-medium text-gray-900">Thành viên:</span> {{ project.countMember }}</p>
         <p><span class="font-medium text-gray-900">Ngày bắt đầu:</span> {{ project.start_date | date: 'dd/MM/yyyy' }}
         </p>
         <p><span class="font-medium text-gray-900">Ngày kết thúc:</span> {{ project.end_date | date: 'dd/MM/yyyy' }}</p>
-      </div>
-
-      <!-- Tiến độ -->
-      <div class="mb-4">
         <p class="text-gray-900 text-sm font-medium mb-1">Tiến độ: {{ project.progress || 0 }}%</p>
         <div class="w-full bg-gray-200 rounded-full h-2">
           <div class="h-2 rounded-full transition-all duration-300" [style.width]="(project.progress || 0) + '%'"
@@ -59,17 +54,33 @@
             }"></div>
         </div>
       </div>
-
       <!-- Nút xem chi tiết -->
       <a [routerLink]="['/app/projects', project.id]" (click)="viewProjectDetails(project)"
         class="text-blue-600 text-sm font-medium flex items-center hover:underline">
         Xem chi tiết
         <i class="fas fa-arrow-right ml-1 text-xs"></i>
       </a>
+      <div class="absolute bottom-4 right-4 flex items-center -space-x-2">
+        <div *ngFor="let member of project.members.slice(0, 2)" class="relative group">
+          <div
+            class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold border-2 border-white cursor-pointer select-none">
+            {{ member.full_name.charAt(0).toUpperCase() }}
+          </div>
+          <div
+            class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            {{ member.full_name }}
+          </div>
+        </div>
+
+        <div *ngIf="project.members.length > 2"
+          class="w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-bold border-2 border-white select-none">
+          +{{ project.members.length - 2 }}
+        </div>
+      </div>
     </div>
   </div>
   <!-- Form tạo mới -->
   <app-create-project [show]="showModal" [isEditMode]="isEditMode" [projectToEdit]="projectToEdit"
-    (save)="handleSave($event)" (close)="closeModal()">
+    (save)="onSaveProject($event)" (close)="closeModal()">
   </app-create-project>
 </div>

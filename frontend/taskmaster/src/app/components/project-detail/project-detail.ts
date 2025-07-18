@@ -20,7 +20,7 @@ export class ProjectDetail implements OnInit {
   isLoading = true;
   public projects: ProjectsData[] = [];
   showEditModal = false;
-  isColumnOpen: { [key: string]: boolean } = { todo: false, 'inprogress': false, inreview: false, done: false, overdue: false };
+  isColumnOpen: { [key: string]: boolean } = { todo: false, 'in_progress': false, inreview: false, done: false, overdue: false };
 
   constructor(
     private route: ActivatedRoute,
@@ -41,7 +41,6 @@ export class ProjectDetail implements OnInit {
           this.tasks = data.tasks || [];
           this.members = data.members?.map(member => member.users) || [];
           this.isLoading = false;
-          console.log('Dữ liệu chi tiết dự án đã được xử lý:', this.project);
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -53,7 +52,7 @@ export class ProjectDetail implements OnInit {
       });
     } else {
       console.error('Không tìm thấy ID dự án trong URL.');
-      this.router.navigate(['/projects']);
+      this.router.navigate(['/app/projects']);
       this.cdr.detectChanges();
     }
   }
@@ -119,14 +118,12 @@ export class ProjectDetail implements OnInit {
         console.error('Error setting dataTransfer:', e);
       }
     } else {
-      console.error('Drag failed: event, dataTransfer, or taskId is invalid', { event, task_id });
     }
   }
 
   allowDrop(event: DragEvent): void {
     if (event) {
       event.preventDefault();
-      console.log('Allowing drop');
     }
   }
 
@@ -140,16 +137,17 @@ export class ProjectDetail implements OnInit {
         const taskIndex = this.tasks.findIndex(t => t.task_id === +taskId);
         if (taskIndex !== -1) {
           const updatedTasks = [...this.tasks];
-          updatedTasks[taskIndex].status = newStatus;
+          const task = updatedTasks[taskIndex];
+          task.status = newStatus; // Cập nhật trạng thái
           this.tasks = updatedTasks; // Gán lại mảng mới
+          this.project = { ...this.project, tasks: updatedTasks }; // Gán lại project với tham chiếu mới
           this.updateTaskStatus(+taskId, newStatus);
-          this.cdr.detectChanges(); // Đảm bảo giao diện cập nhật
+          this.updateProgress(); // Cập nhật tiến độ
+          this.cdr.detectChanges(); // Cập nhật giao diện
         } else {
-          console.error('Task not found for ID:', taskId);
         }
       }
     } else {
-      console.error('dataTransfer is undefined during drop');
     }
   }
 
@@ -157,11 +155,8 @@ export class ProjectDetail implements OnInit {
     if (this.project) {
       this.projectService.updateTask(taskId, { status: newStatus }).subscribe({
         next: () => {
-          console.log(`Cập nhật trạng thái công việc ${taskId} thành ${newStatus} thành công`);
-          // Không cần gọi loadProjectDetails, vì đã cập nhật trực tiếp trong drop
         },
         error: (err) => {
-          console.error('Lỗi khi cập nhật trạng thái:', err);
           alert('Cập nhật trạng thái thất bại. Vui lòng thử lại.');
           // Nếu thất bại, khôi phục trạng thái cũ (tùy chọn)
           const taskIndex = this.tasks.findIndex(t => t.task_id === taskId);
@@ -172,6 +167,20 @@ export class ProjectDetail implements OnInit {
       });
     }
   }
+
+  updateProgress(): void {
+    if (this.project && this.tasks.length > 0) {
+      const totalTasks = this.tasks.length;
+      const completedTasks = this.tasks.filter(task => task.status === 'done').length; // Giả sử 'done' là trạng thái hoàn thành
+      const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+      this.project.progress = Math.round(progress); // Cập nhật progress
+      this.project.completedTasksCount = completedTasks;
+      this.project.totalTasksCount = totalTasks;
+      this.cdr.detectChanges(); // Cập nhật giao diện
+    }
+  }
+
+
   getStatusClass(status: string): string {
     if (!status) return 'bg-gray-100 text-gray-800';
     const formattedStatus = status.toLowerCase().trim();

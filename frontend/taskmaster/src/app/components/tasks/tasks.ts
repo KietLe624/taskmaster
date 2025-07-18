@@ -1,40 +1,55 @@
-import { ChangeDetectorRef, Component, OnInit, } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Task } from '../../services/task/task'; // Chỉnh sửa đường dẫn nếu cần
-import { TaskDetailData } from '../../models/tasks'; // Sử dụng lại model chi tiết
+import { TaskDetailData, TaskForm } from '../../models/tasks'; // Sử dụng lại model chi tiết
+import { User, Project } from '../../models/tasks'; // Sử dụng lại model người dùng và dự án
 
 @Component({
   selector: 'app-tasks',
   standalone: false,
   templateUrl: './tasks.html',
   styleUrl: './tasks.css',
-  
 })
 export class Tasks implements OnInit {
   tasks: TaskDetailData[] = [];
   isLoading = true;
-
+  isModalOpen = false;
+  currentModalTitle = '';
+  selectedTask: any = {}; // Dữ liệu cho modal
+  public isEditMode = false;
+  public taskToEdit: TaskDetailData | null = null; // Dữ liệu công việc để chỉnh sửa
+  public allUsers: User[] = [];
+  public allProjects: Project[] = [];
   constructor(private taskService: Task, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.loadTasks();
   }
+  // lưu thông tin để lọc
+  filters = {
+    name: '',
+    status: 'all',
+    priority: 'all',
+    sortBy: 'due_date',
+    sortOrder: 'asc'
+  };
 
   loadTasks(): void {
     this.isLoading = true;
-    // Giả sử bạn có một hàm getAllTasks trong service
-    this.taskService.getTasks().subscribe({
+    this.taskService.getTasks(this.filters).subscribe({
       next: (data) => {
         this.tasks = data;
         this.isLoading = false;
-        console.log('Dữ liệu công việc:', this.tasks);
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Lỗi khi tải danh sách công việc:', err);
-        this.isLoading = true;
-        alert('Không thể tải danh sách công việc.');
-      }
+        this.isLoading = false;
+      },
     });
+  }
+
+  applyFilters(): void {
+    this.loadTasks();
   }
 
   getStatusBorderClass(status: string): string {
@@ -54,6 +69,7 @@ export class Tasks implements OnInit {
     }
   }
 
+  // hàm lấy trạng thái công việc
   getStatusClass(status: string): string {
     if (!status) return 'bg-gray-100 text-gray-800';
     const formattedStatus = status.toLowerCase().trim();
@@ -90,25 +106,127 @@ export class Tasks implements OnInit {
     }
   }
 
-  // --- Các hàm xử lý sự kiện (hiện tại là giữ chỗ) ---
-
   openCreateModal(): void {
-    console.log('Mở modal để tạo công việc mới');
+    this.selectedTask = {
+      // Reset dữ liệu
+      name: '',
+      description: '',
+      priority: '',
+      status: '',
+      due_date: '',
+      project_id: null,
+      assignee: [],
+    };
+    this.currentModalTitle = 'Tạo Công việc Mới';
+    this.isModalOpen = true;
   }
 
-  openEditModal(task: TaskDetailData): void {
-    console.log('Mở modal để sửa công việc:', task.id);
+  openEditModal(task: any): void {
+    this.isEditMode = true; // Kích hoạt chế độ sửa
+    this.taskToEdit = task; // Lưu lại task cần sửa
+    this.currentModalTitle = `Chỉnh sửa: ${task.name}`;
+    this.isModalOpen = true; // Mở modal
   }
 
-  deleteTask(taskId: number): void {
-    if (confirm('Bạn có chắc chắn muốn xóa công việc này không?')) {
-      console.log('Xóa công việc:', taskId);
-      // Gọi service để xóa và tải lại danh sách
+  onSaveTask(taskFormData: TaskForm): void {
+    if (this.isEditMode && this.taskToEdit) {
+      // Cập nhật công việc hiện tại
+      if (this.taskToEdit) {
+        if (!taskFormData || !taskFormData.name) {
+          alert('Dữ liệu form không hợp lệ. Vui lòng kiểm tra các trường.');
+          return;
+        }
+        this.taskService
+          .updateTask(this.taskToEdit.task_id, taskFormData)
+          .subscribe({
+            next: (updateTask) => {
+              alert('Công việc đã được cập nhật thành công!');
+              this.isModalOpen = false; // Đóng modal sau khi cập nhật thành công
+              this.closeModal(); // Đóng modal
+              this.loadTasks(); // Tải lại danh sách công việc
+              this.cdr.detectChanges();
+            },
+            error: (err) => {
+              console.error('Lỗi khi cập nhật công việc:', err);
+              alert('Không thể cập nhật công việc. Vui lòng thử lại sau.');
+            },
+          });
+      }
+    } else {
+      // Tạo công việc mới
+      this.taskService.createTask(taskFormData).subscribe({
+        next: (newTask) => {
+          alert('Công việc đã được tạo thành công!');
+          this.isModalOpen = false; // Đóng modal sau khi tạo thành công
+          this.loadTasks(); // Tải lại danh sách công việc
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Lỗi khi tạo công việc:', err);
+          alert('Không thể tạo công việc. Vui lòng thử lại sau.');
+          this.closeModal(); // Đóng modal ngay cả khi có lỗi
+        },
+      });
     }
   }
 
+  onStatusChange(event: Event, taskId: number): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const newStatus = selectElement.value;
+    if (taskId === undefined || taskId === null) {
+      return;
+    }
+    this.taskService.updateTaskStatus(taskId, newStatus).subscribe({
+      next: (response) => {
+        const taskToUpdate = this.tasks.find((t) => t.task_id === taskId);
+        if (taskToUpdate) {
+          taskToUpdate.status = newStatus;
+        }
+      },
+      error: (err) => {
+        alert(
+          'Không thể cập nhật trạng thái. Vui lòng tải lại trang và thử lại.'
+        );
+        const taskToUpdate = this.tasks.find((t) => t.task_id === taskId);
+        if (taskToUpdate) {
+          selectElement.value = taskToUpdate.status;
+        }
+      },
+    });
+  }
+  // Hàm được gọi khi nhận sự kiện "close" từ component con
+  closeModal(): void {
+    this.isModalOpen = false;
+    this.cdr.detectChanges();
+  }
+  deleteTask(taskId: number): void {
+    if (confirm('Bạn có chắc chắn muốn xóa công việc này không?')) {
+      this.taskService.deleteTask(taskId).subscribe({
+        next: (response) => {
+          alert('Công việc đã được xóa thành công!');
+          // Sửa toán tử so sánh từ !== thành !=
+          this.tasks = this.tasks.filter((task) => task.task_id != taskId);
+          this.cdr.detectChanges(); // Cập nhật lại view
+        },
+        error: (err) => {
+          alert('Không thể xóa công việc. Vui lòng thử lại.');
+        },
+      });
+    }
+  }
+  // Xoá bộ lọc
+  clearFilters(): void {
+    this.filters = {
+      name: '',
+      status: 'all',
+      priority: 'all',
+      sortBy: 'due_date',
+      sortOrder: 'asc'
+    };
+    this.applyFilters();
+  }
+
+
   updateTaskStatus(taskId: number, newStatus: string): void {
-    console.log(`Cập nhật trạng thái cho công việc ${taskId} thành ${newStatus}`);
-    // Gọi service để cập nhật trạng thái và xử lý kết quả
   }
 }

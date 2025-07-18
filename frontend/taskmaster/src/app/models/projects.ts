@@ -1,5 +1,7 @@
 import { User } from "./users";
 
+
+
 export interface ProjectManager {
   id: number;
   full_name: string;
@@ -16,5 +18,7 @@ export interface ProjectsData {
   progress?: number; // Tiến độ dự án (0-100)
   created_at: string;
   updated_at: string;
-  manager: ProjectManager; // Đối tượng người quản lý được join từ backend
+  manager: ProjectManager; // Đối tượng người quản lý được join từ backend[];
+  members: User[]; // Mảng các thành viên tham gia dự án
 }
+

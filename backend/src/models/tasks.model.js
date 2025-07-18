@@ -2,16 +2,20 @@ module.exports = (sequelize, DataTypes) => {
   const Task = sequelize.define(
     "Task",
     {
-      task_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true},
+      task_id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       project_id: { type: DataTypes.INTEGER, allowNull: false },
       name: { type: DataTypes.TEXT, allowNull: false },
-      description: { type: DataTypes.TEXT, allowNull: false },
+      description: { type: DataTypes.TEXT, allowNull: true },
       status: { type: DataTypes.TEXT, allowNull: false },
       priority: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
-      cate : { type: DataTypes.TEXT, allowNull: false },
+      cate: { type: DataTypes.TEXT, allowNull: true },
       due_date: { type: DataTypes.DATE, allowNull: false },
       createdAt: {
         type: DataTypes.DATE,
@@ -25,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       tableName: "tasks",
       underscored: true,
-      timestamps: true,
+      timestamps: true, // Không sử dụng timestamps tự động
     }
   );
 

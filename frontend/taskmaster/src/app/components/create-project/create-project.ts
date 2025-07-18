@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
-import { ProjectsData } from '../../models/projects'; // Điều chỉnh đường dẫn nếu cần
+import { ProjectsData } from '../../models/projects';
 
 export interface ProjectFrom {
   id: string | null;
@@ -8,19 +8,19 @@ export interface ProjectFrom {
   startDate: string;
   endDate: string;
   manager_name: string;
-  user_name: string;
+  username: string;
 }
 
 @Component({
   selector: 'app-create-project',
   templateUrl: './create-project.html',
   styleUrls: ['./create-project.css'],
-  standalone: false, 
+  standalone: false,
 })
 export class CreateProject implements OnChanges {
   @Input() show = false;
   @Input() isEditMode = false;
-  @Input() projectToEdit: ProjectsData | null = null; // --- INPUT MỚI ---
+  @Input() projectToEdit: ProjectsData | null = null;
 
   @Output() save = new EventEmitter<ProjectFrom>();
   @Output() close = new EventEmitter<void>();
@@ -28,7 +28,7 @@ export class CreateProject implements OnChanges {
   public projectData: ProjectFrom = this.resetForm();
   public modalTitle = 'Tạo dự án mới';
 
-  constructor() {}
+  constructor() { }
 
   ngOnChanges(changes: SimpleChanges): void {
     // Nếu modal được hiển thị, kiểm tra xem có phải chế độ sửa không
@@ -44,7 +44,7 @@ export class CreateProject implements OnChanges {
           startDate: this.formatDate(this.projectToEdit.start_date),
           endDate: this.formatDate(this.projectToEdit.end_date),
           manager_name: '', // Các trường này không thuộc form sửa
-          user_name: ''
+          username: ''
         };
       } else {
         // --- CHẾ ĐỘ TẠO MỚI ---
@@ -62,7 +62,7 @@ export class CreateProject implements OnChanges {
   }
 
   private resetForm(): ProjectFrom {
-    return { id: null, name: '', description: '', startDate: '', endDate: '', manager_name: '', user_name: '' };
+    return { id: null, name: '', description: '', startDate: '', endDate: '', manager_name: '', username: '' };
   }
 
   closeModal(): void {

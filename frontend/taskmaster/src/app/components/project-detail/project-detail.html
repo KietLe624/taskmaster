@@ -47,7 +47,7 @@
         </p>
         <p class="text-gray-700 text-base mt-1" id="detailProjectMembers">
           <span *ngFor="let member of members; let isLast = last" class="text-gray-600">
-            {{ member?.full_name }} {{ !isLast ? ', ' : '' }}
+            {{ member?.full_name || member?.username || members }} {{ !isLast ? ', ' : '' }}
           </span>
         </p>
       </div>
@@ -258,6 +258,6 @@
   </div>
 </div>
 
-<app-create-project *ngIf="showEditModal" [show]="showEditModal" [isEditMode]="true" [projectToEdit]="project"
+<app-create-project *ngIf="showEditModal" [show]="showEditModal" [isEditMode]="true"
   (save)="handleUpdateProject($event)" (close)="closeEditModal()">
 </app-create-project>

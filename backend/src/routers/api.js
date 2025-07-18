@@ -9,9 +9,11 @@ const {
   getAllUsers,
   getUserById,
   getManagedProjectCount,
+  updateUser,
 } = require("../controllers/users.controller");
 // Import các controller cho projects
 const {
+  getAllProjects,
   getProjects,
   getProjectById,
   createProject,
@@ -23,7 +25,13 @@ const { getDashboardData } = require("../controllers/dashboard.controller");
 // Import các controller cho auth
 const { register, login } = require("../controllers/auth.controller");
 // controller cho tasks
-const { getTasks,updateStatusTask } = require("../controllers/tasks.controller");
+const {
+  getTasks,
+  createTask,
+  updateStatusTask,
+  updateTask,
+  deleteTask,
+} = require("../controllers/tasks.controller");
 
 // ============================================= //
 router.use(cors()); // Sử dụng cors cho tất cả các route
@@ -39,9 +47,12 @@ router.get("/users", getAllUsers);
 router.get("/users/:id", getUserById);
 // Route để đếm số lượng dự án mà người dùng đang quản lý
 router.get("/users/:id/countManagedProjects", getManagedProjectCount);
+router.put("/users/:id", authenticateToken, updateUser); // Cập nhật thông tin người dùng
+
 // ============================================= //
+router.get("/projects/all", getAllProjects); // Lấy tất cả dự án
 router.get("/projects", authenticateToken, getProjects); // Lấy danh sách dự án
-router.get("/projects/:id", authenticateToken, getProjectById); // Lấy dự án theo ID
+router.get("/projects/:id", authenticateToken, getProjectById); // Lấy dự án theo ID, bao gồm thông tin thành viên và tiến độ
 router.post("/projects", authenticateToken, createProject); // Tạo dự án mới
 router.put("/projects/:id", authenticateToken, updateProject); // Cập nhật dự án
 router.delete("/projects/:id", authenticateToken, deleteProject); // Xóa dự án
@@ -53,8 +64,11 @@ router.post("/auth/signin", login);
 
 // ============================================= //
 router.get("/tasks", authenticateToken, getTasks); // Route để lấy task theo ID
-router.put("/tasks/:id", authenticateToken, updateStatusTask); // Route để cập nhật trạng thái task
-
+router.post("/tasks", authenticateToken, createTask); // Route để tạo task mới
+router.patch("/taskStatus/:id", authenticateToken, updateStatusTask); // Route để cập nhật trạng thái task
+router.put("/tasks/:id", authenticateToken, updateTask); // Route để cập nhật task
+router.delete("/tasks/:id", authenticateToken, deleteTask); // Route để xoá task
+// ============================================= //
 
 
 module.exports = router;

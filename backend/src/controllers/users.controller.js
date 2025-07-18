@@ -52,8 +52,36 @@ const getManagedProjectCount = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  const userId = req.params.id;
+  const { full_name, email, address, phone_number } = req.body;
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Người dùng không tồn tại" });
+    }
+
+    // Cập nhật thông tin người dùng
+    user.full_name = full_name || user.full_name;
+    user.email = email || user.email;
+    user.address = address || user.address;
+    user.phone_number = phone_number || user.phone_number;
+
+    await user.save();
+    res.status(200).json({ message: "Cập nhật thành công", user });
+  } catch (error) {
+    res.status(500).json({
+      message: "Lỗi khi cập nhật thông tin người dùng",
+      error: error.message,
+    });
+  }
+}
+
+
 module.exports = {
   getAllUsers,
   getUserById,
   getManagedProjectCount,
+  updateUser,
 };
