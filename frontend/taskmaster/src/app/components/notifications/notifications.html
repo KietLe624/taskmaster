@@ -1,9 +1,37 @@
-<div class="container mx-auto max-w-3xl">
-  <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-    <h1 class="text-3xl font-bold text-gray-800 mb-2">Thông báo</h1>
-    <p class="text-gray-600">Các cập nhật mới nhất về công việc và dự án của bạn.</p>
+<div class="container mx-auto max-w-4xl px-4 py-8">
+  <!-- Header Section -->
+  <div class="bg-white p-6 rounded-xl shadow-md mb-8 border border-gray-100">
+    <h1 class="text-2xl font-bold text-gray-900 mb-2 tracking-tight">Thông báo</h1>
+    <!-- <p class="text-gray-500 text-sm">Cập nhật mới nhất về công việc và dự án của bạn.</p> -->
+  </div>
+  <!-- Empty State -->
+  <div *ngIf="notifications.length === 0"
+    class="text-center py-12 bg-white rounded-xl shadow-md border border-gray-100">
+    <p class="text-gray-500 text-lg">Không có thông báo nào.</p>
   </div>
 
-  <div id="notificationList" class="space-y-4">
+  <!-- Notification List -->
+  <div *ngIf="notifications.length > 0" id="notificationList" class="space-y-4">
+    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300"
+      *ngFor="let notification of notifications">
+      <div class="flex items-center justify-between mb-3">
+        <span
+          class="text-xs font-medium px-2 py-1 rounded-full {{ notification.status_read ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100' }}">
+          {{ notification.status_read ? 'Đã đọc' : 'Chưa đọc' }}
+        </span>
+      </div>
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-sm text-gray-400">{{ notification.created_at | date: 'dd/MM/yyyy HH:mm' }}</span>
+          <p class="text-lg font-semibold text-gray-900 mt-1">{{ notification.type }}</p>
+          <p class="text-gray-600 text-sm mt-1 {{ notification.status_read ? 'line-through' : '' }}">{{
+            notification.message }}</p>
+        </div>
+        <label class="flex items-center">
+          <input type="checkbox" [checked]="notification.status_read" (change)="markAsRead(notification)"
+            class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+        </label>
+      </div>
+    </div>
   </div>
 </div>

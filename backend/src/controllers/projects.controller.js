@@ -4,6 +4,7 @@ const User = db.User;
 const Project = db.Project;
 const Task = db.Task;
 const ProjectMember = db.ProjectMember;
+// const {NotificationsController} = require("../controllers/notifications.controller");
 
 console.log("Các models đã được nạp:", Object.keys(db));
 
@@ -291,6 +292,87 @@ const deleteProject = async (req, res) => {
   }
 };
 
+const addMemberToProject = async (req, res) => {
+  try {
+    const projectId = req.params.id; // Lấy ID dự án từ URL
+    const { email, role } = req.body; // Lấy email và vai trò từ body
+    const requesterId = req.user.user_id; // Lấy ID của người yêu cầu từ token
+
+    if (!email || !role) {
+      return res.status(400).json({
+        message: "Vui lòng cung cấp email và vai trò của thành viên.",
+      });
+    }
+
+    // 1. Tìm dự án và người dùng cần thêm
+    const project = await Project.findByPk(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Không tìm thấy dự án." });
+    }
+
+    const userToAdd = await User.findOne({ where: { email: email } });
+    if (!userToAdd) {
+      return res
+        .status(404)
+        .json({ message: `Không tìm thấy người dùng với email: ${email}` });
+    }
+
+    // 2. Kiểm tra quyền hạn: Chỉ người quản lý dự án mới có quyền thêm
+    if (project.manager_id !== requesterId) {
+      return res
+        .status(403)
+        .json({ message: "Bạn không có quyền thêm thành viên vào dự án này." });
+    }
+
+    // 3. Kiểm tra xem người dùng đã là thành viên chưa bằng cách truy vấn bảng ProjectMember
+    const existingMember = await ProjectMember.findOne({
+      where: {
+        project_id: projectId,
+        user_id: userToAdd.user_id,
+      },
+    });
+
+    if (existingMember) {
+      return res
+        .status(400)
+        .json({ message: "Người dùng này đã là thành viên của dự án." });
+    }
+
+    // 4. Thêm người dùng vào dự án bằng cách tạo một bản ghi mới trong ProjectMember
+    const { createNotification } = require("./notifications.controller");
+    await ProjectMember.create({
+      project_id: projectId,
+      user_id: userToAdd.user_id,
+      role: role, // 'member', 'admin', etc.
+      added_at: new Date(),
+    });
+
+    // 5. Tích hợp tạo thông báo
+    const requester = await User.findByPk(requesterId); // Lấy thông tin người mời
+    if (!requester) {
+      return res.status(404).json({ message: "Không tìm thấy người mời." });
+    }
+    console.log(
+      `[ADD MEMBER DEBUG] Người mời: ${requester.full_name} (${requester.email})`
+    );
+    // Tạo thông báo cho người dùng mới được thêm vào
+    await createNotification({
+      user_id: userToAdd.user_id,
+      type: "Thêm thành viên dự án",
+      message: `Bạn vừa được ${requester.full_name} thêm vào dự án "${project.name}" với vai trò ${role}.`,
+      link: `/app/projects/${project.id}`, // Link để điều hướng khi click
+    });
+
+    res.status(200).json({ message: "Thêm thành viên thành công." });
+  } catch (error) {
+    console.error("Lỗi khi thêm thành viên:", error);
+    res.status(500).send({
+      message: "Lỗi khi thêm thành viên vào dự án",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getAllProjects,
   getProjects,
@@ -298,4 +380,5 @@ module.exports = {
   createProject,
   updateProject,
   deleteProject,
+  addMemberToProject,
 };

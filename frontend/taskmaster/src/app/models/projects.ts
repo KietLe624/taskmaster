@@ -1,7 +1,5 @@
 import { User } from "./users";
 
-
-
 export interface ProjectManager {
   id: number;
   full_name: string;

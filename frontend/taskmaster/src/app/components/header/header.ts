@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SidebarService } from '../../services/sidebar/sidebar';
-import { NotificationService } from '../../services/notification/notification';
+import { Notification } from '../../services/notification/notification';
 import { Observable } from 'rxjs';
 import { Auth } from '../../services/auth/auth';
 
@@ -11,15 +11,13 @@ import { Auth } from '../../services/auth/auth';
   styleUrl: './header.css',
 })
 export class Header implements OnInit {
-  public unreadCount$: Observable<number>;
   isLoggedIn$: Observable<boolean>;
 
   constructor(
     private sidebarService: SidebarService,
-    private notificationService: NotificationService,
+    private notificationService: Notification,
     private authService: Auth
   ) {
-    this.unreadCount$ = this.notificationService.getUnreadCount();
     this.isLoggedIn$ = this.authService.isLoggedIn$;
   }
 
@@ -30,7 +28,7 @@ export class Header implements OnInit {
     this.sidebarService.toggle();
   }
   // Hàm đăng xuất
-    // Hàm này sẽ được gọi khi người dùng nhấn nút Đăng xuất
+  // Hàm này sẽ được gọi khi người dùng nhấn nút Đăng xuất
   logout(): void {
     this.authService.logout();
   }

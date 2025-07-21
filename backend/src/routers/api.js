@@ -3,15 +3,17 @@ const router = express.Router();
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const authenticateToken = require("../middleware/auth.middleware");
-
-// Import các controller cần thiết
+ 
+/* --------------------------------------------Controllers--------------------------------------------- */
+// UserController
 const {
   getAllUsers,
   getUserInfo,
   getManagedProjectCount,
   updateUser,
 } = require("../controllers/users.controller");
-// Import các controller cho projects
+
+// ProjectController
 const {
   getAllProjects,
   getProjects,
@@ -19,16 +21,20 @@ const {
   createProject,
   updateProject,
   deleteProject,
+  addMemberToProject,
 } = require("../controllers/projects.controller");
-// Import các controller cho dashboard
+
+// DashboardController
 const { getDashboardData } = require("../controllers/dashboard.controller");
-// Import các controller cho auth
+
+// AuthController
 const {
   register,
   login,
   changePassword,
 } = require("../controllers/auth.controller");
-// controller cho tasks
+
+// TaskController
 const {
   getTasks,
   createTask,
@@ -37,42 +43,55 @@ const {
   deleteTask,
 } = require("../controllers/tasks.controller");
 
-// ============================================= //
-router.use(cors()); // Sử dụng cors cho tất cả các route
-router.use(bodyParser.urlencoded({ extended: true })); // Phân tích dữ liệu từ form
+// NotificationController
+const {
+  createNotification,
+  getUserNotifications,
+  markAsRead,
+} = require("../controllers/notifications.controller");
 
-// Route để lấy tất cả dự án trên dashboard
-router.get("/", authenticateToken, getDashboardData);
-router.get("/dashboard", authenticateToken, getDashboardData);
 
-// Route để lấy tất cả người dùng
-router.get("/users", getAllUsers);
-// Route để lấy người dùng theo ID
-router.get("/users/:user_id", authenticateToken, getUserInfo);
-// Route để đếm số lượng dự án mà người dùng đang quản lý
-router.get("/users/:id/countManagedProjects", getManagedProjectCount);
-router.put("/users/:id", authenticateToken, updateUser); // Cập nhật thông tin người dùng
+/* 
+-------------------------------------Middleware--------------------------------------
+*/
 
-// ============================================= //
-router.get("/projects/all", getAllProjects); // Lấy tất cả dự án
-router.get("/projects", authenticateToken, getProjects); // Lấy danh sách dự án
-router.get("/projects/:id", authenticateToken, getProjectById); // Lấy dự án theo ID, bao gồm thông tin thành viên và tiến độ
-router.post("/projects", authenticateToken, createProject); // Tạo dự án mới
-router.put("/projects/:id", authenticateToken, updateProject); // Cập nhật dự án
-router.delete("/projects/:id", authenticateToken, deleteProject); // Xóa dự án
-// ============================================= //
-// Route đăng ký người dùng
-router.post("/auth/register", register);
-// Route đăng nhập người dùng
-router.post("/auth/signin", login);
-// Route cập nhật mật khẩu người dùng
-router.patch("/auth/changePassword", authenticateToken, changePassword); // Cập nhật mật khẩu người dùng
-// ============================================= //
-router.get("/tasks", authenticateToken, getTasks); // Route để lấy task theo ID
-router.post("/tasks", authenticateToken, createTask); // Route để tạo task mới
-router.patch("/taskStatus/:id", authenticateToken, updateStatusTask); // Route để cập nhật trạng thái task
-router.put("/tasks/:id", authenticateToken, updateTask); // Route để cập nhật task
-router.delete("/tasks/:id", authenticateToken, deleteTask); // Route để xoá task
-// ============================================= //
+router.use(cors());
+router.use(bodyParser.urlencoded({ extended: true }));
+
+// Dashboard Routes
+router.get("/", authenticateToken, getDashboardData); // Get dashboard data
+router.get("/dashboard", authenticateToken, getDashboardData); // Get dashboard data (alias)
+
+// User Routes
+router.get("/users", getAllUsers); // Get all users
+router.get("/users/:user_id", authenticateToken, getUserInfo); // Get user by ID
+router.get("/users/:id/countManagedProjects", getManagedProjectCount); // Count managed projects
+router.put("/users/:id", authenticateToken, updateUser); // Update user info
+
+// Project Routes
+router.get("/projects/all", getAllProjects); // Get all projects
+router.get("/projects", authenticateToken, getProjects); // Get user projects
+router.get("/projects/:id", authenticateToken, getProjectById); // Get project by ID
+router.post("/projects", authenticateToken, createProject); // Create new project
+router.put("/projects/:id", authenticateToken, updateProject); // Update project
+router.delete("/projects/:id", authenticateToken, deleteProject); // Delete project
+router.post("/projects/:id/members", authenticateToken, addMemberToProject); // Add member to project
+
+// Authentication Routes
+router.post("/auth/register", register); // User registration
+router.post("/auth/signin", login); // User login
+router.patch("/auth/changePassword", authenticateToken, changePassword); // Update user password
+
+// Task Routes
+router.get("/tasks", authenticateToken, getTasks); // Get tasks
+router.post("/tasks", authenticateToken, createTask); // Create new task
+router.patch("/taskStatus/:id", authenticateToken, updateStatusTask); // Update task status
+router.put("/tasks/:id", authenticateToken, updateTask); // Update task
+router.delete("/tasks/:id", authenticateToken, deleteTask); // Delete task
+
+// Notification Routes
+router.post("/notifications", authenticateToken, createNotification); // Create notification
+router.get("/notifications", authenticateToken, getUserNotifications); // Get user notifications
+router.patch("/notifications/:id", authenticateToken, markAsRead); // Mark notification as read
 
 module.exports = router;

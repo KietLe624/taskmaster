@@ -32,6 +32,7 @@ import { AuthLayout } from './layouts/auth-layout/auth-layout';
 import { PublicLayout } from './layouts/public-layout/public-layout';
 import { authInterceptor } from './interceptor/auth-interceptor';
 import { FilterPipe } from './services/filter/filer';
+import { BellModule } from './components/bell-module/bell-module';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { FilterPipe } from './services/filter/filer';
     Register,
     AuthLayout,
     PublicLayout,
+    BellModule,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule, CommonModule, FilterPipe],
 
