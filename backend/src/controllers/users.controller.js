@@ -17,14 +17,14 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-const getUserById = async (req, res) => {
-  const userId = req.params.id;
+const getUserInfo = async (req, res) => {
   try {
+    const userId = req.params.user_id; // Lấy ID người dùng từ tham số URL
     const user = await User.findByPk(userId, {
       attributes: { exclude: ["password"] }, // Loại bỏ trường password
     });
     if (!user) {
-      return res.status(404).json({ message: "Người dùng không tồn tại" });
+      return res.status(404).json({ message: "Người dùng không tồn tại." });
     }
     res.status(200).json(user);
   } catch (error) {
@@ -53,35 +53,50 @@ const getManagedProjectCount = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const userId = req.params.id;
-  const { full_name, email, address, phone_number } = req.body;
-
   try {
+    if (!req.user || !req.user.user_id) {
+      return res.status(401).json({
+        message: "Bạn cần đăng nhập để cập nhật thông tin người dùng.",
+      });
+    }
+    const userId = req.user.user_id;
+    const { full_name, email, phone_number, address } = req.body;
     const user = await User.findByPk(userId);
     if (!user) {
-      return res.status(404).json({ message: "Người dùng không tồn tại" });
+      return res.status(404).json({ message: "Người dùng không tồn tại." });
     }
-
-    // Cập nhật thông tin người dùng
+    // Cập nhật thông tin
     user.full_name = full_name || user.full_name;
     user.email = email || user.email;
-    user.address = address || user.address;
     user.phone_number = phone_number || user.phone_number;
+    user.address = address || user.address;
 
-    await user.save();
-    res.status(200).json({ message: "Cập nhật thành công", user });
+    // Kiểm tra họ và tên không được để trống
+    if (!user.full_name) {
+      return res
+        .status(400)
+        .json({ message: "Vui lòng không để trống họ và tên." });
+    }
+    // Kiểm tra email có hợp lệ và chưa được sử dụng
+    if (user.email) {
+      const emailExists = await User.findOne({ where: { email: user.email } });
+      if (emailExists && emailExists.user_id !== userId) {
+        return res.status(400).json({ message: "Email đã được sử dụng." });
+      }
+    }
+    await user.save(); // Chỉ lưu khi full_name hợp lệ
+    res.status(200).json({ message: "Cập nhật thông tin thành công", user });
   } catch (error) {
     res.status(500).json({
       message: "Lỗi khi cập nhật thông tin người dùng",
       error: error.message,
     });
   }
-}
-
+};
 
 module.exports = {
   getAllUsers,
-  getUserById,
+  getUserInfo,
   getManagedProjectCount,
   updateUser,
 };

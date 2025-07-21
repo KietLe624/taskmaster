@@ -18,7 +18,6 @@ export class Projects implements OnInit {
   public isEditMode = false;
   public projectToEdit: ProjectsData | null = null;
 
-
   constructor(private projectService: ProjectService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {

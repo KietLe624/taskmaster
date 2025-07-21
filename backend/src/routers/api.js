@@ -7,7 +7,7 @@ const authenticateToken = require("../middleware/auth.middleware");
 // Import các controller cần thiết
 const {
   getAllUsers,
-  getUserById,
+  getUserInfo,
   getManagedProjectCount,
   updateUser,
 } = require("../controllers/users.controller");
@@ -23,7 +23,11 @@ const {
 // Import các controller cho dashboard
 const { getDashboardData } = require("../controllers/dashboard.controller");
 // Import các controller cho auth
-const { register, login } = require("../controllers/auth.controller");
+const {
+  register,
+  login,
+  changePassword,
+} = require("../controllers/auth.controller");
 // controller cho tasks
 const {
   getTasks,
@@ -44,7 +48,7 @@ router.get("/dashboard", authenticateToken, getDashboardData);
 // Route để lấy tất cả người dùng
 router.get("/users", getAllUsers);
 // Route để lấy người dùng theo ID
-router.get("/users/:id", getUserById);
+router.get("/users/:user_id", authenticateToken, getUserInfo);
 // Route để đếm số lượng dự án mà người dùng đang quản lý
 router.get("/users/:id/countManagedProjects", getManagedProjectCount);
 router.put("/users/:id", authenticateToken, updateUser); // Cập nhật thông tin người dùng
@@ -61,7 +65,8 @@ router.delete("/projects/:id", authenticateToken, deleteProject); // Xóa dự �
 router.post("/auth/register", register);
 // Route đăng nhập người dùng
 router.post("/auth/signin", login);
-
+// Route cập nhật mật khẩu người dùng
+router.patch("/auth/changePassword", authenticateToken, changePassword); // Cập nhật mật khẩu người dùng
 // ============================================= //
 router.get("/tasks", authenticateToken, getTasks); // Route để lấy task theo ID
 router.post("/tasks", authenticateToken, createTask); // Route để tạo task mới
@@ -69,6 +74,5 @@ router.patch("/taskStatus/:id", authenticateToken, updateStatusTask); // Route �
 router.put("/tasks/:id", authenticateToken, updateTask); // Route để cập nhật task
 router.delete("/tasks/:id", authenticateToken, deleteTask); // Route để xoá task
 // ============================================= //
-
 
 module.exports = router;

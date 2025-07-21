@@ -236,26 +236,19 @@ const updateProject = async (req, res) => {
   try {
     const projectId = req.params.id; // SỬA: Lấy ID từ URL params
     const currentUserId = req.user?.user_id;
-
     if (!currentUserId) {
       return res.status(401).json({ message: "Yêu cầu đăng nhập." });
     }
-
     const project = await Project.findByPk(projectId);
-
     if (!project) {
       return res.status(404).json({ message: "Không tìm thấy dự án." });
     }
-
     if (project.manager_id !== currentUserId) {
       return res
         .status(403)
         .json({ message: "Bạn không có quyền chỉnh sửa dự án này." });
     }
-
-    // SỬA: Dùng req.body trực tiếp vì frontend đã gửi đúng định dạng
     const updatedProject = await project.update(req.body);
-
     res.status(200).json(updatedProject);
   } catch (error) {
     console.error("[UPDATE PROJECT ERROR]", error);

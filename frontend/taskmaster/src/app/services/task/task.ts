@@ -17,7 +17,6 @@ export class Task {
   getProjects(): Observable<Project[]> {
     return this.http.get<Project[]>('http://localhost:3000/api/projects/all');
   }
-
   // Phương thức mới để lấy Users
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>('http://localhost:3000/api/users');
@@ -25,14 +24,12 @@ export class Task {
   getTasks(filters: any): Observable<TaskDetailData[]> {
     const token = sessionStorage.getItem('auth_token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token || ''}`);
-
     let params = new HttpParams();
     for (const key in filters) {
       if (filters[key]) {
         params = params.append(key, filters[key]);
       }
     }
-
     return this.http.get<TaskDetailData[]>(this.apiUrl, { headers, params });
   }
   createTask(taskData: TaskForm): Observable<{ message: string; data: TaskDetailData }> {
@@ -57,6 +54,7 @@ export class Task {
       catchError(this.handleError<TaskDetailData>(`updateTask id=${taskId}`))
     );
   }
+  
   deleteTask(taskId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${taskId}`);
   }

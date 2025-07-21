@@ -60,18 +60,36 @@ export class Auth {
     return this.http.post<any>(`${this.apiUrl}/signin`, credentials).pipe(
       tap((response) => {
         console.log('[AuthService] LOGIN - Nhận được phản hồi từ server.');
+        console.log('[AuthService] LOGIN - Phản hồi:', response);
         if (isPlatformBrowser(this.platformId)) {
           const token = response.accessToken || response.token;
           if (token) {
             console.log('[AuthService] LOGIN - Lưu token vào sessionStorage và cập nhật loggedIn = true.');
             sessionStorage.setItem('auth_token', token);
             sessionStorage.setItem('user_info', JSON.stringify(response.user || response));
+            // decode token to get user_id
+            const decodedToken: any = this.decodeToken(token);
+            if (decodedToken && decodedToken.user_id) {
+              sessionStorage.setItem('user_id', decodedToken.user_id.toString());
+            } else {
+              console.error('[AuthService] LOGIN - Không tìm thấy user_id trong token.');
+            }
             this.loggedIn.next(true);
           }
         }
       })
     );
   }
+  // decodeToken
+  private decodeToken(token: string): any {
+    try {
+      return JSON.parse(atob(token.split('.')[1])); // Giải mã payload JWT
+    } catch (e) {
+      console.error('Lỗi giải mã token:', e);
+      return null;
+    }
+  }
+
 
   public hasToken(): boolean {
     // Thay đổi: Sử dụng sessionStorage
@@ -90,5 +108,10 @@ export class Auth {
       this.loggedIn.next(false);
       this.router.navigate(['/login']);
     }
+  }
+
+  changePassword(passwords: any): Observable<any> {
+    const { currentPassword, newPassword } = passwords;
+    return this.http.patch(`${this.apiUrl}/changePassword`, { currentPassword, newPassword });
   }
 }

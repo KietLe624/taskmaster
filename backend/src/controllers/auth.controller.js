@@ -1,5 +1,4 @@
 const db = require("../models/index.model"); // Import file index trung tâm
-const User = db.user;
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
@@ -95,7 +94,58 @@ const login = async (req, res) => {
       .send({ message: "Lỗi khi đăng nhập", error: error.message });
   }
 };
+// thay đổi mật khẩu
+const changePassword = async (req, res) => {
+  try {
+    const { User } = db; // Import model User từ index.model
+    const userId = req.user.user_id; // Lấy user_id từ token đã xác thực
+    const { currentPassword, newPassword } = req.body;
+
+    if (!userId) {
+      return res
+        .status(403)
+        .json({ message: "Không được phép. Vui lòng đăng nhập lại." });
+    }
+
+    // Tìm người dùng trong database
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng." });
+    }
+
+    // So sánh mật khẩu hiện tại người dùng nhập với mật khẩu trong DB
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: "Mật khẩu hiện tại không đúng." });
+    }
+
+    // (Tùy chọn) Kiểm tra xem mật khẩu mới có trùng với mật khẩu cũ không
+    if (currentPassword === newPassword) {
+      return res
+        .status(400)
+        .json({ message: "Mật khẩu mới không được trùng với mật khẩu cũ." });
+    }
+
+    // Mã hóa mật khẩu mới
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Cập nhật mật khẩu mới vào DB
+    user.password = hashedNewPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Thay đổi mật khẩu thành công." });
+  } catch (error) {
+    res
+      .status(500)
+      .send({ message: "Lỗi khi thay đổi mật khẩu", error: error.message });
+  }
+};
+
 module.exports = {
   register,
   login,
+  changePassword,
 };
