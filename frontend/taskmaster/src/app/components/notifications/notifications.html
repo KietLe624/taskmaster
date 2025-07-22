@@ -26,6 +26,7 @@
           <p class="text-lg font-semibold text-gray-900 mt-1">{{ notification.type }}</p>
           <p class="text-gray-600 text-sm mt-1 {{ notification.status_read ? 'line-through' : '' }}">{{
             notification.message }}</p>
+          <p class="text-gray-500 text-xs mt-1">{{ notification.link }}</p>
         </div>
         <label class="flex items-center">
           <input type="checkbox" [checked]="notification.status_read" (change)="markAsRead(notification)"

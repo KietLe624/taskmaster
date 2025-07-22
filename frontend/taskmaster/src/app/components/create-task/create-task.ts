@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { TaskDetailData, TaskForm, Project, User } from '../../models/tasks';
-
 import { ChangeDetectorRef } from '@angular/core'; // Giữ lại import này nếu cần
 
 @Component({
@@ -24,10 +23,12 @@ export class CreateTask implements OnChanges {
   @Output() close = new EventEmitter<void>();
 
 
-  constructor() { }
+  constructor(private cdr: ChangeDetectorRef) { }
+  
   ngOnChanges(changes: SimpleChanges): void {
     // Chỉ xử lý khi modal được mở
     if (changes['show'] && this.show) {
+      console.log(this.userList, this.projectList);
       if (this.isEditMode && this.taskToEdit) {
         // NẾU LÀ CHẾ ĐỘ SỬA: Lấy dữ liệu từ taskToEdit và điền vào form
         this.taskData = {
@@ -56,6 +57,7 @@ export class CreateTask implements OnChanges {
   public closeModal(): void {
     this.close.emit();
   }
+
   private formatDate(dateString: string): string {
     if (!dateString) return '';
     // new Date(dateString).toISOString() trả về "2025-12-20T00:00:00.000Z"

@@ -111,7 +111,9 @@
           <div *ngFor="let task of tasks | filter:'inreview'"
             class="card bg-white p-3 rounded-lg shadow-sm cursor-grab transition-transform duration-200 hover:-translate-y-1"
             draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
-            [attr.data-card-id]="task.task_id">
+            [attr.data-card-id]="task.task_id"
+            (click)="openTaskDetailModal(task)"
+            >
             <span
               class="inline-block bg-pink-200 text-pink-800 text-xs font-semibold px-2 py-1 rounded-full mb-2">{{task.cate
               || "Chưa phân loại"}}</span>
@@ -143,7 +145,8 @@
           <div *ngFor="let task of tasks | filter:'todo'"
             class="card bg-white p-3 rounded-lg shadow-sm cursor-grab transition-transform duration-200 hover:-translate-y-1"
             draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
-            [attr.data-card-id]="task.task_id">
+            [attr.data-card-id]="task.task_id"
+            (click)="openTaskDetailModal(task)">
             <span
               class="inline-block bg-pink-200 text-pink-800 text-xs font-semibold px-2 py-1 rounded-full mb-2">{{task.cate
               || "Chưa phân loại"}}</span>
@@ -175,7 +178,8 @@
           <div *ngFor="let task of tasks | filter:'in_progress'"
             class="card bg-white p-3 rounded-lg shadow-sm cursor-grab transition-transform duration-200 hover:-translate-y-1"
             draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
-            [attr.data-card-id]="task.task_id">
+            [attr.data-card-id]="task.task_id"
+            (click)="openTaskDetailModal(task)">
             <span
               class="inline-block bg-indigo-200 text-indigo-800 text-xs font-semibold px-2 py-1 rounded-full mb-2">{{task.cate
               || "Chưa phân loại"}}</span>
@@ -207,7 +211,8 @@
           <div *ngFor="let task of tasks | filter:'completed'"
             class="card bg-white p-3 rounded-lg shadow-sm cursor-grab transition-transform duration-200 hover:-translate-y-1"
             draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
-            [attr.data-card-id]="task.task_id">
+            [attr.data-card-id]="task.task_id"
+            (click)="openTaskDetailModal(task)">
             <span
               class="inline-block bg-gray-200 text-gray-800 text-xs font-semibold px-2 py-1 rounded-full mb-2">{{task.cate
               || "Chưa phân loại"}}</span>
@@ -239,7 +244,8 @@
           <div *ngFor="let task of tasks | filter:'overdue'"
             class="card bg-white p-3 rounded-lg shadow-sm cursor-grab transition-transform duration-200 hover:-translate-y-1"
             draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
-            [attr.data-card-id]="task.task_id">
+            [attr.data-card-id]="task.task_id"
+            (click)="openTaskDetailModal(task)">
             <span
               class="inline-block bg-red-200 text-red-800 text-xs font-semibold px-2 py-1 rounded-full mb-2">{{task.cate
               || "Chưa phân loại"}}</span>
@@ -261,3 +267,14 @@
 <app-create-project *ngIf="showEditModal" [show]="showEditModal" [isEditMode]="true"
   (save)="handleUpdateProject($event)" (close)="closeEditModal()">
 </app-create-project>
+
+<app-task-detail-modal
+  *ngIf="showTaskDetailModal"
+  [show]="showTaskDetailModal"
+  [task]="selectedTask"
+  [members]="members"
+  (closeModal)="closeTaskDetailModal()"
+  (save)="handleUpdateTask($event)"
+  (deleteTask)="handleDeleteTask($event)"
+></app-task-detail-modal>
+

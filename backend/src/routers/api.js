@@ -63,7 +63,7 @@ router.get("/", authenticateToken, getDashboardData); // Get dashboard data
 router.get("/dashboard", authenticateToken, getDashboardData); // Get dashboard data (alias)
 
 // User Routes
-router.get("/users", getAllUsers); // Get all users
+router.get("/users/all", getAllUsers); // Get all users
 router.get("/users/:user_id", authenticateToken, getUserInfo); // Get user by ID
 router.get("/users/:id/countManagedProjects", getManagedProjectCount); // Count managed projects
 router.put("/users/:id", authenticateToken, updateUser); // Update user info

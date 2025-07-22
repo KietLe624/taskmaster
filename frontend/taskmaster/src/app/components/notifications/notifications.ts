@@ -51,21 +51,28 @@ export class Notifications implements OnInit {
     });
   }
   // mark notification as read
-  markAsRead(notificationId: number): void {
-    this.notificationService.markAsRead(notificationId).subscribe({
-      next: () => {
-        const index = this.notifications.findIndex(n => n.id === notificationId);
-        if (index > -1) {
-          const updatedNotification = { ...this.notifications[index], status_read: true };
-          const newNotifications = [...this.notifications];
-          newNotifications[index] = updatedNotification;
-          this.notifications = newNotifications;
-          this.unreadCount = this.notifications.filter(n => !n.status_read).length;
-        }
-      },
-      error: (err) => {
-        console.error("Lỗi khi đánh dấu thông báo là đã đọc:", err);
+  markAsRead(notification: any): void {
+    if (!notification.status_read) {
+      this.notificationService.markAsRead(notification.id).subscribe({
+        next: () => {
+          const index = this.notifications.findIndex(n => n.id === notification.id);
+          if (index > -1) {
+            const updatedNotification = { ...this.notifications[index], status_read: true };
+            const newNotifications = [...this.notifications];
+            newNotifications[index] = updatedNotification;
+            this.notifications = newNotifications;
+            this.unreadCount = this.notifications.filter(n => !n.status_read).length;
+          }
+          if (notification.link) {
+            this.router.navigateByUrl(notification.link);
+          }
+        },
+        error: (err) => console.error("Lỗi khi đánh dấu đã đọc:", err)
+      });
+    } else {
+      if (notification.link) {
+        this.router.navigateByUrl(notification.link);
       }
-    });
+    }
   }
 }

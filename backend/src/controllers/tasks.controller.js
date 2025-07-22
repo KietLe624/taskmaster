@@ -1,11 +1,19 @@
 const db = require("../models/index.model");
 const { Op } = require("sequelize");
-const { get } = require("../routers/api");
 const Task = db.Task;
 const Project = db.Project;
 const User = db.User;
-const TaskAssignment = db.TaskAssignment;
 const sequelize = db.sequelize;
+
+// Kiểm tra xem người dùng có phải là quản lý dự án hay không
+const isProjectManager = async (userId, projectId) => {
+  const project = await Project.findByPk(projectId);
+  if (!project) {
+    // Trả về false nếu không tìm thấy dự án
+    return false;
+  }
+  return project.manager_id === userId;
+};
 
 // Hàm lấy tất cả công việc (hỗ trợ lọc)
 const getAllTasks = async (req, res) => {
@@ -110,7 +118,6 @@ const getTasks = async (req, res) => {
 
     res.status(200).json(tasks);
   } catch (error) {
-    console.error("[GET TASKS BY USER ERROR]", error);
     res.status(500).json({
       message: "Lỗi khi lấy danh sách công việc của bạn",
       error: error.message,
@@ -123,34 +130,29 @@ const createTask = async (req, res) => {
   console.log("--- SERVER ĐÃ NHẬN ĐƯỢC DỮ LIỆU ---");
   console.log(req.body);
   console.log("---------------------------------");
-  const t = await sequelize.transaction();
+
+  const t = await sequelize.transaction(); // Bắt đầu một transaction
+
   try {
-    const {
-      name,
-      description,
-      status,
-      priority,
-      cate,
-      due_date,
-      project_id,
-      assignee_id,
-    } = req.body;
+    const { name, description, status, priority, cate, due_date, project_id } =
+      req.body;
+
+    let assignee_ids = req.body.assignee_id; // Lấy ra để xử lý
+
+    const requesterId = req.user.user_id; // Lấy ID người tạo task từ token
 
     // Kiểm tra dữ liệu đầu vào
-    if (
-      !name ||
-      !status ||
-      !priority ||
-      !cate ||
-      !due_date ||
-      !project_id ||
-      !assignee_id
-    ) {
+    if (!name || !status || !priority || !cate || !due_date || !project_id) {
       return res
         .status(400)
         .json({ message: "Vui lòng điền đầy đủ các trường bắt buộc." });
     }
-
+    const canCreate = await isProjectManager(requesterId, project_id);
+    if (!canCreate) {
+      return res.status(403).json({
+        message: "Chỉ người quản lý dự án mới có quyền tạo công việc.",
+      });
+    }
     // Tạo công việc mới trong transaction
     const newTask = await Task.create(
       {
@@ -165,11 +167,70 @@ const createTask = async (req, res) => {
       { transaction: t }
     );
 
-    if (assignee_id) {
-      await newTask.setAssignees(assignee_id, { transaction: t });
+    // SỬA LỖI: Chuẩn hóa assignee_id thành một mảng để xử lý nhất quán
+    if (assignee_ids && !Array.isArray(assignee_ids)) {
+      assignee_ids = [assignee_ids]; // Nếu là một số, biến nó thành mảng một phần tử
     }
+
+    // Nếu có người được giao việc
+    if (assignee_ids && assignee_ids.length > 0) {
+      console.log("[DEBUG] Đã đi vào khối xử lý giao việc và thông báo.");
+
+      // Gán công việc cho các thành viên
+      await newTask.setAssignees(assignee_ids, { transaction: t });
+
+      // --- TÍCH HỢP LOGIC THÔNG BÁO ---
+      // 1. Lấy thông tin cần thiết cho nội dung thông báo
+      const { createNotification } = require("./notifications.controller"); // Just-in-time require
+      const project = await Project.findByPk(project_id, { transaction: t });
+      const requester = await User.findByPk(requesterId, { transaction: t });
+
+      // Kiểm tra xem có lấy được thông tin dự án và người yêu cầu không
+      if (!project || !requester) {
+        console.error(
+          "[DEBUG] LỖI: Không tìm thấy Project hoặc Requester. Sẽ rollback."
+        );
+        await t.rollback();
+        return res.status(404).json({
+          message: "Không tìm thấy dự án hoặc thông tin người giao việc.",
+        });
+      }
+      console.log(
+        `[DEBUG] Thông tin để tạo message: Project Name='${project.name}', Requester Name='${requester.full_name}'`
+      );
+
+      // 2. Lặp qua từng người được giao để tạo thông báo
+      for (const singleAssigneeId of assignee_ids) {
+        console.log(
+          `[DEBUG] Vòng lặp: Chuẩn bị tạo thông báo cho user ID: ${singleAssigneeId}`
+        );
+
+        // Đảm bảo không tự gửi thông báo cho chính mình
+        if (singleAssigneeId !== requesterId) {
+          await createNotification(
+            {
+              user_id: singleAssigneeId,
+              type: "NEW_TASK",
+              message: `${requester.full_name} vừa giao cho bạn một công việc mới: "${newTask.name}" trong dự án "${project.name}".`,
+              link: `/app/projects/${project.id}/tasks/${newTask.task_id}`,
+            },
+            { transaction: t }
+          ); // Thêm transaction vào hàm tạo thông báo
+          console.log(
+            `[DEBUG] ĐÃ GỌI createNotification cho user ID: ${singleAssigneeId}`
+          );
+        }
+      }
+    } else {
+      console.log(
+        "[DEBUG] Không có assignee_id hoặc không phải mảng, bỏ qua khối thông báo."
+      );
+    }
+
+    // Nếu tất cả thành công, commit transaction
     await t.commit();
 
+    // Lấy lại thông tin task đầy đủ để trả về cho client
     const result = await Task.findByPk(newTask.task_id, {
       include: [
         { model: Project, as: "project", attributes: ["id", "name"] },
@@ -181,26 +242,26 @@ const createTask = async (req, res) => {
         },
       ],
     });
+
     res.status(201).json({
       message: "Công việc đã được tạo thành công",
       data: result,
     });
   } catch (error) {
-    await t.rollback();
+    // Nếu có bất kỳ lỗi nào, rollback tất cả các thay đổi
+    if (!t.finished) {
+      await t.rollback();
+    }
     console.error("Lỗi khi tạo công việc:", error);
     res
       .status(500)
       .json({ message: "Lỗi máy chủ nội bộ", error: error.message });
   }
 };
-
 // cập nhật trạng thái công việc
 const updateStatusTask = async (req, res) => {
-  console.log(`Received request: ${req.method} ${req.url}`); // Debug
-  console.log("Task ID from params:", req.params.id); // Kiểm tra taskId
   try {
     const taskId = req.params.id; // Lấy taskId từ URL
-    console.log(`Updating status for task ID: ${taskId}`); // Debug
     const { status } = req.body; // Lấy trạng thái mới từ body
     // Kiểm tra dữ liệu đầu vào
     if (!status) {
@@ -219,7 +280,6 @@ const updateStatusTask = async (req, res) => {
       data: task,
     });
   } catch (error) {
-    console.error("Lỗi khi cập nhật trạng thái:", error);
     res
       .status(500)
       .json({ message: "Lỗi máy chủ nội bộ", error: error.message });
@@ -248,7 +308,13 @@ const updateTask = async (req, res) => {
         .status(400)
         .json({ message: "Tên, ngày hết hạn, và dự án là bắt buộc." });
     }
-
+    // 2. Kiểm tra quyền hạn
+    const canUpdate = await isProjectManager(requesterId, task.project_id);
+    if (!canUpdate) {
+      return res.status(403).json({
+        message: "Chỉ người quản lý dự án mới có quyền sửa công việc.",
+      });
+    }
     // 2. Tìm công việc cần cập nhật
     const task = await Task.findByPk(taskId, { transaction: t });
     if (!task) {
@@ -288,7 +354,6 @@ const updateTask = async (req, res) => {
   } catch (error) {
     // Nếu có lỗi, rollback tất cả thay đổi
     await t.rollback();
-    console.error("Lỗi khi cập nhật công việc:", error);
     res
       .status(500)
       .json({ message: "Lỗi máy chủ nội bộ", error: error.message });
@@ -306,26 +371,27 @@ const deleteTask = async (req, res) => {
       await t.rollback();
       return res.status(404).json({ message: "Không tìm thấy công việc." });
     }
+    // Kiểm tra quyền xoá công việc
+    const canDelete = await isProjectManager(requesterId, task.project_id);
+    if (!canDelete) {
+      return res
+        .status(403)
+        .json({
+          message: "Chỉ người quản lý dự án mới có quyền xóa công việc.",
+        });
+    }
 
-    // BƯỚC 1: Xóa tất cả các liên kết trong bảng trung gian `TaskAssignments`
-    // Dùng setAssignees với một mảng rỗng là cách của Sequelize để xóa các liên kết
     await task.setAssignees([], { transaction: t });
 
-    // BƯỚC 2: Sau khi các "hàng con" đã bị xóa, giờ mới xóa "hàng cha"
     await task.destroy({ transaction: t });
 
-    // Nếu cả 2 bước trên thành công, commit transaction
     await t.commit();
 
-    res
-      .status(200)
-      .json({
-        message: `Công việc #${taskId} và các phân công liên quan đã được xoá.`,
-      });
+    res.status(200).json({
+      message: `Công việc #${taskId} và các phân công liên quan đã được xoá.`,
+    });
   } catch (error) {
-    // Nếu có bất kỳ lỗi nào, hủy bỏ tất cả thay đổi
     await t.rollback();
-    console.error("Lỗi khi xoá công việc:", error);
     res
       .status(500)
       .json({ message: "Lỗi máy chủ nội bộ", error: error.message });

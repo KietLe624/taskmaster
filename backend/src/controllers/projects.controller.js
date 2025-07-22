@@ -1,10 +1,10 @@
-const { TokenExpiredError } = require("jsonwebtoken");
+const { Op } = require("sequelize");
 const db = require("../models/index.model");
 const User = db.User;
 const Project = db.Project;
 const Task = db.Task;
 const ProjectMember = db.ProjectMember;
-// const {NotificationsController} = require("../controllers/notifications.controller");
+
 
 console.log("Các models đã được nạp:", Object.keys(db));
 
@@ -34,7 +34,20 @@ const getProjects = async (req, res) => {
     }
 
     const projects = await Project.findAll({
-      where: { manager_id: currentUserId },
+      where: {
+        [Op.or]: [
+          // Điều kiện 1: Người dùng là người quản lý dự án
+          { manager_id: currentUserId },
+          // Điều kiện 2: Người dùng là thành viên của dự án (sử dụng subquery)
+          {
+            id: {
+              [Op.in]: db.sequelize.literal(
+                `(SELECT project_id FROM projectmembers WHERE user_id = ${currentUserId})`
+              ),
+            },
+          },
+        ],
+      },
       include: [
         {
           model: User,
@@ -49,7 +62,7 @@ const getProjects = async (req, res) => {
         {
           model: ProjectMember,
           as: "members",
-          attributes: ["id"], // Chỉ lấy thông tin thành viên, không cần thuộc tính cụ thể
+          attributes: ["id"],
           include: [
             {
               model: User,
@@ -60,6 +73,7 @@ const getProjects = async (req, res) => {
         },
       ],
       order: [["createdAt", "DESC"]],
+      distinct: true, // Tránh trả về các dự án trùng lặp nếu người dùng vừa là manager vừa là member
     });
 
     // Xử lý dữ liệu để thêm 'progress' và định dạng lại 'members'
@@ -83,7 +97,6 @@ const getProjects = async (req, res) => {
         plainProject.progress = Math.round((completedTasks / totalTasks) * 100);
       }
 
-      // *** THAY ĐỔI 2: Xử lý lại mảng members thay vì xóa nó đi ***
       // Biến đổi mảng `members` để chỉ chứa thông tin `full_name` của user.
       if (plainProject.members) {
         plainProject.members = plainProject.members.map(
@@ -110,6 +123,7 @@ const getProjects = async (req, res) => {
       .json({ message: "Lỗi khi lấy danh sách dự án", error: error.message });
   }
 };
+
 const getProjectById = async (req, res) => {
   try {
     const projectId = req.params.id;

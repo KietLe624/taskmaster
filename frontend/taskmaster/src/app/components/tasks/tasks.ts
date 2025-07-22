@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Task } from '../../services/task/task'; // Chỉnh sửa đường dẫn nếu cần
+import { Task } from '../../services/task/task';
 import { TaskDetailData, TaskForm } from '../../models/tasks'; // Sử dụng lại model chi tiết
 import { User, Project } from '../../models/tasks'; // Sử dụng lại model người dùng và dự án
 
@@ -23,6 +23,7 @@ export class Tasks implements OnInit {
 
   ngOnInit(): void {
     this.loadTasks();
+    this.loadDataForModal();
   }
   // lưu thông tin để lọc
   filters = {
@@ -32,6 +33,17 @@ export class Tasks implements OnInit {
     sortBy: 'due_date',
     sortOrder: 'asc'
   };
+
+  // kiểm tra user và project có tồn tại hay không
+  checkUserAndProjectExistence(): void {
+    this.taskService.getUsers().subscribe(users => {
+      this.allUsers = users;
+    });
+
+    this.taskService.getProjects().subscribe(projects => {
+      this.allProjects = projects;
+    });
+  }
 
   loadTasks(): void {
     this.isLoading = true;
@@ -45,6 +57,18 @@ export class Tasks implements OnInit {
         console.error('Lỗi khi tải danh sách công việc:', err);
         this.isLoading = false;
       },
+    });
+  }
+
+  loadDataForModal(): void {
+    this.taskService.getProjects().subscribe({
+      next: (projects) => { this.allProjects = projects; },
+      error: (err) => console.error('Lỗi khi tải danh sách dự án:', err)
+    });
+
+    this.taskService.getUsers().subscribe({
+      next: (users) => { this.allUsers = users; },
+      error: (err) => console.error('Lỗi khi tải danh sách người dùng:', err)
     });
   }
 
@@ -225,8 +249,6 @@ export class Tasks implements OnInit {
     };
     this.applyFilters();
   }
-
-
   updateTaskStatus(taskId: number, newStatus: string): void {
   }
 }

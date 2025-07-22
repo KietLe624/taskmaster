@@ -1,5 +1,4 @@
 import {
-  ChangeDetectorRef,
   NgModule,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
@@ -9,7 +8,7 @@ import {
   provideClientHydration,
   withEventReplay,
 } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
@@ -33,6 +32,7 @@ import { PublicLayout } from './layouts/public-layout/public-layout';
 import { authInterceptor } from './interceptor/auth-interceptor';
 import { FilterPipe } from './services/filter/filer';
 import { BellModule } from './components/bell-module/bell-module';
+import { TaskDetailModal } from './components/task-detail-modal/task-detail-modal';
 
 @NgModule({
   declarations: [
@@ -54,8 +54,9 @@ import { BellModule } from './components/bell-module/bell-module';
     AuthLayout,
     PublicLayout,
     BellModule,
+    TaskDetailModal,
   ],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, CommonModule, FilterPipe],
+  imports: [BrowserModule, AppRoutingModule, FormsModule, CommonModule, FilterPipe, ReactiveFormsModule],
 
   providers: [
     provideBrowserGlobalErrorListeners(),

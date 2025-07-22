@@ -19,7 +19,7 @@ export class Task {
   }
   // Phương thức mới để lấy Users
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>('http://localhost:3000/api/users');
+    return this.http.get<User[]>('http://localhost:3000/api/users/all');
   }
   getTasks(filters: any): Observable<TaskDetailData[]> {
     const token = sessionStorage.getItem('auth_token');
@@ -54,7 +54,7 @@ export class Task {
       catchError(this.handleError<TaskDetailData>(`updateTask id=${taskId}`))
     );
   }
-  
+
   deleteTask(taskId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${taskId}`);
   }

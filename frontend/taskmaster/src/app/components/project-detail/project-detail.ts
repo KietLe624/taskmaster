@@ -11,7 +11,7 @@ import { ProjectFrom } from '../create-project/create-project';
   standalone: false,
   templateUrl: './project-detail.html',
   styleUrl: './project-detail.css',
-  changeDetection: ChangeDetectionStrategy.OnPush, // Sử dụng OnPush để tối ưu hiệu suất
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectDetail implements OnInit {
   project: ProjectDetailData | null = null;
@@ -21,6 +21,9 @@ export class ProjectDetail implements OnInit {
   public projects: ProjectsData[] = [];
   showEditModal = false;
   isColumnOpen: { [key: string]: boolean } = { todo: false, 'in_progress': false, inreview: false, done: false, overdue: false };
+
+  selectedTask: Task | null = null;
+  showTaskDetailModal = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -109,77 +112,6 @@ export class ProjectDetail implements OnInit {
     });
   }
 
-  drag(event: DragEvent, task_id: number): void {
-    if (event && event.dataTransfer && task_id !== undefined && task_id !== null) {
-      try {
-        event.dataTransfer.setData('text/plain', task_id.toString());
-        this.cdr.detectChanges(); // Cập nhật view sau khi set dataTransfer
-      } catch (e) {
-        console.error('Error setting dataTransfer:', e);
-      }
-    } else {
-    }
-  }
-
-  allowDrop(event: DragEvent): void {
-    if (event) {
-      event.preventDefault();
-    }
-  }
-
-  drop(event: DragEvent, newStatus: string): void {
-    event.preventDefault();
-
-    if (event.dataTransfer) {
-      const taskId = event.dataTransfer.getData('text/plain');
-      console.log('Dropped task ID:', taskId);
-      if (taskId && this.project) {
-        const taskIndex = this.tasks.findIndex(t => t.task_id === +taskId);
-        if (taskIndex !== -1) {
-          const updatedTasks = [...this.tasks];
-          const task = updatedTasks[taskIndex];
-          task.status = newStatus; // Cập nhật trạng thái
-          this.tasks = updatedTasks; // Gán lại mảng mới
-          this.project = { ...this.project, tasks: updatedTasks }; // Gán lại project với tham chiếu mới
-          this.updateTaskStatus(+taskId, newStatus);
-          this.updateProgress(); // Cập nhật tiến độ
-          this.cdr.detectChanges(); // Cập nhật giao diện
-        } else {
-        }
-      }
-    } else {
-    }
-  }
-
-  updateTaskStatus(taskId: number, newStatus: string): void {
-    if (this.project) {
-      this.projectService.updateTask(taskId, { status: newStatus }).subscribe({
-        next: () => {
-        },
-        error: (err) => {
-          alert('Cập nhật trạng thái thất bại. Vui lòng thử lại.');
-          // Nếu thất bại, khôi phục trạng thái cũ (tùy chọn)
-          const taskIndex = this.tasks.findIndex(t => t.task_id === taskId);
-          if (taskIndex !== -1) {
-            this.loadProjectDetails(); // Tải lại nếu có lỗi
-          }
-        }
-      });
-    }
-  }
-
-  updateProgress(): void {
-    if (this.project && this.tasks.length > 0) {
-      const totalTasks = this.tasks.length;
-      const completedTasks = this.tasks.filter(task => task.status === 'done').length; // Giả sử 'done' là trạng thái hoàn thành
-      const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-      this.project.progress = Math.round(progress); // Cập nhật progress
-      this.project.completedTasksCount = completedTasks;
-      this.project.totalTasksCount = totalTasks;
-      this.cdr.detectChanges(); // Cập nhật giao diện
-    }
-  }
-
 
   getStatusClass(status: string): string {
     if (!status) return 'bg-gray-100 text-gray-800';
@@ -231,5 +163,125 @@ export class ProjectDetail implements OnInit {
 
   toggleColumn(columnId: string): void {
     this.isColumnOpen[columnId] = !this.isColumnOpen[columnId];
+  }
+
+  openTaskDetailModal(task: Task): void {
+    console.log('Hàm openTaskDetailModal đã được gọi với task:', task); // THÊM DÒNG NÀY
+    this.selectedTask = task;
+    this.showTaskDetailModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeTaskDetailModal(): void {
+    console.log('Parent: Hàm closeTaskDetailModal() đã được gọi.'); // <-- THÊM DÒNG NÀY
+    this.showTaskDetailModal = false;
+    this.selectedTask = null;
+    this.cdr.detectChanges(); // Dòng này rất quan trọng
+  }
+
+  handleUpdateTask(formData: any): void {
+    // Thêm một bước kiểm tra an toàn
+    if (!this.selectedTask) {
+      console.error('Không có công việc nào được chọn để cập nhật.');
+      alert('Đã có lỗi xảy ra, không tìm thấy công việc.');
+      return;
+    }
+    // Lấy ID từ `selectedTask` và gửi `formData` tới service
+    this.projectService.updateTask(this.selectedTask.task_id, formData).subscribe({
+      next: () => {
+        alert('Cập nhật công việc thành công!');
+        this.closeTaskDetailModal();
+        this.loadProjectDetails(); // Tải lại dữ liệu để cập nhật danh sách
+      },
+      error: (err) => {
+        console.error('Lỗi khi cập nhật công việc:', err);
+        alert('Cập nhật công việc thất bại.');
+      }
+    });
+  }
+
+  handleDeleteTask(taskId: number): void {
+    this.projectService.deleteTask(taskId).subscribe({
+      next: () => {
+        alert('Đã xóa công việc thành công.');
+        this.closeTaskDetailModal();
+        this.loadProjectDetails(); // Tải lại dữ liệu
+      },
+      error: (err) => {
+        console.error('Lỗi khi xóa công việc:', err);
+        alert('Xóa công việc thất bại.');
+      }
+    });
+  }
+
+  drag(event: DragEvent, task_id: number): void {
+    if (event && event.dataTransfer && task_id !== undefined && task_id !== null) {
+      try {
+        event.dataTransfer.setData('text/plain', task_id.toString());
+        this.cdr.detectChanges(); // Cập nhật view sau khi set dataTransfer
+      } catch (e) {
+        console.error('Error setting dataTransfer:', e);
+      }
+    } else {
+    }
+  }
+
+  allowDrop(event: DragEvent): void {
+    if (event) {
+      event.preventDefault();
+    }
+  }
+
+  drop(event: DragEvent, newStatus: string): void {
+    event.preventDefault();
+
+    if (event.dataTransfer) {
+      const taskId = event.dataTransfer.getData('text/plain');
+      console.log('Dropped task ID:', taskId);
+      if (taskId && this.project) {
+        const taskIndex = this.tasks.findIndex(t => t.task_id === +taskId);
+        if (taskIndex !== -1) {
+          const updatedTasks = [...this.tasks];
+          const task = updatedTasks[taskIndex];
+          task.status = newStatus; // Cập nhật trạng thái
+          this.tasks = updatedTasks; // Gán lại mảng mới
+          this.project = { ...this.project, tasks: updatedTasks }; // Gán lại project với tham chiếu mới
+          this.updateTaskStatus(+taskId, newStatus);
+          this.updateProgress(); // Cập nhật tiến độ
+          this.cdr.detectChanges(); // Cập nhật giao diện
+        } else {
+        }
+      }
+    } else {
+    }
+  }
+
+  updateTaskStatus(taskId: number, newStatus: string): void {
+    if (this.project) {
+      this.projectService.updateStatusTask(taskId, { status: newStatus }).subscribe({
+        next: () => {
+        },
+        error: (err) => {
+          alert('Cập nhật trạng thái thất bại. Vui lòng thử lại.');
+          // Nếu thất bại, khôi phục trạng thái cũ (tùy chọn)
+          const taskIndex = this.tasks.findIndex(t => t.task_id === taskId);
+          if (taskIndex !== -1) {
+            this.loadProjectDetails(); // Tải lại nếu có lỗi
+          }
+        }
+      });
+    }
+  }
+
+  updateProgress(): void {
+    if (this.project && this.tasks.length > 0) {
+      const totalTasks = this.tasks.length;
+      const completedTasks = this.tasks.filter(task => task.status === 'done').length; // Giả sử 'done' là trạng thái hoàn thành
+      const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+      this.project.progress = Math.round(progress); // Cập nhật progress
+      this.project.completedTasksCount = completedTasks;
+      this.project.totalTasksCount = totalTasks;
+      this.cdr.detectChanges(); // Cập nhật giao diện
+    }
   }
 }
