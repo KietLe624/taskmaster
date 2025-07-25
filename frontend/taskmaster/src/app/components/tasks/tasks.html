@@ -1,30 +1,37 @@
-<div class="container mx-auto">
+<div class="container mx-auto p-4 sm:p-6 lg:p-8">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">Quản Lý Công Việc</h1>
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Quản Lý Công Việc</h1>
     <button (click)="openCreateModal()" id="openCreateTaskModalBtn"
-      class="px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-200 flex items-center">
-      <i class="fas fa-plus"></i>
-      <span class="ml-2 hidden md:inline">Thêm Công việc Mới</span>
+      class="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 flex items-center">
+      <i class="fas fa-plus mr-2"></i>
+      <span class="hidden md:inline">Thêm Công việc Mới</span>
     </button>
   </div>
 
-  <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-      <div>
-        <label for="searchTask" class="block text-sm font-medium text-gray-700 mb-1">Tìm kiếm công việc</label>
-        <div class="input-with-icon">
-          <i class="fas fa-search icon"></i>
-          <input type="text" id="searchTask" [(ngModel)]="filters.name" placeholder="Nhập tiêu đề, mô tả..."
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
-        </div>
+  <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-md border border-gray-100 mb-6">
+    <!-- Search Input -->
+    <div class="mb-6">
+      <label for="searchTask" class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm công việc</label>
+      <div class="relative">
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+          <i class="fas fa-search"></i>
+        </span>
+        <input type="text" id="searchTask" [(ngModel)]="filters.name" placeholder="Nhập tiêu đề, mô tả..."
+          class="w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 sm:text-sm" />
       </div>
+    </div>
 
+    <!-- Dropdown Filters -->
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+      <!-- Status Filter -->
       <div>
-        <label for="filterStatus" class="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
-        <div class="input-with-icon">
-          <i class="fas fa-hourglass-half icon"></i>
+        <label for="filterStatus" class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+            <i class="fas fa-hourglass-half"></i>
+          </span>
           <select id="filterStatus" [(ngModel)]="filters.status"
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md filter-select">
+            class="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 sm:text-sm">
             <option value="all">Tất cả</option>
             <option value="inreview">Chờ duyệt</option>
             <option value="todo">Cần làm</option>
@@ -35,26 +42,15 @@
         </div>
       </div>
 
-      <!-- <div>
-        <label for="filterAssignee" class="block text-sm font-medium text-gray-700 mb-1">Người thực hiện</label>
-        <div class="input-with-icon">
-          <i class="fas fa-user icon"></i>
-          <select id="filterAssignee"
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md filter-select">
-            <option value="all">Tất cả</option>
-            <option value="alice">Alice Wonderland</option>
-            <option value="bob">Bob The Builder</option>
-            <option value="charlie">Charlie Brown</option>
-          </select>
-        </div>
-      </div> -->
-
+      <!-- Priority Filter -->
       <div>
-        <label for="filterPriority" class="block text-sm font-medium text-gray-700 mb-1">Mức độ ưu tiên</label>
-        <div class="input-with-icon">
-          <i class="fas fa-flag icon"></i>
+        <label for="filterPriority" class="block text-sm font-medium text-gray-700 mb-2">Mức độ ưu tiên</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+            <i class="fas fa-flag"></i>
+          </span>
           <select id="filterPriority" [(ngModel)]="filters.priority"
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md filter-select">
+            class="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 sm:text-sm">
             <option value="all">Tất cả</option>
             <option value="low">Thấp</option>
             <option value="medium">Trung bình</option>
@@ -62,15 +58,16 @@
           </select>
         </div>
       </div>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+      <!-- Sort By -->
       <div>
-        <label for="sortBy" class="block text-sm font-medium text-gray-700 mb-1">Sắp xếp theo</label>
-        <div class="input-with-icon">
-          <i class="fas fa-sort icon"></i>
+        <label for="sortBy" class="block text-sm font-medium text-gray-700 mb-2">Sắp xếp theo</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+            <i class="fas fa-sort"></i>
+          </span>
           <select id="sortBy" [(ngModel)]="filters.sortBy"
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md filter-select">
+            class="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 sm:text-sm">
             <option value="due_date">Ngày hết hạn</option>
             <option value="priority">Mức độ ưu tiên</option>
             <option value="name">Tiêu đề</option>
@@ -78,40 +75,45 @@
         </div>
       </div>
 
+      <!-- Sort Order -->
       <div>
-        <label for="sortOrder" class="block text-sm font-medium text-gray-700 mb-1">Thứ tự</label>
-        <div class="input-with-icon">
-          <i class="fas fa-arrow-up-wide-short icon"></i>
+        <label for="sortOrder" class="block text-sm font-medium text-gray-700 mb-2">Thứ tự</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+            <i class="fas fa-arrow-up-wide-short"></i>
+          </span>
           <select id="sortOrder" [(ngModel)]="filters.sortOrder"
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md filter-select">
+            class="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 sm:text-sm">
             <option value="asc">Tăng dần</option>
             <option value="desc">Giảm dần</option>
           </select>
         </div>
       </div>
-      <div class="md:col-span-2 flex justify-start md:justify-end gap-2">
-        <button (click)="applyFilters()"
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center w-full md:w-auto">
-          <i class="fas fa-check mr-2"></i>Áp dụng
-        </button>
+    </div>
 
-        <button (click)="clearFilters()"
-          class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow-md hover:bg-red-500 transition-colors duration-200 flex items-center justify-center w-full md:w-auto">
-          <i class="fas fa-times mr-2"></i>Xóa bỏ lọc
-        </button>
-      </div>
+    <!-- Action Buttons -->
+    <div class="flex justify-end gap-3">
+      <button (click)="applyFilters()"
+        class="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 flex items-center justify-center w-full sm:w-auto">
+        <i class="fas fa-check mr-2"></i>Áp dụng
+      </button>
+      <button (click)="clearFilters()"
+        class="px-5 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors duration-200 flex items-center justify-center w-full sm:w-auto">
+        <i class="fas fa-times mr-2"></i>Xóa bộ lọc
+      </button>
     </div>
   </div>
-  <!-- Hiển thị trạng thái tải dữ liệu -->
+
+  <!-- Loading State -->
   <div *ngIf="isLoading" class="space-y-4">
-    <div class="card">
-      <div class="card__skeleton card__title"></div>
-      <div class="card__skeleton card__description"></div>
+    <div class="card bg-white rounded-2xl shadow-md border border-gray-100 p-6">
+      <div class="card__skeleton card__title h-6 w-3/4 bg-gray-200 rounded-lg animate-pulse mb-4"></div>
+      <div class="card__skeleton card__description h-4 w-full bg-gray-200 rounded-lg animate-pulse"></div>
     </div>
   </div>
-  <!-- Danh sách công việc -->
+
+  <!-- Task List -->
   <div *ngIf="!isLoading" class="space-y-4">
-    <!-- Thẻ công việc, sử dụng Grid Layout với 6 cột trên màn hình lớn -->
     <div *ngFor="let task of tasks"
       class="bg-white rounded-lg shadow-sm border-l-4 p-4 grid grid-cols-1 md:grid-cols-6 gap-6 items-center transition-shadow duration-200 hover:shadow-md"
       [ngClass]="getStatusBorderClass(task.status)">
@@ -120,7 +122,7 @@
         <h2 class="text-xl font-bold text-gray-800">{{ task.name }}</h2>
         <p class="text-sm font-medium mt-1">
           Dự án:
-          <a [routerLink]="['/app/projects', task.project.id]" class="hover:underline">{{ task.project.name }}</a>
+          <a [routerLink]="['/app/projects', task.project.id]" class="hover:underline text-blue-600">{{ task.project.name }}</a>
         </p>
         <p class="text-sm text-gray-600 mt-2">{{ task.description }}</p>
         <div class="flex flex-wrap gap-x-6 gap-y-2 mt-3 text-sm text-gray-700">
@@ -128,7 +130,7 @@
         </div>
       </div>
 
-      <!-- Cột 4: Hạn chót (Căn giữa) -->
+      <!-- Cột 4: Hạn chót & Ưu tiên -->
       <div class="md:col-span-2 flex justify-between text-center">
         <div>
           <p class="text-sm text-gray-600">Hạn chót</p>
@@ -144,11 +146,12 @@
           </div>
         </div>
       </div>
-      <!-- Cột 5: Trạng thái (Căn giữa) -->
+
+      <!-- Cột 5: Trạng thái -->
       <div class="text-center">
-        <p class="text-left text-sm text-black mb-3">Trạng thái</p>
+        <p class="text-left text-sm text-gray-600 mb-3">Trạng thái</p>
         <select [ngModel]="task.status" (ngModelChange)="updateTaskStatus(task.task_id, $event)"
-          class="px-3 py-1.5 text-sm font-semibold w-full" [ngClass]="getStatusClass(task.status)"
+          class="px-3 py-1.5 text-sm font-semibold w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" [ngClass]="getStatusClass(task.status)"
           (change)="onStatusChange($event, task.task_id)">
           <option value="inreview">Chờ duyệt</option>
           <option value="todo">Cần làm</option>
@@ -158,29 +161,26 @@
         </select>
       </div>
 
-      <!-- Cột 6: Nút sửa/xóa (Căn phải) -->
+      <!-- Cột 6: Nút sửa/xóa -->
       <div class="flex items-center justify-end gap-2">
-        <button (click)="openEditModal(task)" class="text-gray-400 hover:text-blue-600 text-lg">
+        <button (click)="openEditModal(task)" class="text-gray-400 hover:text-blue-600 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
           <i class="fas fa-edit"></i>
         </button>
-        <button (click)="deleteTask(task.task_id)" class="text-gray-400 hover:text-red-600 text-lg">
+        <button (click)="deleteTask(task.task_id)" class="text-gray-400 hover:text-red-600 text-lg focus:outline-none focus:ring-2 focus:ring-red-500">
           <i class="fas fa-trash"></i>
         </button>
       </div>
     </div>
   </div>
-  <!-- Trạng thái rỗng -->
-  <div *ngIf="!isLoading && tasks.length === 0" class="text-center py-16 text-gray-500 bg-gray-50 rounded-lg">
-    <div *ngIf="isLoading" class="space-y-4">
-      <div class="card">
-        <div class="card__skeleton card__title"></div>
-        <div class="card__skeleton card__description"></div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<app-create-task [show]="isModalOpen" [modalTitle]="currentModalTitle" [isEditMode]="isEditMode"
-  [taskToEdit]="taskToEdit" [userList]="allUsers" [projectList]="allProjects" (save)="onSaveTask($event)"
-  (close)="closeModal()">
-</app-create-task>
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && tasks.length === 0" class="text-center py-16 text-gray-500 bg-gray-50 rounded-2xl border border-gray-100">
+    Không có công việc nào.
+  </div>
+
+  <!-- Create/Edit Task Modal -->
+  <app-create-task [show]="isModalOpen" [modalTitle]="currentModalTitle" [isEditMode]="isEditMode"
+    [taskToEdit]="taskToEdit" [userList]="allUsers" [projectList]="allProjects" (save)="onSaveTask($event)"
+    (close)="closeModal()">
+  </app-create-task>
+</div>

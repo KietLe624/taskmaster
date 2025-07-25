@@ -1,0 +1,28 @@
+/* Custom animation for content fading in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Utility class to apply the animation */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+  opacity: 0; /* Start as invisible */
+}
+
+/* Staggered delay classes */
+.fade-in-delay-1 {
+  animation-delay: 100ms;
+}
+.fade-in-delay-2 {
+  animation-delay: 200ms;
+}
+.fade-in-delay-3 {
+  animation-delay: 300ms;
+}

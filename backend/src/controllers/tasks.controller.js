@@ -68,7 +68,6 @@ const getTasks = async (req, res) => {
     // Lấy các tham số lọc và sắp xếp từ query string
     const { name, status, priority, sortBy, sortOrder } = req.query;
 
-    // --- Xây dựng các điều kiện ---
     const whereCondition = {}; // Điều kiện cho bảng tasks
     const orderCondition = []; // Điều kiện sắp xếp
 
@@ -90,7 +89,7 @@ const getTasks = async (req, res) => {
       orderCondition.push(["due_date", "ASC"]); // Mặc định
     }
 
-    // --- Lấy ID các task được giao cho user ---
+    // Lấy ID các task được giao cho user
     const assignments = await db.TaskAssignment.findAll({
       where: { user_id: currentUserId },
       attributes: ["task_id"],
@@ -124,7 +123,6 @@ const getTasks = async (req, res) => {
     });
   }
 };
-
 // tạo công việc mới
 const createTask = async (req, res) => {
   console.log("--- SERVER ĐÃ NHẬN ĐƯỢC DỮ LIỆU ---");
@@ -288,40 +286,45 @@ const updateStatusTask = async (req, res) => {
 
 // Cập nhật thông tin công việc
 const updateTask = async (req, res) => {
-  const t = await sequelize.transaction(); // Bắt đầu transaction
+  const t = await sequelize.transaction();
   try {
-    const taskId = req.params.id;
-    // Lấy tất cả các trường có thể cập nhật từ body
+    const taskId = req.params.id; // Lấy taskId từ URL
+    const requesterId = req.user.user_id; // Lấy ID người yêu cầu từ token
+
     const {
       name,
       description,
       priority,
       cate,
       due_date,
+      status,
       project_id,
       assignee_id,
     } = req.body;
 
-    // 1. Kiểm tra các trường thực sự bắt buộc
     if (!name || !due_date || !project_id) {
       return res
         .status(400)
         .json({ message: "Tên, ngày hết hạn, và dự án là bắt buộc." });
     }
-    // 2. Kiểm tra quyền hạn
+
+    // Tìm công việc trước khi kiểm tra quyền
+    const task = await Task.findByPk(taskId, { transaction: t });
+    if (!task) {
+      await t.rollback();
+      return res.status(404).json({ message: "Không tìm thấy công việc." });
+    }
+
+    // Kiểm tra quyền hạn AFTER finding the task
     const canUpdate = await isProjectManager(requesterId, task.project_id);
     if (!canUpdate) {
+      await t.rollback();
       return res.status(403).json({
         message: "Chỉ người quản lý dự án mới có quyền sửa công việc.",
       });
     }
-    // 2. Tìm công việc cần cập nhật
-    const task = await Task.findByPk(taskId, { transaction: t });
-    if (!task) {
-      return res.status(404).json({ message: "Không tìm thấy công việc." });
-    }
 
-    // 3. Cập nhật các trường thông tin của công việc
+    // Cập nhật các trường thông tin
     await task.update(
       {
         name,
@@ -330,21 +333,29 @@ const updateTask = async (req, res) => {
         cate,
         due_date,
         project_id,
+        status,
       },
       { transaction: t }
     );
 
-    // 4. Cập nhật người thực hiện (nếu có)
+    // Cập nhật người thực hiện
     if (assignee_id) {
       await task.setAssignees([assignee_id], { transaction: t });
     }
 
-    // 5. Commit transaction nếu mọi thứ thành công
     await t.commit();
 
-    // 6. Trả về kết quả thành công
+    // Trả về kết quả
     const updatedTask = await Task.findByPk(taskId, {
-      include: ["project", "assignees"],
+      include: [
+        { model: Project, as: "project", attributes: ["id", "name"] },
+        {
+          model: User,
+          as: "assignees",
+          attributes: ["user_id", "full_name"],
+          through: { attributes: [] },
+        },
+      ],
     });
 
     res.status(200).json({
@@ -352,8 +363,8 @@ const updateTask = async (req, res) => {
       data: updatedTask,
     });
   } catch (error) {
-    // Nếu có lỗi, rollback tất cả thay đổi
     await t.rollback();
+    console.error("Lỗi khi cập nhật task:", error);
     res
       .status(500)
       .json({ message: "Lỗi máy chủ nội bộ", error: error.message });
@@ -361,37 +372,46 @@ const updateTask = async (req, res) => {
 };
 // xoá công việc
 const deleteTask = async (req, res) => {
-  const t = await sequelize.transaction(); // Bắt đầu một transaction
+  const t = await sequelize.transaction();
   try {
     const taskId = req.params.id;
+    // THÊM DÒNG NÀY: Lấy ID người dùng từ token đã được xác thực
+    const requesterId = req.user.user_id;
 
-    // Tìm công việc cần xóa
     const task = await Task.findByPk(taskId, { transaction: t });
     if (!task) {
       await t.rollback();
       return res.status(404).json({ message: "Không tìm thấy công việc." });
     }
-    // Kiểm tra quyền xoá công việc
+
+    // Bây giờ requesterId đã có giá trị
     const canDelete = await isProjectManager(requesterId, task.project_id);
     if (!canDelete) {
-      return res
-        .status(403)
-        .json({
-          message: "Chỉ người quản lý dự án mới có quyền xóa công việc.",
-        });
+      // THÊM DÒNG NÀY: Rollback transaction trước khi trả về lỗi
+      await t.rollback();
+      return res.status(403).json({
+        message: "Chỉ người quản lý dự án mới có quyền xóa công việc.",
+      });
     }
 
+    // Xóa các bản ghi liên quan trong bảng TaskAssignments
     await task.setAssignees([], { transaction: t });
 
+    // Xóa công việc
     await task.destroy({ transaction: t });
 
+    // Commit nếu mọi thứ thành công
     await t.commit();
 
     res.status(200).json({
       message: `Công việc #${taskId} và các phân công liên quan đã được xoá.`,
     });
   } catch (error) {
-    await t.rollback();
+    // Đảm bảo rollback nếu có lỗi xảy ra
+    if (!t.finished) {
+      await t.rollback();
+    }
+    console.error("Lỗi khi xóa công việc:", error); // Log lỗi chi tiết ở backend
     res
       .status(500)
       .json({ message: "Lỗi máy chủ nội bộ", error: error.message });

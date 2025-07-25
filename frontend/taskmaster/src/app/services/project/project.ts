@@ -12,8 +12,8 @@ import { TaskDetailData, TaskForm } from '../../models/tasks'; // Điều chỉn
 })
 export class ProjectService {
   private apiUrl = 'http://localhost:3000/api/projects';
-  private apiUrlTasks = 'http://localhost:3000/api/taskStatus';
-  private apiUrlDeleteTasks = 'http://localhost:3000/api/tasks';
+  private apiUrlTaskStatus = 'http://localhost:3000/api/taskStatus';
+  private apiUrlTasks = 'http://localhost:3000/api/tasks';
 
   // Hàm tạo header động với token
   private getAuthHeaders(): { headers: HttpHeaders } {
@@ -64,13 +64,16 @@ export class ProjectService {
   }
 
   updateStatusTask(taskId: number, updateData: { status: string }): Observable<any> {
-    const url = `${this.apiUrlTasks}/${taskId}`;
+    const url = `${this.apiUrlTaskStatus}/${taskId}`;
     return this.http.patch(url, updateData, this.getAuthHeaders()).pipe(
       tap(_ => console.log(`Cập nhật trạng thái task ${taskId} thành công`)),
       catchError(this.handleError<any>(`updateTask id=${taskId}`))
     );
   }
+  
   updateTask(taskId: number, taskData: TaskForm): Observable<TaskDetailData> {
+    console.log('Service updateTask called with:', { taskId, taskData }); // Debug log
+
     const payload = {
       name: taskData.name,
       description: taskData.description,
@@ -79,15 +82,18 @@ export class ProjectService {
       project_id: taskData.project_id,
       cate: taskData.cate,
       due_date: taskData.due_date,
-    }
-    return this.http.put<TaskDetailData>(`${this.apiUrl}/${taskId}`, payload).pipe(
+      assignee_id: taskData.assignee_id
+    };
+
+    console.log('Service payload:', payload); // Debug log
+    return this.http.put<TaskDetailData>(`${this.apiUrlTasks}/${taskId}`, payload, this.getAuthHeaders()).pipe(
       tap(_ => console.log(`Cập nhật công việc ${taskId} thành công`)),
       catchError(this.handleError<TaskDetailData>(`updateTask id=${taskId}`))
     );
   }
 
   deleteTask(taskId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrlDeleteTasks}/${taskId}`);
+    return this.http.delete(`${this.apiUrlTasks}/${taskId}`);
   }
 
   private handleError<T>(operation = 'operation', result?: T) {

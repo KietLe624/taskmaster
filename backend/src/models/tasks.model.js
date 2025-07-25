@@ -40,18 +40,24 @@ module.exports = (sequelize, DataTypes) => {
       as: "project",
     });
 
-    // Một Task có thể được giao cho nhiều User (Many-to-Many)
+    // Quan hệ nhiều-nhiều với User
     Task.belongsToMany(models.User, {
-      through: "TaskAssignments",
-      as: "assignees",
+      through: models.TaskAssignment,
       foreignKey: "task_id",
-      otherKey: "user_id",
+      as: "assignees",
     });
 
-    // Một Task có thể có nhiều TaskAssignments
+    // Quan hệ một-nhiều với bảng trung gian TaskAssignment
     Task.hasMany(models.TaskAssignment, {
       foreignKey: "task_id",
       as: "assignments",
+    });
+
+    // THÊM QUAN HỆ NÀY VÀO
+    // Một Task có nhiều bản ghi lịch sử trạng thái
+    Task.hasMany(models.TaskStatus, {
+      foreignKey: "task_id",
+      as: "statusHistory",
     });
   };
   return Task;

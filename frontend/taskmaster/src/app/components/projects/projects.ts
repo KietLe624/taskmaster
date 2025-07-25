@@ -36,7 +36,6 @@ export class Projects implements OnInit {
   }
 
   public isCreateModalVisible = false;
-  // Các hàm xử lý sự kiện (sẽ được thêm sau)
   openCreateModal(): void {
     this.isEditMode = false;
     this.projectToEdit = null;
@@ -113,6 +112,7 @@ export class Projects implements OnInit {
   }
   // Hàm này sẽ được gọi khi người dùng muốn xem chi tiết dự án
   viewProjectDetails(project: ProjectsData): void {
+    console.log('Xem chi tiết dự án:', project.name);
   }
   // load lại danh sách dự án sau khi tạo hoặc cập nhật
   reloadProjects(): void {

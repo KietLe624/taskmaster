@@ -52,6 +52,7 @@ export class Tasks implements OnInit {
         this.tasks = data;
         this.isLoading = false;
         this.cdr.detectChanges();
+        console.log('Tasks loaded:', this.tasks);
       },
       error: (err) => {
         console.error('Lỗi khi tải danh sách công việc:', err);
@@ -65,7 +66,6 @@ export class Tasks implements OnInit {
       next: (projects) => { this.allProjects = projects; },
       error: (err) => console.error('Lỗi khi tải danh sách dự án:', err)
     });
-
     this.taskService.getUsers().subscribe({
       next: (users) => { this.allUsers = users; },
       error: (err) => console.error('Lỗi khi tải danh sách người dùng:', err)

@@ -31,8 +31,8 @@ module.exports = (sequelize, DataTypes) => {
       // underscored: true,
     }
   );
-  // Định nghĩa các quan hệ giữa User và các model khác
   User.associate = (models) => {
+    // Một User có thể quản lý nhiều Project
     User.hasMany(models.Project, {
       foreignKey: "manager_id",
       as: "managedProjects",
@@ -40,10 +40,15 @@ module.exports = (sequelize, DataTypes) => {
 
     // Quan hệ nhiều-nhiều với Task qua bảng TaskAssignments
     User.belongsToMany(models.Task, {
-      through: "TaskAssignments",
-      as: "assignedTasks",
+      through: models.TaskAssignment,
       foreignKey: "user_id",
-      otherKey: "task_id",
+      as: "tasks",
+    });
+
+    // Quan hệ một-nhiều với bảng trung gian TaskAssignment
+    User.hasMany(models.TaskAssignment, {
+      foreignKey: "user_id",
+      as: "taskAssignments",
     });
   };
   return User;

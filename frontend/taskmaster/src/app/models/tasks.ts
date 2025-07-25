@@ -21,7 +21,7 @@ export interface TaskForm {
   cate: string;
   due_date: string;
   project_id: number | null;
-  assignee_id: number | null;
+  assignee_id: number | null; // ID của người được giao việc
 }
 
 // Định nghĩa cho Dự án

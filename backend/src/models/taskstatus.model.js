@@ -31,10 +31,15 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   TaskStatus.associate = (models) => {
-    // Một TaskStatus có nhiều Task
-    TaskStatus.hasMany(models.Task, {
+    // Thay đổi trạng thái của một Task
+    TaskStatus.belongsTo(models.Task, {
       foreignKey: "task_id",
-      as: "tasks",
+    });
+
+    // Một TaskStatus được thay đổi bởi một User
+    TaskStatus.belongsTo(models.User, {
+      foreignKey: "changed_by",
+      as: "changer",
     });
   };
 

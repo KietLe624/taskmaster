@@ -1,280 +1,294 @@
-<div class="container mx-auto p-4">
-  <!-- Loading -->
-  <div *ngIf="isLoading" class="text-center p-6">
-    <div class="card">
-      <div class="card__skeleton card__title bg-gray-300 animate-pulse"></div>
-      <div class="card__skeleton card__description bg-gray-300 animate-pulse"></div>
-    </div>
-  </div>
-
-  <!-- Hiển thị chi tiết dự án -->
-  <div *ngIf="!isLoading && project"
-    class="bg-white p-6 rounded-xl shadow-lg mb-6 transition-all duration-300 hover:shadow-xl">
-    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
-      <div class="w-full md:w-2/3 flex-shrink-0">
-        <h2 class="text-3xl font-bold text-gray-900 truncate" id="detailProjectName">
-          {{ project.name }}
-        </h2>
-        <p class="text-gray-600 text-base mt-2" id="detailProjectDescription">
-          <span id="shortDescription">{{ project.description }}</span>
-          <span id="fullDescription" class="md:max-w-[80%] hidden"></span>
-        </p>
+<div class="bg-gray-50 font-sans text-gray-800">
+  <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+    <!-- Loading Skeleton -->
+    <div *ngIf="isLoading" class="space-y-6">
+      <!-- Skeleton for header -->
+      <div class="bg-white p-6 rounded-xl shadow-sm animate-pulse">
+        <div class="h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
+        <div class="h-4 bg-gray-200 rounded w-full"></div>
+        <div class="h-4 bg-gray-200 rounded w-3/4 mt-2"></div>
       </div>
-      <div class="mt-4 md:mt-0 flex flex-col md:flex-row md:space-x-4 space-y-3 md:space-y-0">
-        <a (click)="goBack()" id="backToProjectsList"
-          class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-gray-300 transition-colors duration-200 flex items-center justify-center">
-          <i class="fas fa-arrow-left mr-2"></i>
-          <span>Quay lại</span>
-        </a>
-        <button (click)="openEditModal()" id="editProjectDetailBtn"
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center">
-          <i class="fas fa-edit mr-2"></i>
-          <span>Sửa</span>
-        </button>
+      <!-- Skeleton for info grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 h-32 bg-white p-6 rounded-xl shadow-sm animate-pulse"></div>
+        <div class="h-32 bg-white p-6 rounded-xl shadow-sm animate-pulse"></div>
+      </div>
+      <!-- Skeleton for Kanban -->
+      <div class="bg-white p-6 rounded-xl shadow-sm animate-pulse">
+        <div class="grid grid-cols-5 gap-4">
+          <div class="h-48 bg-gray-200 rounded-lg"></div>
+          <div class="h-48 bg-gray-200 rounded-lg"></div>
+          <div class="h-48 bg-gray-200 rounded-lg"></div>
+          <div class="h-48 bg-gray-200 rounded-lg"></div>
+          <div class="h-48 bg-gray-200 rounded-lg"></div>
+        </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="flex flex-col">
-        <p class="text-gray-900 text-lg font-semibold">Người quản lý:</p>
-        <p class="text-gray-700 text-base mt-1" id="detailProjectManager">
-          {{ project.manager.full_name }}
-        </p>
+    <!-- Project Detail Content -->
+    <div *ngIf="!isLoading && project" class="space-y-6 lg:space-y-8">
+      <!-- Header Section -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in">
+        <div>
+          <h2 class="text-4xl font-semibold text-gray-900" id="detailProjectName">{{ project.name }}</h2>
+          <p class="text-gray-500 text-base mt-2 max-w-3xl" id="detailProjectDescription">{{ project.description }}</p>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <a (click)="goBack()" id="backToProjectsList"
+            class="px-4 py-2 bg-white text-gray-700 rounded-lg shadow-sm border border-gray-200 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 transition-all duration-200 flex items-center justify-center font-semibold">
+            <i class="fas fa-arrow-left mr-2 text-sm"></i>
+            <span>Quay lại</span>
+          </a>
+          <button (click)="openEditModal()" id="editProjectDetailBtn"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 transition-all duration-200 flex items-center justify-center font-semibold">
+            <i class="fas fa-edit mr-2 text-sm"></i>
+            <span>Sửa dự án</span>
+          </button>
+        </div>
       </div>
-      <div class="flex flex-col">
-        <p class="text-gray-900 text-lg font-semibold">
-          Thành viên (<span id="detailMemberCount">{{ members.length }}</span>):
-        </p>
-        <p class="text-gray-700 text-base mt-1" id="detailProjectMembers">
-          <span *ngFor="let member of members; let isLast = last" class="text-gray-600">
-            {{ member?.full_name || member?.username || members }} {{ !isLast ? ', ' : '' }}
-          </span>
-        </p>
-      </div>
-      <div class="flex flex-col">
-        <p class="text-gray-900 text-lg font-semibold">Thời gian:</p>
-        <p class="text-gray-700 text-base mt-1" id="detailProjectTime">
-          <span id="detailProjectStartDate">
-            {{ project.start_date | date: "dd/MM/yyyy" }}
-          </span>
-          -
-          <span id="detailProjectEndDate">
-            {{ project.end_date | date: "dd/MM/yyyy" }}
-          </span>
-        </p>
-      </div>
-    </div>
-  </div>
 
-  <div class="bg-white p-6 rounded-xl shadow-lg mb-6 transition-all duration-300 hover:shadow-xl">
-    <h3 class="text-xl font-bold text-gray-800 mb-4">Tiến độ dự án</h3>
-    <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
-      <div class="h-4 rounded-full transition-all duration-500" [style.width]="(project?.progress || 0) + '%'"
-        [ngClass]="{
-          'bg-green-500': project?.progress === 100,
-          'bg-blue-500': project && project.progress < 100
-        }"></div>
-    </div>
-    <p class="text-gray-700 text-base">
-      {{ project?.progress || 0 }}% hoàn thành ({{ project?.completedTasksCount || 0 }}/{{ project?.totalTasksCount || 0
-      }} công việc)
-    </p>
-  </div>
+      <!-- Project Info & Progress -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div
+          class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 animate-fade-in fade-in-delay-1">
+          <h3 class="text-xl font-semibold text-gray-800 mb-5">Tổng quan dự án</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="flex flex-col">
+              <p class="text-base text-gray-500 uppercase tracking-wider">Người quản lý</p>
+              <p class="text-gray-900 text-base font-bold mt-1" id="detailProjectManager">{{ project.manager.full_name
+                }}</p>
+            </div>
+            <div class="flex flex-col">
+              <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Thời gian</p>
+              <p class="text-gray-900 text-base font-bold mt-1" id="detailProjectTime">
+                {{ project.start_date | date: "dd/MM/yy" }} - {{ project.end_date | date: "dd/MM/yy" }}
+              </p>
+            </div>
+            <div class="flex flex-col">
+              <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Thành viên (<span
+                  id="detailMemberCount">{{ members.length }}</span>)</p>
+              <div class="flex items-center mt-2 -space-x-2">
+                <div *ngFor="let member of members.slice(0, 5)" class="relative group">
+                  <div
+                    class="w-9 h-9 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-bold border-2 border-white cursor-pointer select-none ring-2 ring-white">
+                    {{ (member.users.full_name || member.users.username || '?')?.charAt(0)}}
+                  </div>
+                  <div
+                    class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                    {{ member.users.full_name || member.users.username || '?' }}
+                  </div>
+                </div>
+                <div *ngIf="members.length > 5"
+                  class="w-9 h-9 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-bold border-2 border-white select-none ring-2 ring-white">
+                  +{{ members.length - 5 }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 animate-fade-in fade-in-delay-2">
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Tiến độ</h3>
+          <p class="text-gray-600 text-sm mb-4">
+            {{ project.completedTasksCount || 0 }}/{{ project.totalTasksCount || 0 }} công việc hoàn thành
+          </p>
+          <div class="w-full bg-gray-200 rounded-full h-3">
+            <div class="h-3 rounded-full transition-all duration-500" [style.width]="(project.progress || 0) + '%'"
+              [ngClass]="{
+                       'bg-green-500': project.progress === 100,
+                       'bg-gradient-to-r from-sky-400 to-blue-600': project && project.progress < 100
+                     }"></div>
+          </div>
+          <p class="text-right text-2xl font-bold text-gray-800 mt-2">{{ project.progress || 0 }}%</p>
+        </div>
+      </div>
 
-  <div class="bg-white p-6 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">
-        Công việc của dự án (<span id="detailTaskCount">{{ tasks.length }}</span>)
-      </h3>
-      <button id="openTaskModal" routerLink="/app/tasks"
-        class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-200 flex items-center">
-        <i class="fas fa-plus mr-2"></i>
-        <span>Thêm công việc</span>
-      </button>
-    </div>
-    <!-- Kanban -->
-    <div class="w-full flex flex-col md:flex-row flex-wrap justify-start items-start gap-4 min-h-[400px]">
-      <!-- Cột 1: Chờ duyệt -->
-      <div class="kanban-column bg-gray-200 rounded-lg p-3 w-full md:w-auto flex-1 flex flex-col"
-        data-column-id="inreview" (dragover)="allowDrop($event)" (drop)="drop($event, 'inreview')">
-        <h2 (click)="toggleColumn('inreview')"
-          class="font-semibold text-gray-700 mb-3 flex items-center justify-between cursor-pointer"
-          [ngClass]="{'bg-gray-300': isColumnOpen['inreview']}">
-          <span class="flex items-center"><i class="fas fa-eye text-orange-500 mr-2"></i>Chờ duyệt</span>
-          <span class=" text-gray-600 text-sm font-bold px-2 py-1 rounded-full">{{ (tasks |
-            filter:'inreview').length }}</span>
-          <i class="fas"
-            [ngClass]="{'fa-chevron-down': !isColumnOpen['inreview'], 'fa-chevron-up': isColumnOpen['inreview']}"></i>
-        </h2>
-        <div class="card-list flex-grow space-y-3 pr-1 overflow-y-auto max-h-[calc(100vh-600px)]"
-          [ngClass]="{'hidden md:block': !isColumnOpen['inreview']}">
-          <div *ngFor="let task of tasks | filter:'inreview'"
-            class="card bg-white p-3 rounded-lg shadow-sm cursor-grab transition-transform duration-200 hover:-translate-y-1"
-            draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
-            [attr.data-card-id]="task.task_id"
-            (click)="openTaskDetailModal(task)"
-            >
-            <span
-              class="inline-block bg-pink-200 text-pink-800 text-xs font-semibold px-2 py-1 rounded-full mb-2">{{task.cate
-              || "Chưa phân loại"}}</span>
-            <p class="font-medium text-gray-800">{{ task.name }}</p>
-            <div class="flex justify-between items-center mt-3 text-sm text-gray-500">
-              <span>{{ formatDate(task.due_date) }}</span>
-              <img class="h-6 w-6 rounded-full"
-                [src]="task.assignees[0]?.avatar || 'https://placehold.co/40x40/ec4899/FFFFFF?text=B'"
-                [alt]="'Avatar ' + (task.assignees[0]?.full_name || 'Bình')">
+      <!-- Kanban Board Section -->
+      <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-200 animate-fade-in fade-in-delay-3">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+          <h3 class="text-2xl font-semibold text-gray-800">
+            Bảng công việc (<span id="detailTaskCount">{{ tasks.length }}</span>)
+          </h3>
+          <button id="openTaskModal" routerLink="/app/tasks"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 transition-colors duration-200 flex items-center font-semibold w-full sm:w-auto justify-center">
+            <i class="fas fa-plus mr-2"></i>
+            <span>Thêm công việc</span>
+          </button>
+        </div>
+
+        <!-- Kanban Columns -->
+        <div class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 min-h-[400px]">
+          <!-- Column Template -->
+          <div class="kanban-column bg-gray-100 rounded-xl p-3 flex flex-col" (dragover)="allowDrop($event)"
+            (drop)="drop($event, 'inreview')">
+            <h2
+              class="font-semibold mb-3 flex items-center justify-between cursor-pointer p-1 rounded-md text-sm text-orange-600">
+              <span class="flex items-center">
+                <i class="mr-2 text-base fas fa-eye"></i>Chờ duyệt
+              </span>
+              <span class="font-bold px-2 py-0.5 rounded-full text-xs bg-orange-100 text-orange-600">{{ (tasks |
+                filter:'inreview').length }}</span>
+            </h2>
+            <div class="card-list flex-grow space-y-3 pr-1 overflow-y-auto" [style.max-height]="'calc(100vh - 480px)'">
+              <div *ngFor="let task of tasks | filter:'inreview'"
+                class="card bg-gray-200 p-3.5 rounded-lg shadow-sm cursor-grab transition-all duration-200 hover:shadow-md hover:-translate-y-1 border-l-orange-400"
+                draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
+                [attr.data-card-id]="task.task_id" (click)="openTaskDetailModal(task)">
+                <p class="font-semibold text-gray-800 leading-tight">{{ task.name }}</p>
+                <span
+                  class="inline-block bg-yellow-400 text-gray-600 text-xs font-semibold px-2 py-1 rounded-full my-2">{{task.cate
+                  || "Chưa phân loại"}}</span>
+                <div class="flex justify-between items-center mt-2 text-sm text-gray-500">
+                  <span class="font-medium"><i class="far fa-calendar-alt mr-1.5 text-gray-400"></i>{{
+                    formatDate(task.due_date) }}</span>
+                  <div
+                    class="h-7 w-7 rounded-full flex items-center justify-center bg-blue-400 text-gray-600 font-bold text-xs ring-2 ring-white"
+                    title="{{ task.assignees[0]?.full_name || '?' }}">
+                    {{ (task.assignees[0]?.full_name || '?').charAt(0).toUpperCase() }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="kanban-column bg-blue-100 rounded-xl p-3 flex flex-col" (dragover)="allowDrop($event)"
+            (drop)="drop($event, 'todo')">
+            <h2
+              class="font-semibold mb-3 flex items-center justify-between cursor-pointer p-1 rounded-md text-sm text-blue-600">
+              <span class="flex items-center">
+                <i class="mr-2 text-base fas fa-lightbulb"></i>Cần làm
+              </span>
+              <span class="font-bold px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-600">{{ (tasks |
+                filter:'todo').length }}</span>
+            </h2>
+            <div class="card-list flex-grow space-y-3 pr-1 overflow-y-auto" [style.max-height]="'calc(100vh - 480px)'">
+              <div *ngFor="let task of tasks | filter:'todo'"
+                class="card bg-gray-200 p-3.5 rounded-lg shadow-sm cursor-grab transition-all duration-200 hover:shadow-md hover:-translate-y-1 border-l-orange-400"
+                draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
+                [attr.data-card-id]="task.task_id" (click)="openTaskDetailModal(task)">
+                <p class="font-semibold text-gray-800 leading-tight">{{ task.name }}</p>
+                <span
+                  class="inline-block bg-yellow-400 text-gray-600 text-xs font-semibold px-2 py-1 rounded-full my-2">{{task.cate
+                  || "Chưa phân loại"}}</span>
+                <div class="flex justify-between items-center mt-2 text-sm text-gray-500">
+                  <span class="font-medium"><i class="far fa-calendar-alt mr-1.5 text-gray-400"></i>{{
+                    formatDate(task.due_date) }}</span>
+                  <div
+                    class="h-7 w-7 rounded-full flex items-center justify-center bg-blue-400 text-gray-600 font-bold text-xs ring-2 ring-white"
+                    title="{{ task.assignees[0]?.full_name || '?' }}">
+                    {{ (task.assignees[0]?.full_name || '?').charAt(0).toUpperCase() }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="kanban-column bg-yellow-100 rounded-xl p-3 flex flex-col" (dragover)="allowDrop($event)"
+            (drop)="drop($event, 'in_progress')">
+            <h2
+              class="font-semibold mb-3 flex items-center justify-between cursor-pointer p-1 rounded-md text-sm text-purple-600">
+              <span class="flex items-center">
+                <i class="mr-2 text-base fas fa-person-running"></i>Đang làm
+              </span>
+              <span class="font-bold px-2 py-0.5 rounded-full text-xs bg-purple-100 text-purple-600">{{ (tasks |
+                filter:'in_progress').length }}</span>
+            </h2>
+            <div class="card-list flex-grow space-y-3 pr-1 overflow-y-auto" [style.max-height]="'calc(100vh - 480px)'">
+              <div *ngFor="let task of tasks | filter:'in_progress'"
+                class="card bg-gray-200 p-3.5 rounded-lg shadow-sm cursor-grab transition-all duration-200 hover:shadow-md hover:-translate-y-1 border-l-purple-400"
+                draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
+                [attr.data-card-id]="task.task_id" (click)="openTaskDetailModal(task)">
+                <p class="font-semibold text-gray-800 leading-tight">{{ task.name }}</p>
+                <span
+                  class="inline-block bg-yellow-400 text-gray-600 text-xs font-semibold px-2 py-1 rounded-full my-2">{{task.cate
+                  || "Chưa phân loại"}}</span>
+                <div class="flex justify-between items-center mt-2 text-sm text-gray-500">
+                  <span class="font-medium"><i class="far fa-calendar-alt mr-1.5 text-gray-400"></i>{{
+                    formatDate(task.due_date) }}</span>
+                  <div
+                    class="h-7 w-7 rounded-full flex items-center justify-center bg-blue-400 text-gray-600 font-bold text-xs ring-2 ring-white"
+                    title="{{ task.assignees[0]?.full_name || '?' }}">
+                    {{ (task.assignees[0]?.full_name || '?').charAt(0).toUpperCase() }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="kanban-column bg-green-100 rounded-xl p-3 flex flex-col" (dragover)="allowDrop($event)"
+            (drop)="drop($event, 'completed')">
+            <h2
+              class="font-semibold mb-3 flex items-center justify-between cursor-pointer p-1 rounded-md text-sm text-green-600">
+              <span class="flex items-center">
+                <i class="mr-2 text-base fas fa-check-circle"></i>Hoàn thành
+              </span>
+              <span class="font-bold px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-600">{{ (tasks |
+                filter:'completed').length }}</span>
+            </h2>
+            <div class="card-list flex-grow space-y-3 pr-1 overflow-y-auto" [style.max-height]="'calc(100vh - 480px)'">
+              <div *ngFor="let task of tasks | filter:'completed'"
+                class="card bg-gray-200 p-3.5 rounded-lg shadow-sm cursor-grab transition-all duration-200 hover:shadow-md hover:-translate-y-1 border-l-green-400"
+                draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
+                [attr.data-card-id]="task.task_id" (click)="openTaskDetailModal(task)">
+                <p class="font-semibold text-gray-800 leading-tight">{{ task.name }}</p>
+                <span
+                  class="inline-block bg-yellow-400 text-gray-600 text-xs font-semibold px-2 py-1 rounded-full my-2">{{task.cate
+                  || "Chưa phân loại"}}</span>
+                <div class="flex justify-between items-center mt-2 text-sm text-gray-500">
+                  <span class="font-medium"><i class="far fa-calendar-alt mr-1.5 text-gray-400"></i>{{
+                    formatDate(task.due_date) }}</span>
+                  <div
+                    class="h-7 w-7 rounded-full flex items-center justify-center bg-blue-400 text-gray-600 font-bold text-xs ring-2 ring-white"
+                    title="{{ task.assignees[0]?.full_name || '?' }}">
+                    {{ (task.assignees[0]?.full_name || '?').charAt(0).toUpperCase() }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="kanban-column bg-red-100 rounded-xl p-3 flex flex-col" (dragover)="allowDrop($event)"
+            (drop)="drop($event, 'overdue')">
+            <h2
+              class="font-semibold mb-3 flex items-center justify-between cursor-pointer p-1 rounded-md text-sm text-red-600">
+              <span class="flex items-center">
+                <i class="mr-2 text-base fas fa-exclamation-triangle"></i>Quá hạn
+              </span>
+              <span class="font-bold px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-600">{{ (tasks |
+                filter:'overdue').length }}</span>
+            </h2>
+            <div class="card-list flex-grow space-y-3 pr-1 overflow-y-auto" [style.max-height]="'calc(100vh - 480px)'">
+              <div *ngFor="let task of tasks | filter:'overdue'"
+                class="card bg-gray-200 p-3.5 rounded-lg shadow-sm cursor-grab transition-all duration-200 hover:shadow-md hover:-translate-y-1 border-l-red-400"
+                draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
+                [attr.data-card-id]="task.task_id" (click)="openTaskDetailModal(task)">
+                <p class="font-semibold text-gray-800 leading-tight">{{ task.name }}</p>
+                <span
+                  class="inline-block bg-yellow-400 text-gray-600 text-xs font-semibold px-2 py-1 rounded-full my-2">{{task.cate
+                  || "Chưa phân loại"}}</span>
+                <div class="flex justify-between items-center mt-2 text-sm text-gray-500">
+                  <span class="font-medium"><i class="far fa-calendar-alt mr-1.5 text-gray-400"></i>{{
+                    formatDate(task.due_date) }}</span>
+                  <div
+                    class="h-7 w-7 rounded-full flex items-center justify-center bg-blue-400 text-gray-600 font-bold text-xs ring-2 ring-white"
+                    title="{{ task.assignees[0]?.full_name || '?' }}">
+                    {{ (task.assignees[0]?.full_name || '?').charAt(0).toUpperCase() }}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Cột 2: Cần làm -->
-      <div class="kanban-column bg-blue-100 rounded-lg p-3 w-full md:w-auto flex-1 flex flex-col" data-column-id="todo"
-        (dragover)="allowDrop($event)" (drop)="drop($event, 'todo')">
-        <h2 (click)="toggleColumn('todo')"
-          class="font-semibold text-gray-700 mb-3 flex items-center justify-between cursor-pointer"
-          [ngClass]="{'bg-gray-300': isColumnOpen['todo']}">
-          <span class="flex items-center"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i>Cần làm</span>
-          <span class=" text-gray-600 text-sm font-bold px-2 py-1 rounded-full">{{ (tasks |
-            filter:'todo').length }}</span>
-          <i class="fas"
-            [ngClass]="{'fa-chevron-down': !isColumnOpen['todo'], 'fa-chevron-up': isColumnOpen['todo']}"></i>
-        </h2>
-        <div class="card-list flex-grow space-y-3 pr-1 overflow-y-auto max-h-[calc(100vh-600px)]"
-          [ngClass]="{'hidden md:block': !isColumnOpen['todo']}">
-          <div *ngFor="let task of tasks | filter:'todo'"
-            class="card bg-white p-3 rounded-lg shadow-sm cursor-grab transition-transform duration-200 hover:-translate-y-1"
-            draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
-            [attr.data-card-id]="task.task_id"
-            (click)="openTaskDetailModal(task)">
-            <span
-              class="inline-block bg-pink-200 text-pink-800 text-xs font-semibold px-2 py-1 rounded-full mb-2">{{task.cate
-              || "Chưa phân loại"}}</span>
-            <p class="font-medium text-gray-800">{{ task.name }}</p>
-            <div class="flex justify-between items-center mt-3 text-sm text-gray-500">
-              <span>{{ formatDate(task.due_date) }}</span>
-              <img class="h-6 w-6 rounded-full"
-                [src]="task.assignees[0]?.avatar || 'https://placehold.co/40x40/ec4899/FFFFFF?text=B'"
-                [alt]="'Avatar ' + (task.assignees[0]?.full_name || 'Bình')">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Cột 3: Đang làm -->
-      <div class="kanban-column bg-yellow-100 rounded-lg p-3 w-full md:w-auto flex-1 flex flex-col"
-        data-column-id="in_progress" (dragover)="allowDrop($event)" (drop)="drop($event, 'in_progress')">
-        <h2 (click)="toggleColumn('in_progress')"
-          class="font-semibold text-gray-700 mb-3 flex items-center justify-between cursor-pointer"
-          [ngClass]="{'bg-gray-300': isColumnOpen['in_progress']}">
-          <span class="flex items-center"><i class="fas fa-person-running text-blue-500 mr-2"></i>Đang làm</span>
-          <span class=" text-gray-600 text-sm font-bold px-2 py-1 rounded-full">{{ (tasks |
-            filter:'in_progress').length }}</span>
-          <i class="fas"
-            [ngClass]="{'fa-chevron-down': !isColumnOpen['in_progress'], 'fa-chevron-up': isColumnOpen['in_progress']}"></i>
-        </h2>
-        <div class="card-list flex-grow space-y-3 pr-1 overflow-y-auto max-h-[calc(100vh-600px)]"
-          [ngClass]="{'hidden md:block': !isColumnOpen['in_progress']}">
-          <div *ngFor="let task of tasks | filter:'in_progress'"
-            class="card bg-white p-3 rounded-lg shadow-sm cursor-grab transition-transform duration-200 hover:-translate-y-1"
-            draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
-            [attr.data-card-id]="task.task_id"
-            (click)="openTaskDetailModal(task)">
-            <span
-              class="inline-block bg-indigo-200 text-indigo-800 text-xs font-semibold px-2 py-1 rounded-full mb-2">{{task.cate
-              || "Chưa phân loại"}}</span>
-            <p class="font-medium text-gray-800">{{ task.name }}</p>
-            <div class="flex justify-between items-center mt-3 text-sm text-gray-500">
-              <span>{{ formatDate(task.due_date) }}</span>
-              <img class="h-6 w-6 rounded-full"
-                [src]="task.assignees[0]?.avatar || 'https://placehold.co/40x40/6366f1/FFFFFF?text=A'"
-                [alt]="'Avatar ' + (task.assignees[0]?.full_name || 'An')">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Cột 4: Hoàn thành -->
-      <div class="kanban-column bg-green-100 rounded-lg p-3 w-full md:w-auto flex-1 flex flex-col"
-        data-column-id="completed" (dragover)="allowDrop($event)" (drop)="drop($event, 'completed')">
-        <h2 (click)="toggleColumn('completed')"
-          class="font-semibold text-gray-700 mb-3 flex items-center justify-between cursor-pointer"
-          [ngClass]="{'bg-gray-300': isColumnOpen['completed']}">
-          <span class="flex items-center"><i class="fas fa-check-circle text-green-600 mr-2"></i>Hoàn thành</span>
-          <span class=" text-gray-600 text-sm font-bold px-2 py-1 rounded-full">{{ (tasks |
-            filter:'completed').length }}</span>
-          <i class="fas"
-            [ngClass]="{'fa-chevron-down': !isColumnOpen['completed'], 'fa-chevron-up': isColumnOpen['completed']}"></i>
-        </h2>
-        <div class="card-list flex-grow space-y-3 pr-1 overflow-y-auto max-h-[calc(100vh-600px)]"
-          [ngClass]="{'hidden md:block': !isColumnOpen['completed']}">
-          <div *ngFor="let task of tasks | filter:'completed'"
-            class="card bg-white p-3 rounded-lg shadow-sm cursor-grab transition-transform duration-200 hover:-translate-y-1"
-            draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
-            [attr.data-card-id]="task.task_id"
-            (click)="openTaskDetailModal(task)">
-            <span
-              class="inline-block bg-gray-200 text-gray-800 text-xs font-semibold px-2 py-1 rounded-full mb-2">{{task.cate
-              || "Chưa phân loại"}}</span>
-            <p class="font-medium line-through text-gray-500">{{ task.name }}</p>
-            <div class="flex justify-between items-center mt-3 text-sm text-gray-500">
-              <span>{{ formatDate(task.due_date) }}</span>
-              <img class="h-6 w-6 rounded-full"
-                [src]="task.assignees[0]?.avatar || 'https://placehold.co/40x40/FFFFFF/000000?text=?'"
-                [alt]="'Avatar ' + (task.assignees[0]?.full_name || '?')">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Cột 5: Quá hạn -->
-      <div class="kanban-column bg-red-100 rounded-lg p-3 w-full md:w-auto flex-1 flex flex-col"
-        data-column-id="overdue" (dragover)="allowDrop($event)" (drop)="drop($event, 'overdue')">
-        <h2 (click)="toggleColumn('overdue')"
-          class="font-semibold text-gray-700 mb-3 flex items-center justify-between cursor-pointer"
-          [ngClass]="{'bg-gray-300': isColumnOpen['overdue']}">
-          <span class="flex items-center"><i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>Quá hạn</span>
-          <span class=" text-gray-600 text-sm font-bold px-2 py-1 rounded-full">{{ (tasks |
-            filter:'overdue').length }}</span>
-          <i class="fas"
-            [ngClass]="{'fa-chevron-down': !isColumnOpen['overdue'], 'fa-chevron-up': isColumnOpen['overdue']}"></i>
-        </h2>
-        <div class="card-list flex-grow space-y-3 pr-1 overflow-y-auto max-h-[calc(100vh-600px)]"
-          [ngClass]="{'hidden md:block': !isColumnOpen['overdue']}">
-          <div *ngFor="let task of tasks | filter:'overdue'"
-            class="card bg-white p-3 rounded-lg shadow-sm cursor-grab transition-transform duration-200 hover:-translate-y-1"
-            draggable="true" (dragstart)="drag($event, task.task_id); $event.stopPropagation()"
-            [attr.data-card-id]="task.task_id"
-            (click)="openTaskDetailModal(task)">
-            <span
-              class="inline-block bg-red-200 text-red-800 text-xs font-semibold px-2 py-1 rounded-full mb-2">{{task.cate
-              || "Chưa phân loại"}}</span>
-            <p class="font-medium text-gray-800">{{ task.name }}</p>
-            <div class="flex justify-between items-center mt-3 text-sm text-gray-500">
-              <span> {{ formatDate(task.due_date) }} </span>
-              <img class="h-6 w-6 rounded-full"
-                [src]="task.assignees[0]?.avatar || 'https://placehold.co/40x40/ef4444/FFFFFF?text=?'"
-                [alt]="'Avatar ' + (task.assignees[0]?.full_name || '?')">
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-    <!-- End Kanban -->
   </div>
 </div>
 
+<!-- Modals -->
 <app-create-project *ngIf="showEditModal" [show]="showEditModal" [isEditMode]="true"
   (save)="handleUpdateProject($event)" (close)="closeEditModal()">
 </app-create-project>
 
-<app-task-detail-modal
-  *ngIf="showTaskDetailModal"
-  [show]="showTaskDetailModal"
-  [task]="selectedTask"
-  [members]="members"
-  (closeModal)="closeTaskDetailModal()"
-  (save)="handleUpdateTask($event)"
-  (deleteTask)="handleDeleteTask($event)"
-></app-task-detail-modal>
-
+<app-task-detail-modal *ngIf="showTaskDetailModal" [show]="showTaskDetailModal" [task]="selectedTask"
+  [members]="members" (closeModal)="closeTaskDetailModal()" (saveTask)="handleUpdateTask($event)"
+  (deleteTask)="handleDeleteTask($event)">
+</app-task-detail-modal>

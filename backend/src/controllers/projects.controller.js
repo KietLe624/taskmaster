@@ -5,7 +5,6 @@ const Project = db.Project;
 const Task = db.Task;
 const ProjectMember = db.ProjectMember;
 
-
 console.log("Các models đã được nạp:", Object.keys(db));
 
 const getAllProjects = async (req, res) => {
@@ -161,6 +160,7 @@ const getProjectById = async (req, res) => {
           attributes: [
             "task_id",
             "name",
+            "description",
             "status",
             "cate",
             "priority",

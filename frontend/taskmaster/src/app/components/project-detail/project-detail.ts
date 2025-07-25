@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { ProjectService } from '../../services/project/project';
 import { ProjectsData } from '../../models/projects';
-import { ProjectDetailData, Task, User } from '../../models/project-detail';
+import { ProjectDetailData, Task, User, ProjectMember } from '../../models/project-detail';
 import { ProjectFrom } from '../create-project/create-project';
 
 @Component({
@@ -16,7 +16,7 @@ import { ProjectFrom } from '../create-project/create-project';
 export class ProjectDetail implements OnInit {
   project: ProjectDetailData | null = null;
   tasks: Task[] = [];
-  members: User[] = [];
+  members: ProjectMember[] = [];
   isLoading = true;
   public projects: ProjectsData[] = [];
   showEditModal = false;
@@ -35,29 +35,6 @@ export class ProjectDetail implements OnInit {
 
   ngOnInit(): void {
     this.loadProjectDetails();
-    const projectId = this.route.snapshot.paramMap.get('id');
-
-    if (projectId) {
-      this.projectService.getProjectById(+projectId).subscribe({
-        next: (data: ProjectDetailData) => {
-          this.project = data;
-          this.tasks = data.tasks || [];
-          this.members = data.members?.map(member => member.users) || [];
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Lỗi khi tải chi tiết dự án:', err);
-          this.isLoading = false;
-          alert('Không tìm thấy dự án hoặc có lỗi xảy ra.');
-          this.router.navigate(['/app/projects']);
-        }
-      });
-    } else {
-      console.error('Không tìm thấy ID dự án trong URL.');
-      this.router.navigate(['/app/projects']);
-      this.cdr.detectChanges();
-    }
   }
 
   loadProjectDetails(): void {
@@ -73,14 +50,16 @@ export class ProjectDetail implements OnInit {
       next: (data) => {
         this.project = data;
         this.tasks = data.tasks || [];
-        this.members = data.members?.map(member => member.users).filter(user => user) || [];
+        this.members = data.members || [];
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         this.isLoading = false;
+        console.error('Lỗi khi tải chi tiết dự án:', err);
         alert('Không thể tải chi tiết dự án.');
-        this.router.navigate(['/projects']);
+        this.router.navigate(['/app/projects']);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -166,7 +145,7 @@ export class ProjectDetail implements OnInit {
   }
 
   openTaskDetailModal(task: Task): void {
-    console.log('Hàm openTaskDetailModal đã được gọi với task:', task); // THÊM DÒNG NÀY
+    console.log('Hàm openTaskDetailModal đã được gọi với task:', task);
     this.selectedTask = task;
     this.showTaskDetailModal = true;
     this.cdr.detectChanges();
@@ -179,19 +158,58 @@ export class ProjectDetail implements OnInit {
     this.cdr.detectChanges(); // Dòng này rất quan trọng
   }
 
+  // handleUpdateTask(formData: any): void {
+  //   // Thêm một bước kiểm tra an toàn
+  //   if (!this.selectedTask) {
+  //     console.error('Không có công việc nào được chọn để cập nhật.');
+  //     alert('Đã có lỗi xảy ra, không tìm thấy công việc.');
+  //     return;
+  //   }
+  //   console.log('Parent: Hàm handleUpdateTask đã được gọi với formData:', formData);
+  //   console.log('Parent: selectedTask:', this.selectedTask);
+  //   // Lấy ID từ `selectedTask` và gửi `formData` tới service
+  //   this.projectService.updateTask(this.selectedTask.task_id, formData).subscribe({
+  //     next: () => {
+  //       alert('Cập nhật công việc thành công!');
+  //       this.closeTaskDetailModal();
+  //       this.loadProjectDetails(); // Tải lại dữ liệu để cập nhật danh sách
+  //     },
+  //     error: (err) => {
+  //       console.error('Lỗi khi cập nhật công việc:', err);
+  //       alert('Cập nhật công việc thất bại.');
+  //     }
+  //   });
+  // }
+  // file: project-detail.ts
+
   handleUpdateTask(formData: any): void {
-    // Thêm một bước kiểm tra an toàn
-    if (!this.selectedTask) {
-      console.error('Không có công việc nào được chọn để cập nhật.');
-      alert('Đã có lỗi xảy ra, không tìm thấy công việc.');
+    // Kiểm tra để đảm bảo có task và project được chọn
+    if (!this.selectedTask || !this.project) {
+      console.error('Không có công việc hoặc dự án được chọn để cập nhật.');
+      alert('Đã có lỗi xảy ra, vui lòng tải lại trang.');
       return;
     }
-    // Lấy ID từ `selectedTask` và gửi `formData` tới service
-    this.projectService.updateTask(this.selectedTask.task_id, formData).subscribe({
+
+    // 1. Dữ liệu người dùng sửa trên form, nhận từ modal
+    const formValues = formData;
+
+    // 2. Các dữ liệu tĩnh, lấy từ component cha
+    const staticValues = {
+      project_id: this.project.id,        // Lấy ID từ project đang xem
+      cate: this.selectedTask.cate,       // Lấy cate từ task đã chọn
+    };
+
+    // 3. Trộn tất cả lại để có payload hoàn chỉnh
+    const finalPayload = { ...formValues, ...staticValues };
+
+    console.log('Payload cuối cùng gửi tới service:', finalPayload);
+
+    // 4. Gọi service với payload hoàn chỉnh
+    this.projectService.updateTask(this.selectedTask.task_id, finalPayload).subscribe({
       next: () => {
         alert('Cập nhật công việc thành công!');
         this.closeTaskDetailModal();
-        this.loadProjectDetails(); // Tải lại dữ liệu để cập nhật danh sách
+        this.loadProjectDetails();
       },
       error: (err) => {
         console.error('Lỗi khi cập nhật công việc:', err);
@@ -199,7 +217,6 @@ export class ProjectDetail implements OnInit {
       }
     });
   }
-
   handleDeleteTask(taskId: number): void {
     this.projectService.deleteTask(taskId).subscribe({
       next: () => {

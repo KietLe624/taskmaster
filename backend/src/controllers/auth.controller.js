@@ -68,7 +68,7 @@ const login = async (req, res) => {
     }
     // Thời gian hết hạn của token
     const options = {
-      expiresIn: "1h", // Token hết hạn sau 30p
+      expiresIn: "1h", // Token hết hạn sau 1h
       algorithm: "HS256", // Thuật toán mã hóa (mặc định)
     };
     // Tạo token
