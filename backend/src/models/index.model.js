@@ -17,12 +17,14 @@ if (!dbConfig || !dbConfig.dialect) {
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
-  pool: { // Thêm cấu hình pool để quản lý kết nối tốt hơn
+  pool: {
+    // Thêm cấu hình pool để quản lý kết nối tốt hơn
     max: dbConfig.pool ? dbConfig.pool.max : 5,
     min: dbConfig.pool ? dbConfig.pool.min : 0,
     acquire: dbConfig.pool ? dbConfig.pool.acquire : 30000,
-    idle: dbConfig.pool ? dbConfig.pool.idle : 10000
-  }
+    idle: dbConfig.pool ? dbConfig.pool.idle : 10000,
+  },
+  timezone: "+07:00",
 });
 
 // Đọc tất cả các file model trong thư mục hiện tại

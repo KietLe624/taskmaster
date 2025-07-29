@@ -23,6 +23,8 @@ export interface Task {
 export interface ProjectMember {
   id: number;
   user_id: number;
+  email: string;
+  role: string; // Vai trò của thành viên trong dự án
   users: User;
 }
 

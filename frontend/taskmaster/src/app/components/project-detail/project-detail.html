@@ -31,19 +31,34 @@
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in">
         <div>
           <h2 class="text-4xl font-semibold text-gray-900" id="detailProjectName">{{ project.name }}</h2>
-          <p class="text-gray-500 text-base mt-2 max-w-3xl" id="detailProjectDescription">{{ project.description }}</p>
+          <p class="text-gray-500 text-base mt-2 max-w-3xl" id="detailProjectDescription"><span class="font-semibold text-black">Mô tả:</span> {{ project.description }}</p>
         </div>
-        <div class="flex items-center gap-2 flex-shrink-0">
-          <a (click)="goBack()" id="backToProjectsList"
-            class="px-4 py-2 bg-white text-gray-700 rounded-lg shadow-sm border border-gray-200 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300 transition-all duration-200 flex items-center justify-center font-semibold">
-            <i class="fas fa-arrow-left mr-2 text-sm"></i>
-            <span>Quay lại</span>
+        <div class="flex items-center gap-3 flex-shrink-0">
+
+          <a (click)="goBack()" id="backToProjectsList" class="px-4 py-2 flex items-center justify-center font-semibold text-base
+            text-gray-700 bg-white border border-gray-300 rounded-lg
+            transform transition-all duration-200
+            hover:shadow-md hover:-translate-y-0.5 hover:text-red-600 hover:border-red-300">
+            <i class="fas fa-arrow-left text-sm"></i>
+            <span class="ml-2 hidden md:inline">Quay lại</span>
           </a>
-          <button (click)="openEditModal()" id="editProjectDetailBtn"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 transition-all duration-200 flex items-center justify-center font-semibold">
-            <i class="fas fa-edit mr-2 text-sm"></i>
-            <span>Sửa dự án</span>
+
+          <button (click)="openEditModal()" id="editProjectDetailBtn" class="px-4 py-2 flex items-center justify-center font-semibold text-base
+                 text-gray-700 bg-white border border-gray-300 rounded-lg
+                 transform transition-all duration-200
+                 hover:shadow-md hover:-translate-y-0.5 hover:text-blue-600 hover:border-blue-300">
+            <i class="fas fa-edit text-sm"></i>
+            <span class="ml-2 hidden md:inline">Sửa dự án</span>
           </button>
+
+          <button (click)="openAddMemberModal()" class="px-4 py-2 flex items-center justify-center font-semibold text-base
+                 text-gray-700 bg-white border border-gray-300 rounded-lg
+                 transform transition-all duration-200
+                 hover:shadow-md hover:-translate-y-0.5 hover:text-green-600 hover:border-green-300">
+            <i class="fa-solid fa-user-plus text-sm"></i>
+            <span class="ml-2 hidden md:inline">Thêm thành viên</span>
+          </button>
+
         </div>
       </div>
 
@@ -109,7 +124,7 @@
             Bảng công việc (<span id="detailTaskCount">{{ tasks.length }}</span>)
           </h3>
           <button id="openTaskModal" routerLink="/app/tasks"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 transition-colors duration-200 flex items-center font-semibold w-full sm:w-auto justify-center">
+            class="px-4 py-2 text-black hover:text-green-500 transition-colors duration-200 flex items-center font-semibold w-full sm:w-auto justify-center">
             <i class="fas fa-plus mr-2"></i>
             <span>Thêm công việc</span>
           </button>
@@ -292,3 +307,10 @@
   [members]="members" (closeModal)="closeTaskDetailModal()" (saveTask)="handleUpdateTask($event)"
   (deleteTask)="handleDeleteTask($event)">
 </app-task-detail-modal>
+
+<app-add-member-modal *ngIf="project"
+  [show]="showAddMemberModal"
+  [projectId]="project.id"
+  (close)="closeAddMemberModal()"
+  (memberAdded)="handleMemberAdded()">
+</app-add-member-modal>

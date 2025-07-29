@@ -26,7 +26,7 @@ const {
 
 // DashboardController
 const { getDashboardData } = require("../controllers/dashboard.controller");
-
+const { getScheduleForWeek } = require("../controllers/schedule.controller");
 // AuthController
 const {
   register,
@@ -61,7 +61,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 // Dashboard Routes
 router.get("/", authenticateToken, getDashboardData); // Get dashboard data
 router.get("/dashboard", authenticateToken, getDashboardData); // Get dashboard data (alias)
-
+router.get("/schedules", authenticateToken, getScheduleForWeek); // Get schedule for the current week  
 // User Routes
 router.get("/users/all", getAllUsers); // Get all users
 router.get("/users/:user_id", authenticateToken, getUserInfo); // Get user by ID

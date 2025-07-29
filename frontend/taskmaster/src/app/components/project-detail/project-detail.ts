@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { ProjectService } from '../../services/project/project';
 import { ProjectsData } from '../../models/projects';
-import { ProjectDetailData, Task, User, ProjectMember } from '../../models/project-detail';
+import { ProjectDetailData, Task, ProjectMember } from '../../models/project-detail';
 import { ProjectFrom } from '../create-project/create-project';
 
 @Component({
@@ -21,9 +21,11 @@ export class ProjectDetail implements OnInit {
   public projects: ProjectsData[] = [];
   showEditModal = false;
   isColumnOpen: { [key: string]: boolean } = { todo: false, 'in_progress': false, inreview: false, done: false, overdue: false };
-
   selectedTask: Task | null = null;
-  showTaskDetailModal = false;
+
+  showTaskDetailModal = false; // Biến để điều khiển modal chi tiết công việc
+
+  showAddMemberModal = false; // Biến để điều khiển modal thêm thành viên
 
   constructor(
     private route: ActivatedRoute,
@@ -87,6 +89,7 @@ export class ProjectDetail implements OnInit {
       error: (err) => {
         const errorMessage = err.error?.message || 'Đã có lỗi không xác định xảy ra.';
         alert(`Cập nhật dự án thất bại: ${errorMessage}`);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -214,6 +217,7 @@ export class ProjectDetail implements OnInit {
       error: (err) => {
         console.error('Lỗi khi cập nhật công việc:', err);
         alert('Cập nhật công việc thất bại.');
+        this.cdr.detectChanges(); // Cập nhật giao diện sau khi có lỗi
       }
     });
   }
@@ -227,6 +231,7 @@ export class ProjectDetail implements OnInit {
       error: (err) => {
         console.error('Lỗi khi xóa công việc:', err);
         alert('Xóa công việc thất bại.');
+        this.cdr.detectChanges(); // Cập nhật giao diện sau khi có lỗi
       }
     });
   }
@@ -300,5 +305,21 @@ export class ProjectDetail implements OnInit {
       this.project.totalTasksCount = totalTasks;
       this.cdr.detectChanges(); // Cập nhật giao diện
     }
+  }
+
+  openAddMemberModal(): void {
+    this.showAddMemberModal = true;
+    this.loadProjectDetails(); // Tải lại dữ liệu để đảm bảo danh sách thành viên mới nhất
+  }
+
+  closeAddMemberModal(): void {
+    this.showAddMemberModal = false;
+  }
+
+  // Hàm này sẽ được gọi khi modal phát sự kiện 'memberAdded'
+  handleMemberAdded(): void {
+    // kiểm tra xem thành viên đã tồn tại chưa
+    console.log('Thành viên mới đã được thêm. Tải lại danh sách...');
+    this.loadProjectDetails(); // Tải lại dữ liệu để cập nhật UI
   }
 }

@@ -73,23 +73,6 @@ export class TaskDetailModal implements OnInit, OnChanges {
     }
   }
 
-  // onSave(): void {
-  //   console.log('Button clicked: Lưu công việc');
-  //   if (this.taskForm.invalid) {
-  //     return;
-  //   }
-  //   console.log('Modal: Dữ liệu công việc:', this.taskForm.value);
-  //   this.isSubmitting = true;
-  //   const taskData = {
-  //     ...this.taskForm.value,
-  //     task_id: this.task?.task_id
-  //   };
-
-  //   this.saveTask.emit(taskData);
-  // }
-
-  // Sửa trong file: task-detail-modal.ts
-
   onSave(): void {
     if (this.taskForm.invalid) {
       return;

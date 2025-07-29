@@ -33,6 +33,7 @@ import { authInterceptor } from './interceptor/auth-interceptor';
 import { FilterPipe } from './services/filter/filer';
 import { BellModule } from './components/bell-module/bell-module';
 import { TaskDetailModal } from './components/task-detail-modal/task-detail-modal';
+import { AddMemberModal } from './components/add-member-modal/add-member-modal';
 
 @NgModule({
   declarations: [
@@ -55,6 +56,7 @@ import { TaskDetailModal } from './components/task-detail-modal/task-detail-moda
     PublicLayout,
     BellModule,
     TaskDetailModal,
+    AddMemberModal,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule, CommonModule, FilterPipe, ReactiveFormsModule],
 

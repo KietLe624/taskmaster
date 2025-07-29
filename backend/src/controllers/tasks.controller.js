@@ -132,7 +132,7 @@ const createTask = async (req, res) => {
   const t = await sequelize.transaction(); // Bắt đầu một transaction
 
   try {
-    const { name, description, status, priority, cate, due_date, project_id } =
+    const { name, description, status, priority, cate, due_date, project_id, start_time } =
       req.body;
 
     let assignee_ids = req.body.assignee_id; // Lấy ra để xử lý
@@ -159,6 +159,7 @@ const createTask = async (req, res) => {
         status,
         priority,
         cate,
+        start_time, // Thêm trường start_time với thời gian hiện tại
         due_date,
         project_id,
       },
@@ -296,6 +297,7 @@ const updateTask = async (req, res) => {
       description,
       priority,
       cate,
+      start_time, // Thêm trường start_time
       due_date,
       status,
       project_id,
@@ -331,6 +333,7 @@ const updateTask = async (req, res) => {
         description,
         priority,
         cate,
+        start_time, // Cập nhật trường start_time
         due_date,
         project_id,
         status,

@@ -2,25 +2,28 @@
   <!-- Tiêu đề và nút thêm -->
   <div class="flex justify-between items-center mb-6">
     <h2 class="text-3xl font-bold text-gray-900">Quản Lý Dự Án</h2>
-    <button (click)="openCreateModal()" id="openCreateProjectModal"
-      class="px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 flex items-center">
-      <i class="fas fa-plus"></i>
-      <span class="ml-2 hidden md:inline">Thêm Dự Án Mới</span>
+    <button (click)="openCreateModal()" id="openCreateProjectModal" class="px-5 py-2.5 text-black font-semibold rounded-lg
+               flex items-center text-sm
+               border border-gray-300
+               transform transition-all duration-200
+               hover:shadow-md hover:-translate-y-0.5 hover:text-blue-600 hover:border-blue-300">
+      <i class="fas fa-plus mr-2"></i>
+      <span class="hidden md:inline">Thêm Dự Án Mới</span>
     </button>
   </div>
 
   <!-- Hiệu ứng loading -->
   <div *ngIf="isLoading" class="text-center p-10">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Skeleton Card -->
-        <div *ngFor="let i of [1,2,3,4]" class="bg-white p-6 rounded-xl shadow-md">
-            <div class="animate-pulse flex flex-col space-y-4">
-                <div class="h-6 bg-gray-200 rounded w-3/4"></div>
-                <div class="h-4 bg-gray-200 rounded"></div>
-                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
-                <div class="h-10 bg-gray-200 rounded mt-4"></div>
-            </div>
+      <!-- Skeleton Card -->
+      <div *ngFor="let i of [1,2,3,4]" class="bg-white p-6 rounded-xl shadow-md">
+        <div class="animate-pulse flex flex-col space-y-4">
+          <div class="h-6 bg-gray-200 rounded w-3/4"></div>
+          <div class="h-4 bg-gray-200 rounded"></div>
+          <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+          <div class="h-10 bg-gray-200 rounded mt-4"></div>
         </div>
+      </div>
     </div>
   </div>
 
@@ -35,10 +38,12 @@
 
       <!-- Nút chỉnh sửa và xóa -->
       <div class="absolute top-4 right-4 flex space-x-2">
-        <button (click)="openEditModal(project)" class="text-gray-400 hover:text-blue-600 text-lg focus:outline-none transition-colors">
+        <button (click)="openEditModal(project)"
+          class="text-gray-400 hover:text-blue-600 text-lg focus:outline-none transition-colors">
           <i class="fas fa-edit"></i>
         </button>
-        <button (click)="deleteProject(project.id)" class="text-gray-400 hover:text-red-600 focus:outline-none transition-colors">
+        <button (click)="deleteProject(project.id)"
+          class="text-gray-400 hover:text-red-600 focus:outline-none transition-colors">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
@@ -74,31 +79,31 @@
 
       <!-- Footer card -->
       <div class="mt-auto flex justify-between items-end">
-          <!-- Nút xem chi tiết -->
-          <a [routerLink]="['/app/projects', project.id]" (click)="viewProjectDetails(project)"
-            class="text-blue-600 text-sm font-medium flex items-center hover:underline">
-            Xem chi tiết
-            <i class="fas fa-arrow-right ml-1.5 text-xs"></i>
-          </a>
+        <!-- Nút xem chi tiết -->
+        <a [routerLink]="['/app/projects', project.id]" (click)="viewProjectDetails(project)"
+          class="text-blue-600 text-sm font-medium flex items-center hover:underline">
+          Xem chi tiết
+          <i class="fas fa-arrow-right ml-1.5 text-xs"></i>
+        </a>
 
-          <!-- Avatars thành viên -->
-          <div class="flex items-center -space-x-2">
-            <div *ngFor="let member of project.members.slice(0, 2)" class="relative group">
-              <div
-                class="w-8 h-8 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-bold border-2 border-white cursor-pointer select-none">
-                {{ member.full_name.charAt(0).toUpperCase() }}
-              </div>
-              <div
-                class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                {{ member.full_name }}
-              </div>
+        <!-- Avatars thành viên -->
+        <div class="flex items-center -space-x-2">
+          <div *ngFor="let member of project.members.slice(0, 2)" class="relative group">
+            <div
+              class="w-8 h-8 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-bold border-2 border-white cursor-pointer select-none">
+              {{ member.full_name.charAt(0).toUpperCase() }}
             </div>
-
-            <div *ngIf="project.members.length > 2"
-              class="w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-bold border-2 border-white select-none">
-              +{{ project.members.length - 2 }}
+            <div
+              class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+              {{ member.full_name }}
             </div>
           </div>
+
+          <div *ngIf="project.members.length > 2"
+            class="w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-bold border-2 border-white select-none">
+            +{{ project.members.length - 2 }}
+          </div>
+        </div>
       </div>
     </div>
   </div>

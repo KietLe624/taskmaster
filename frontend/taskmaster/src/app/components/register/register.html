@@ -12,6 +12,12 @@
         placeholder="Tên của bạn" />
     </div>
     <div>
+      <label for="fullName" class="block text-gray-700 text-sm font-semibold mb-2">Họ và tên</label>
+      <input type="text" id="fullName" name="fullName" required [(ngModel)]="userData.full_name"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+        placeholder="Họ và tên đầy đủ" />
+    </div>
+    <div>
       <label for="email" class="block text-gray2-700 text-sm font-semibold mb-2">Địa chỉ Email</label>
       <input type="email" id="email" name="email" required [(ngModel)]="userData.email"
         class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"

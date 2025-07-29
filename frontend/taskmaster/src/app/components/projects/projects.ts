@@ -1,9 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit, } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ProjectsData } from '../../models/projects';
 import { ProjectService } from '../../services/project/project';
 import { ProjectFrom } from '../create-project/create-project';
-
 
 @Component({
   selector: 'app-projects',
@@ -18,7 +17,10 @@ export class Projects implements OnInit {
   public isEditMode = false;
   public projectToEdit: ProjectsData | null = null;
 
-  constructor(private projectService: ProjectService, private cdr: ChangeDetectorRef) { }
+  constructor(
+    private projectService: ProjectService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.projectService.getProjects().subscribe({
@@ -31,7 +33,7 @@ export class Projects implements OnInit {
         console.error('Lỗi khi tải dữ liệu dự án:', err);
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -61,18 +63,25 @@ export class Projects implements OnInit {
         alert('Dữ liệu form không hợp lệ. Vui lòng kiểm tra các trường.');
         return;
       }
-      this.projectService.updateProject(this.projectToEdit.id, formData).subscribe({
-        next: (updatedProject) => {
-          alert('Dự án ' + updatedProject.name + ' đã được cập nhật thành công!');
-          this.closeModal(); // Đóng modal sau khi cập nhật thành công
-          this.reloadProjects(); // Tải lại danh sách dự án sau khi cập nhật
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          this.closeModal(); // Đóng modal ngay cả khi có lỗi
-          alert('Cập nhật dự án thất bại: ' + (err.error?.message || 'Lỗi không xác định'));
-        }
-      });
+      this.projectService
+        .updateProject(this.projectToEdit.id, formData)
+        .subscribe({
+          next: (updatedProject) => {
+            alert(
+              'Dự án ' + updatedProject.name + ' đã được cập nhật thành công!'
+            );
+            this.closeModal(); // Đóng modal sau khi cập nhật thành công
+            this.reloadProjects(); // Tải lại danh sách dự án sau khi cập nhật
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            this.closeModal(); // Đóng modal ngay cả khi có lỗi
+            alert(
+              'Cập nhật dự án thất bại: ' +
+                (err.error?.message || 'Lỗi không xác định')
+            );
+          },
+        });
     } else {
       // Tạo dự án mới
       this.projectService.createProject(formData).subscribe({
@@ -83,17 +92,20 @@ export class Projects implements OnInit {
           this.cdr.detectChanges();
         },
         error: (err) => {
-          const errorMessage = err.error?.message || 'Đã có lỗi không xác định xảy ra.';
+          const errorMessage =
+            err.error?.message || 'Đã có lỗi không xác định xảy ra.';
           alert(errorMessage);
           this.closeModal(); // Đóng modal ngay cả khi có lỗi
-        }
+        },
       });
     }
   }
 
   deleteProject(projectId: number): void {
     // Sử dụng confirm() để xác nhận đơn giản
-    const confirmation = confirm('Bạn có chắc chắn muốn xóa dự án này không? Hành động này không thể hoàn tác.');
+    const confirmation = confirm(
+      'Bạn có chắc chắn muốn xóa dự án này không? Hành động này không thể hoàn tác.'
+    );
     if (confirmation) {
       this.projectService.deleteProject(projectId).subscribe({
         next: () => {
@@ -102,13 +114,17 @@ export class Projects implements OnInit {
           this.cdr.detectChanges();
         },
         error: (err) => {
-          const errorMessage = err.error?.message || 'Đã có lỗi không xác định xảy ra.';
-        }
+          const errorMessage =
+            err.error?.message || 'Đã có lỗi không xác định xảy ra.';
+        },
       });
     }
   }
   saveProject(project: ProjectsData): void {
     console.log('Lưu dự án:', project.name);
+  }
+  addMemberToProject(project: ProjectsData): void {
+
   }
   // Hàm này sẽ được gọi khi người dùng muốn xem chi tiết dự án
   viewProjectDetails(project: ProjectsData): void {
@@ -127,7 +143,7 @@ export class Projects implements OnInit {
         console.error('Lỗi khi tải lại dữ liệu dự án:', err);
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 }

@@ -3,17 +3,17 @@
   width: 18rem;
   padding: 1rem;
   text-align: center;
-  border-radius: .8rem;
+  border-radius: 0.8rem;
   background-color: white;
 }
 
 .card__skeleton {
   background-image: linear-gradient(
-		90deg,
-		#ccc 0px,
-		rgb(229 229 229 / 90%) 40px,
-		#ccc 80px
-	);
+    90deg,
+    #ccc 0px,
+    rgb(229 229 229 / 90%) 40px,
+    #ccc 80px
+  );
   background-size: 300%;
   background-position: 100% 0;
   border-radius: inherit;
@@ -33,4 +33,82 @@
   to {
     background-position: -100% 0;
   }
+}
+
+.schedule-container {
+  overflow-x: auto; /* Cho phép cuộn ngang */
+  padding-bottom: 10px; /* Thêm chút không gian cho thanh cuộn */
+}
+
+/* SỬA LẠI CLASS NÀY: Đặt chiều rộng tối thiểu lớn hơn để kích hoạt thanh cuộn */
+.schedule-grid {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  row-gap: 8px;
+  min-width: 1200px; /* Chiều rộng tối thiểu để nội dung không bị co lại */
+}
+
+/* SỬA LẠI CLASS NÀY: Mở rộng lưới ra 48 cột (24 giờ x 2 cột/giờ) */
+.day-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(48, 1fr); /* 24 giờ * 2 cột/giờ = 48 cột */
+  height: 50px;
+  background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px);
+  background-size: calc(100% / 24) 100%; /* Đường kẻ mỗi 2 cột (mỗi giờ) */
+}
+
+/* SỬA LẠI CLASS NÀY: Căn chỉnh lại các mốc thời gian */
+.time-row {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: repeat(24, 1fr); /* Hiển thị 24 mốc giờ */
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+}
+
+
+.day-label {
+  font-weight: 600;
+  color: #6b7280; /* text-gray-500 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  margin: 4px 0;
+  border-left-width: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 0 8px;
+}
+
+.time-marker {
+  color: #6b7280; /* text-gray-500 */
+  font-size: 0.875rem; /* text-sm */
+  text-align: center;
+}
+
+.time-label-placeholder {
+  grid-column: 1;
+}
+
+/* Định nghĩa các biến màu cho project */
+:root {
+  --color-purple: #8b5cf6;
+  --color-purple-dark: #7c3aed;
+  --color-green: #22c55e;
+  --color-green-dark: #16a34a;
+  --color-orange: #f97316;
+  --color-orange-dark: #ea580c;
+  --color-default: #6b7280;
+  --color-default-dark: #4b5563;
 }

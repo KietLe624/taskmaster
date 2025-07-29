@@ -25,7 +25,6 @@ export class ProjectService {
       })
     };
   }
-
   constructor(private http: HttpClient) { }
 
   getProjects(): Observable<{ data: ProjectsData[]; count: number; message: string }> {
@@ -70,7 +69,7 @@ export class ProjectService {
       catchError(this.handleError<any>(`updateTask id=${taskId}`))
     );
   }
-  
+
   updateTask(taskId: number, taskData: TaskForm): Observable<TaskDetailData> {
     console.log('Service updateTask called with:', { taskId, taskData }); // Debug log
 
@@ -96,10 +95,15 @@ export class ProjectService {
     return this.http.delete(`${this.apiUrlTasks}/${taskId}`);
   }
 
+  addMemberToProject(projectId: number, memberData: { email: string, role: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${projectId}/members`, memberData);
+  }
+
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
       console.error(`${operation} failed: ${error.message}`, error);
       return of(result as T);
     };
   }
+
 }

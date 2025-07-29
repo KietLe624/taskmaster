@@ -6,6 +6,7 @@ export interface TaskDetailData {
   status: string;
   priority: string;
   cate: string;
+  start_time: string; // Thêm trường start_time
   due_date: string;
   project: Project;
   assignees: User[];
@@ -19,6 +20,7 @@ export interface TaskForm {
   status: string;
   priority: string;
   cate: string;
+  start_time: string; // Thêm trường start_time
   due_date: string;
   project_id: number | null;
   assignee_id: number | null; // ID của người được giao việc

@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
   password: process.env.DB_PASSWORD, //
   database: process.env.DB_NAME, // Từ biến môi trường .env
   dialect: process.env.DB_DIALECT,
-});
+  });
 
 // Thực hiện kết nối
 connection.connect((err) => {

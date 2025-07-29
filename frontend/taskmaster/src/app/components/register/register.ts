@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { Auth } from '../../services/auth/auth';
 
@@ -12,6 +12,7 @@ export class Register {
   userData = {
     username: '',
     email: '',
+    full_name: '',
     password: '',
     confirmPassword: '',
   };
@@ -19,7 +20,7 @@ export class Register {
   errorMessage = '';
   successMessage = '';
 
-  constructor(private authService: Auth, private router: Router) { }
+  constructor(private authService: Auth, private router: Router, private cdr: ChangeDetectorRef) { }
 
   onRegister(): void {
     // Reset thông báo
@@ -35,6 +36,7 @@ export class Register {
     // 2. Tạo một đối tượng mới không chứa confirmPassword để gửi lên server
     const registrationData = {
       username: this.userData.username,
+      full_name: this.userData.full_name,
       email: this.userData.email,
       password: this.userData.password,
     };
@@ -54,6 +56,9 @@ export class Register {
         this.errorMessage =
           err.error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
       },
+      complete: () => {
+        this.cdr.detectChanges();
+      }
     });
   }
 }

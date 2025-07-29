@@ -24,13 +24,11 @@ export class CreateTask implements OnChanges {
 
 
   constructor(private cdr: ChangeDetectorRef) { }
-  
+
   ngOnChanges(changes: SimpleChanges): void {
-    // Chỉ xử lý khi modal được mở
     if (changes['show'] && this.show) {
       console.log(this.userList, this.projectList);
       if (this.isEditMode && this.taskToEdit) {
-        // NẾU LÀ CHẾ ĐỘ SỬA: Lấy dữ liệu từ taskToEdit và điền vào form
         this.taskData = {
           id: this.taskToEdit.task_id,
           name: this.taskToEdit.name,
@@ -38,33 +36,38 @@ export class CreateTask implements OnChanges {
           status: this.taskToEdit.status,
           priority: this.taskToEdit.priority,
           cate: this.taskToEdit.cate || '',
-          due_date: this.formatDate(this.taskToEdit.due_date), // Định dạng lại ngày tháng
+          start_time: this.formatDateTimeForInput(this.taskToEdit.start_time),
+          due_date: this.formatDateTimeForInput(this.taskToEdit.due_date),
           project_id: this.taskToEdit.project ? this.taskToEdit.project.id : null,
           assignee_id: this.taskToEdit.assignees.length > 0 ? this.taskToEdit.assignees[0].user_id : null
         };
       } else {
-        // NẾU LÀ CHẾ ĐỘ TẠO MỚI: Reset form
         this.taskData = this.resetForm();
+        this.cdr.detectChanges(); // Cập nhật giao diện khi mở modal
       }
     }
   }
   saveTask(): void {
-
     this.save.emit(this.taskData);
-    this.closeModal();
   }
 
   public closeModal(): void {
     this.close.emit();
   }
 
-  private formatDate(dateString: string): string {
+  private formatDateTimeForInput(dateString: string | null | undefined): string {
     if (!dateString) return '';
-    // new Date(dateString).toISOString() trả về "2025-12-20T00:00:00.000Z"
-    // .split('T')[0] sẽ lấy "2025-12-20"
-    return new Date(dateString).toISOString().split('T')[0];
+    const date = new Date(dateString);
+    // Tránh vấn đề timezone bằng cách lấy các thành phần và tự ghép chuỗi
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    const hours = ('0' + date.getHours()).slice(-2);
+    const minutes = ('0' + date.getMinutes()).slice(-2);
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
   private resetForm(): TaskForm {
-    return { id: null, name: '', description: '', status: 'inreview', priority: 'medium', cate: '', due_date: '', project_id: null, assignee_id: null };
+    return { id: null, name: '', description: '', status: 'inreview', priority: 'medium', cate: '', start_time: '', due_date: '', project_id: null, assignee_id: null };
   }
 }

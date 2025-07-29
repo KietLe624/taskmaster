@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       cate: { type: DataTypes.TEXT, allowNull: true },
       due_date: { type: DataTypes.DATE, allowNull: false },
+      start_time: { type: DataTypes.DATE, allowNull: true }, // Thêm trường start_time
       createdAt: {
         type: DataTypes.DATE,
         field: "created_at", // Ánh xạ đến cột created_at trong DB
