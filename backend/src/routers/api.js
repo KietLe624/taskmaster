@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const authenticateToken = require("../middleware/auth.middleware");
  
 /* --------------------------------------------Controllers--------------------------------------------- */
 // UserController
@@ -26,7 +25,7 @@ const {
 
 // DashboardController
 const { getDashboardData } = require("../controllers/dashboard.controller");
-const { getScheduleForWeek } = require("../controllers/schedule.controller");
+
 // AuthController
 const {
   register,
@@ -54,6 +53,7 @@ const {
 /* 
 -------------------------------------Middleware--------------------------------------
 */
+const { authenticateToken } = require("../middleware/auth.middleware");
 
 router.use(cors());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -61,7 +61,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 // Dashboard Routes
 router.get("/", authenticateToken, getDashboardData); // Get dashboard data
 router.get("/dashboard", authenticateToken, getDashboardData); // Get dashboard data (alias)
-router.get("/schedules", authenticateToken, getScheduleForWeek); // Get schedule for the current week  
+
 // User Routes
 router.get("/users/all", getAllUsers); // Get all users
 router.get("/users/:user_id", authenticateToken, getUserInfo); // Get user by ID

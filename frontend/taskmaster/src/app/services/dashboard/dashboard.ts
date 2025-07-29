@@ -16,8 +16,7 @@ export class DashboardService {
   getDashboardData(): Observable<DashboardData> {
     return this.http.get<DashboardData>(`${this.apiUrl}/dashboard`); // Gọi endpoint để lấy dữ liệu dashboard
   }
-
-  getScheduleData(): Observable<ScheduledTask[]> {
-    return this.http.get<ScheduledTask[]>(`${this.apiUrl}/schedules`); // Gọi endpoint mới
+  getTaskInMonth(year: number, month: number): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/tasks/activity/${year}/${month}`);
   }
 }

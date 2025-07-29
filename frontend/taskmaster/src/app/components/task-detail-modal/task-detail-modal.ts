@@ -8,7 +8,9 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Task, User, ProjectMember } from '../../models/project-detail'; // Đảm bảo đường dẫn này chính xác
+import { Task, ProjectMember } from '../../models/project-detail';
+import { TaskNotification } from '../../models/tasks';
+import { TaskService } from '../../services/task/task';
 
 @Component({
   selector: 'app-task-detail-modal',
@@ -28,8 +30,10 @@ export class TaskDetailModal implements OnInit, OnChanges {
 
   taskForm: FormGroup;
   isSubmitting = false;
+  notifications: TaskNotification[] = [];
+  isLoadingNotifications = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private taskService: TaskService) {
     this.taskForm = this.fb.group({
       name: ['', Validators.required],
       description: ['', Validators.required],
@@ -46,7 +50,6 @@ export class TaskDetailModal implements OnInit, OnChanges {
       console.log('assignee_id changed:', value, typeof value);
     });
   }
-
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['task'] && this.task) {
       this.updateForm();
@@ -72,7 +75,6 @@ export class TaskDetailModal implements OnInit, OnChanges {
       });
     }
   }
-
   onSave(): void {
     if (this.taskForm.invalid) {
       return;
@@ -90,10 +92,26 @@ export class TaskDetailModal implements OnInit, OnChanges {
     this.closeModal.emit();
     console.log('Modal: Modal đã đóng');
   }
-
   private formatDateForInput(dateStr: string): string {
     if (!dateStr) return '';
     const date = new Date(dateStr);
     return date.toISOString().split('T')[0];
+  }
+  loadNotifications(taskId: number): void {
+    this.isLoadingNotifications = true;
+    this.taskService.getNotificationsForTask(taskId).subscribe({
+      next: (data) => {
+        this.notifications = data;
+        this.isLoadingNotifications = false;
+        console.log('Lịch sử thông báo:', this.notifications);
+        if (this.notifications.length === 0) {
+          console.log('Không có thông báo nào cho công việc này.');
+        }
+      },
+      error: (err) => {
+        console.error('Lỗi khi tải lịch sử thông báo:', err);
+        this.isLoadingNotifications = false;
+      }
+    });
   }
 }

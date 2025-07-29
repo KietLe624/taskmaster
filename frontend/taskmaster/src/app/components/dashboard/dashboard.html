@@ -1,131 +1,169 @@
-<div class="container mx-auto p-4 md:p-6">
-  <div *ngIf="isLoading" class="text-center p-10">
-    <!-- From Uiverse.io by vk-uiux -->
-    <div class="card">
-      <div class="card__skeleton card__title"></div>
-      <div class="card__skeleton card__description"> </div>
+<div class="bg-gray-50 min-h-screen">
+  <div class="container mx-auto p-4 md:p-6">
+    <!-- Giao diện khi đang tải (giữ nguyên) -->
+    <div *ngIf="isLoading" class="text-center p-10">
+      <div class="card">
+        <div class="card__skeleton card__title"></div>
+        <div class="card__skeleton card__description"></div>
+      </div>
     </div>
-  </div>
 
-  <div *ngIf="!isLoading && currentUser && stats">
-    <!-- Header chào mừng -->
-    <div
-      class="bg-gray-50 p-6 rounded-lg border-gray-100 shadow-sm mb-6 flex flex-col md:flex-row md:items-start justify-between">
-      <div>
-        <h1 class="text-2xl font-semibold text-gray-800 mb-2 title">
-          Chào mừng trở lại {{ currentUser.full_name || undefined}}!
+    <!-- Nội dung chính của Dashboard -->
+    <div *ngIf="!isLoading && currentUser && stats">
+      <!-- 1. Header Chào Mừng -->
+      <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 md:p-8 rounded-xl shadow-lg mb-8">
+        <h1 class="text-2xl md:text-3xl font-bold">
+          Chào mừng trở lại, {{ currentUser.full_name || 'bạn' }}!
         </h1>
-        <p class="text-gray-600 text-base">
+        <p class="text-blue-100 mt-1">
           Đây là tổng quan nhanh về công việc và dự án của bạn.
         </p>
       </div>
-    </div>
 
-    <!-- Lưới các thẻ thống kê chính -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-      <!-- Card: Dự án đang quản lý -->
-      <div
-        class="bg-purple-50 p-6 rounded-lg shadow-sm flex flex-col items-start border-l-4 border-purple-500 transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-        <div class="flex items-center mb-4">
-          <div class="w-10 h-10 flex items-center justify-center p-3 rounded-full bg-purple-100 text-purple-500 mr-3">
-            <i class="fas fa-folder-closed text-xl"></i>
-          </div>
-          <div>
-            <p class="text-gray-600 text-base">Dự án đang quản lý</p>
-            <p class="text-3xl font-bold text-gray-800">{{ stats.manageProjectsCount }}</p>
-          </div>
-        </div>
-        <a routerLink="/app/projects" class="text-purple-600 text-sm flex items-center hover:underline mt-auto">
-          Xem chi tiết <i class="fas fa-arrow-right ml-1 text-xs"></i>
-        </a>
-      </div>
-      <!-- Card: Công việc đang làm -->
-      <div
-        class="bg-blue-50 p-6 rounded-lg shadow-sm flex flex-col items-start border-l-4 border-blue-500 transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-        <div class="flex items-center mb-4">
-          <div class="w-10 h-10 flex items-center justify-center p-3 rounded-full bg-blue-100 text-blue-500 mr-3">
-            <i class="fas fa-clock text-lg"></i>
-          </div>
-          <div>
-            <p class="text-gray-600 text-base">Công việc đang làm</p>
-            <p class="text-3xl font-bold text-gray-800">{{ stats.inProgressTasksCount }}</p>
-          </div>
-        </div>
-        <a routerLink="/app/tasks" class="text-blue-600 text-sm flex items-center hover:underline mt-auto">
-          Xem chi tiết <i class="fas fa-arrow-right ml-1 text-xs"></i>
-        </a>
-      </div>
-      <!-- Card: Công việc sắp đến hạn -->
-      <div
-        class="bg-yellow-50 p-6 rounded-lg shadow-sm flex flex-col items-start border-l-4 border-yellow-300 transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-        <div class="flex items-center mb-4">
-          <div class="w-10 h-10 flex items-center justify-center p-3 rounded-full bg-yellow-100 text-yellow-400 mr-3">
-            <i class="fas fa-calendar-alt text-lg"></i>
-          </div>
-          <div>
-            <p class="text-gray-600 text-base">Công việc sắp đến hạn</p>
-            <p class="text-3xl font-bold text-gray-800">{{ stats.dueSoonTasksCount }}</p>
-          </div>
-        </div>
-        <a routerLink="/tasks" class="text-yellow-400 text-sm flex items-center hover:underline mt-auto">
-          Xem chi tiết <i class="fas fa-arrow-right ml-1 text-xs"></i>
-        </a>
-      </div>
-      <!-- Card: Công việc quá hạn -->
-      <div
-        class="bg-red-50 p-6 rounded-lg shadow-sm flex flex-col items-start border-l-4 border-red-500 transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-        <div class="flex items-center mb-4">
-          <div class="w-10 h-10 flex items-center justify-center p-3 rounded-full bg-red-100 text-red-500 mr-3">
-            <i class="fas fa-exclamation-triangle text-lg"></i>
-          </div>
-          <div>
-            <p class="text-gray-600 text-base">Công việc quá hạn</p>
-            <p class="text-3xl font-bold text-gray-800">{{ stats.overdueTasksCount }}</p>
-          </div>
-        </div>
-        <a routerLink="/tasks" class="text-red-600 text-sm flex items-center hover:underline mt-auto">
-          Xem chi tiết <i class="fas fa-arrow-right ml-1 text-xs"></i>
-        </a>
-      </div>
-    </div>
-
-    <!-- Lưới 2 cột: Lịch trình và Dự án gần đây -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Cột Lịch trình -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-        <h3 class="text-2xl font-bold text-gray-800 mb-6">Lịch trình của tôi</h3>
-
-        <div class="schedule-container">
-          <div class="schedule-grid">
-
-            <ng-container *ngFor="let day of daysOfWeek">
-              <div class="day-label">{{ day }}</div>
-              <div class="day-row">
-                <div *ngFor="let task of weeklySchedule[day]" class="task-block" [ngStyle]="getTaskStyle(task)">
-                  {{ task.name }}
-                </div>
-              </div>
-            </ng-container>
-
-            <div class="time-label-placeholder"></div>
-            <div class="time-row">
-              <div *ngFor="let time of timeMarkers" class="time-marker">
-                {{ time }}
-              </div>
+      <!-- 2. Lưới các thẻ thống kê -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Card: Dự án đang quản lý -->
+        <div
+          class="bg-white p-5 rounded-xl shadow-sm flex flex-col justify-between border-l-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 border-purple-500">
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full mr-4 text-xl bg-purple-100 text-purple-600">
+              <i class="fas fa-folder-closed"></i>
             </div>
-
+            <div>
+              <p class="text-gray-500 text-sm font-medium">Dự án quản lý</p>
+              <p class="text-2xl font-bold text-gray-900">{{ stats.manageProjectsCount }}</p>
+            </div>
           </div>
+          <a routerLink="/app/projects"
+            class="text-sm font-semibold flex items-center mt-4 transition-colors duration-200 text-purple-600 hover:text-purple-800">
+            Xem chi tiết <i class="fas fa-arrow-right ml-1 text-xs"></i>
+          </a>
+        </div>
+
+        <!-- Card: Công việc đang làm -->
+        <div
+          class="bg-white p-5 rounded-xl shadow-sm flex flex-col justify-between border-l-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 border-blue-500">
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full mr-4 text-xl bg-blue-100 text-blue-600">
+              <i class="fas fa-tasks"></i>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm font-medium">Công việc đang làm</p>
+              <p class="text-2xl font-bold text-gray-900">{{ stats.inProgressTasksCount }}</p>
+            </div>
+          </div>
+          <a routerLink="/app/tasks"
+            class="text-sm font-semibold flex items-center mt-4 transition-colors duration-200 text-blue-600 hover:text-blue-800">
+            Xem chi tiết <i class="fas fa-arrow-right ml-1 text-xs"></i>
+          </a>
+        </div>
+
+        <!-- Card: Công việc sắp đến hạn -->
+        <div
+          class="bg-white p-5 rounded-xl shadow-sm flex flex-col justify-between border-l-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 border-yellow-500">
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full mr-4 text-xl bg-yellow-100 text-yellow-600">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm font-medium">Sắp đến hạn</p>
+              <p class="text-2xl font-bold text-gray-900">{{ stats.dueSoonTasksCount }}</p>
+            </div>
+          </div>
+          <a routerLink="/app/tasks"
+            class="text-sm font-semibold flex items-center mt-4 transition-colors duration-200 text-yellow-600 hover:text-yellow-800">
+            Xem chi tiết <i class="fas fa-arrow-right ml-1 text-xs"></i>
+          </a>
+        </div>
+
+        <!-- Card: Công việc quá hạn -->
+        <div
+          class="bg-white p-5 rounded-xl shadow-sm flex flex-col justify-between border-l-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 border-red-500">
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full mr-4 text-xl bg-red-100 text-red-600">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm font-medium">Công việc quá hạn</p>
+              <p class="text-2xl font-bold text-gray-900">{{ stats.overdueTasksCount }}</p>
+            </div>
+          </div>
+          <a routerLink="/app/tasks"
+            class="text-sm font-semibold flex items-center mt-4 transition-colors duration-200 text-red-600 hover:text-red-800">
+            Xem chi tiết <i class="fas fa-arrow-right ml-1 text-xs"></i>
+          </a>
         </div>
       </div>
-      <!-- Cột Dự án gần đây -->
-      <div class="bg-white p-6 rounded-lg shadow-sm">
-        <h2 class="text-2xl text-gray-800 mb-4">Dự án gần đây</h2>
-        <div class="space-y-4">
-          <div *ngFor="let project of recentProjects" class="border border-gray-300 p-4 rounded-md">
-            <p class="font-semibold text-xl text-gray-800">{{ project.name }}</p>
-            <p class="text-base text-gray-600">{{ project.description }}</p>
+
+      <!-- 3. Bố cục chính: Lịch và Dự án gần đây -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Cột Lịch (chiếm 2/3 không gian) -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-lg text-gray-800">
+              {{ currentDate | date : "MMMM yyyy" }}
+            </h3>
+            <div class="flex items-center space-x-1">
+              <button (click)="goToToday()"
+                class="px-3 py-1 text-sm font-semibold text-gray-600 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors">Today</button>
+              <button (click)="previousMonth()"
+                class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200 transition-colors">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button (click)="nextMonth()"
+                class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200 transition-colors">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
           </div>
-          <p *ngIf="recentProjects.length === 0" class="text-gray-500">Không có dự án nào gần đây.</p>
+          <div class="grid grid-cols-7 gap-1">
+            <div *ngFor="let day of weekDays" class="text-center text-xs font-bold text-gray-500 uppercase py-2">{{ day
+              }}</div>
+            <!-- Cập nhật vòng lặp hiển thị ngày -->
+            <div *ngFor="let day of daysInMonth" class="relative flex items-center justify-center aspect-square">
+              <div class="w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200"
+                [ngClass]="{
+                  'text-gray-400': !day.isCurrentMonth,
+                  'bg-blue-500 text-white font-bold': isToday(day.date),
+                  'hover:bg-gray-100': !isToday(day.date) && day.isCurrentMonth
+                }">
+                <span>{{ day.date | date : "d" }}</span>
+              </div>
+              <!-- Dấu chấm cho ngày có công việc -->
+              <div *ngIf="hasTask(day)" class="absolute bottom-1.5 w-1.5 h-1.5 bg-red-500 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cột Dự án gần đây (chiếm 1/3 không gian) -->
+        <div class="space-y-4">
+          <h2 class="text-xl font-bold text-gray-800 px-1">Dự án gần đây</h2>
+
+          <div *ngIf="recentProjects && recentProjects.length > 0" class="space-y-3">
+            <div *ngFor="let project of recentProjects"
+              class="group bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex justify-between items-center transition-all duration-300 hover:shadow-md hover:border-blue-500 hover:scale-105">
+              <div class="flex-grow">
+                <h3 class="font-bold text-gray-800">{{ project.name }}</h3>
+                <p class="text-sm text-gray-500 mt-1 overflow-hidden"
+                  style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;">{{
+                  project.description }}</p>
+              </div>
+              <a [routerLink]="['/app/projects', project.id]"
+                class="w-8 h-8 flex-shrink-0 ml-4 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-all duration-300 group-hover:bg-blue-500 group-hover:text-white">
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <div *ngIf="!recentProjects || recentProjects.length === 0"
+            class="text-center py-10 px-4 bg-white rounded-lg shadow-sm border border-gray-200">
+            <i class="fas fa-folder-open text-4xl text-gray-300"></i>
+            <p class="mt-3 text-gray-500 font-medium">Không có dự án nào gần đây.</p>
+          </div>
         </div>
       </div>
     </div>

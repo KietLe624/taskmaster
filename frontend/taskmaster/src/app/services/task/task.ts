@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { catchError, Observable, of, tap } from 'rxjs';
-import { TaskDetailData, TaskForm } from '../../models/tasks'; // Điều chỉnh đường dẫn nếu cần
-import { User, Project } from '../../models/tasks'; // Điều chỉnh đường dẫn nếu cần
+import { TaskDetailData, TaskForm, User, Project, TaskNotification } from '../../models/tasks';
 
 @Injectable({
   providedIn: 'root'
 })
-export class Task {
+export class TaskService {
 
   private apiUrl = 'http://localhost:3000/api/tasks'; // URL cho lấy danh sách công việc
   private apiUrlTasks = 'http://localhost:3000/api/taskStatus'; // URL cho lấy trạng thái công việc
@@ -57,6 +56,10 @@ export class Task {
 
   deleteTask(taskId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${taskId}`);
+  }
+
+  getNotificationsForTask(taskId: number): Observable<TaskNotification[]> {
+    return this.http.get<TaskNotification[]>(`${this.apiUrl}/${taskId}/notifications`);
   }
 
   private handleError<T>(operation = 'operation', result?: T) {

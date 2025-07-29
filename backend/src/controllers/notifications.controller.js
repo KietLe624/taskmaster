@@ -2,16 +2,23 @@ const db = require("../models/index.model"); // Import file index trung tâm
 const Notification = db.Notification;
 
 // tạo thông báo mới
-const createNotification = async (data) => {
+const createNotification = async (data, options = {}) => {
   try {
-    await Notification.create(data);
-    console.log(`Đã tạo thông báo cho user_id: ${data.user_id}`);
-    // (Nâng cao) Tại đây, bạn có thể phát một sự kiện WebSocket đến người dùng 
+    // --- BƯỚC GỠ LỖI: Ghi lại dữ liệu nhận được ---
+    console.log("--- [DEBUG] Dữ liệu nhận được bởi createNotification ---");
+    console.log("Data:", JSON.stringify(data, null, 2));
+    console.log("Options (có transaction?):", !!options.transaction);
+    console.log("----------------------------------------------------");
+
+    // --- SỬA LỖI: Truyền options (chứa transaction) vào hàm create ---
+    await Notification.create(data, options);
+    console.log(`Đã tạo thông báo thành công cho user_id: ${data.user_id}`);
   } catch (error) {
     console.error("Lỗi khi tạo thông báo:", error);
+    // Ném lỗi ra ngoài để transaction có thể bắt và rollback
+    throw error;
   }
 };
-
 const getUserNotifications = async (req, res) => {
   const userId = req.user.user_id; // Lấy từ middleware xác thực token
 
@@ -55,9 +62,34 @@ const markAsRead = async (req, res) => {
       .send({ message: "Lỗi khi đánh dấu thông báo", error: error.message });
   }
 };
+const deleteNotification = async (req, res) => {
+  const userId = req.user.user_id;
+  const notificationId = req.params.id; // Lấy id từ URL, vd: /api/notifications/123/delete
+  try {
+    const notification = await Notification.findOne({
+      where: {
+        id: notificationId,
+        user_id: userId, // Đảm bảo người dùng chỉ có thể xóa thông báo của chính họ
+      },
+    });
+
+    if (!notification) {
+      return res.status(404).json({ message: "Không tìm thấy thông báo." });
+    }
+
+    await notification.destroy();
+
+    res.status(200).json({ message: "Đã xóa thông báo." });
+  } catch (error) {
+    res
+      .status(500)
+      .send({ message: "Lỗi khi xóa thông báo", error: error.message });
+  }
+};
 
 module.exports = {
   createNotification,
   getUserNotifications,
   markAsRead,
+  deleteNotification,
 };

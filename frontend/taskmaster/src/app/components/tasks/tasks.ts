@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Task } from '../../services/task/task';
+import { TaskService } from '../../services/task/task';
 import { TaskDetailData, TaskForm } from '../../models/tasks'; // Sử dụng lại model chi tiết
 import { User, Project } from '../../models/tasks'; // Sử dụng lại model người dùng và dự án
 
@@ -19,7 +19,7 @@ export class Tasks implements OnInit {
   public taskToEdit: TaskDetailData | null = null; // Dữ liệu công việc để chỉnh sửa
   public allUsers: User[] = [];
   public allProjects: Project[] = [];
-  constructor(private taskService: Task, private cdr: ChangeDetectorRef) { }
+  constructor(private taskService: TaskService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.loadTasks();

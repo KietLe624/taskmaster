@@ -1,9 +1,17 @@
-<div *ngIf="show" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center p-4" (click)="onClose()">
-  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-lg relative max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+<div *ngIf="show" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center p-4"
+  (click)="onClose()">
+  <!--
+    LƯU Ý:
+    - Đã tăng max-w-lg thành max-w-2xl để có thêm không gian cho nội dung mới.
+    - Đã thêm khối "Lịch sử Thông báo" vào cuối form.
+  -->
+  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto"
+    (click)="$event.stopPropagation()">
     <!-- Header -->
     <div class="flex justify-between items-center border-b border-gray-200 pb-4 mb-6">
       <h3 class="text-2xl font-bold text-gray-900 tracking-tight">Chi tiết công việc</h3>
-      <button (click)="onClose()" class="text-gray-500 hover:text-gray-800 text-2xl font-semibold transition-colors duration-200">
+      <button (click)="onClose()"
+        class="text-gray-500 hover:text-gray-800 text-2xl font-semibold transition-colors duration-200">
         ×
       </button>
     </div>
@@ -64,6 +72,64 @@
             </select>
           </div>
         </div>
+
+        <!-- =================================================================== -->
+        <!-- BẮT ĐẦU PHẦN TÍCH HỢP LỊCH SỬ THÔNG BÁO -->
+        <!-- =================================================================== -->
+        <div class="pt-6 border-t border-gray-200">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">
+            <i class="fas fa-history mr-2 text-gray-400"></i>
+            Lịch sử Thông báo
+          </h3>
+
+          <!-- Trạng thái đang tải -->
+          <div *ngIf="isLoadingNotifications" class="text-center py-4">
+            <p class="text-gray-500">Đang tải lịch sử...</p>
+          </div>
+
+          <!-- Trạng thái trống -->
+          <div *ngIf="!isLoadingNotifications && notifications.length === 0"
+            class="bg-gray-50 p-6 rounded-lg text-center">
+            <p class="text-gray-600">Chưa có thông báo nào được gửi cho công việc này.</p>
+          </div>
+
+          <!-- Danh sách thông báo -->
+          <div *ngIf="!isLoadingNotifications && notifications.length > 0"
+            class="space-y-3 max-h-60 overflow-y-auto pr-2 border rounded-lg p-2 bg-gray-50">
+            <div *ngFor="let notif of notifications"
+              class="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+
+              <!-- Thông tin người nhận và nội dung -->
+              <div class="flex items-center">
+                <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                  <i class="fas fa-user text-gray-500"></i>
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">
+                    {{ notif.recipient.full_name }}
+                  </p>
+                  <p class="text-xs text-gray-600 mt-0.5">{{ notif.message }}</p>
+                  <p class="text-xs text-gray-400 mt-1">{{ notif.created_at | date:'dd/MM/yyyy HH:mm' }}</p>
+                </div>
+              </div>
+
+              <!-- Trạng thái đã xem/chưa xem -->
+              <div>
+                <span *ngIf="notif.status_read"
+                  class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <i class="fas fa-check-circle mr-1"></i> Đã xem
+                </span>
+                <span *ngIf="!notif.status_read"
+                  class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
+                  <i class="far fa-circle mr-1"></i> Chưa xem
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- =================================================================== -->
+        <!-- KẾT THÚC PHẦN TÍCH HỢP -->
+        <!-- =================================================================== -->
 
         <!-- Action Buttons -->
         <div class="flex justify-between items-center border-t border-gray-200 pt-6 mt-6">

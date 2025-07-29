@@ -3,6 +3,7 @@ const User = db.User;
 const Project = db.Project;
 const Task = db.Task;
 const TaskAssignment = db.TaskAssignment;
+const { Op } = db.Sequelize;
 
 // Hàm chính để lấy tất cả dữ liệu cho Dashboard
 const getDashboardData = async (req, res) => {
@@ -125,14 +126,38 @@ const getDashboardData = async (req, res) => {
       }),
 
       User.findByPk(currentUserId),
-
-      // Lấy các dự án gần đây -> Đã sửa đúng tên cột
+      // Lấy các dự án gần đây
       Project.findAll({
-        where: { manager_id: currentUserId },
-        limit: 3,
+        include: [
+          {
+            model: Task,
+            as: "tasks",
+            attributes: [],
+            required: false,
+            include: [
+              {
+                model: TaskAssignment,
+                as: "assignments",
+                attributes: [],
+                where: { user_id: currentUserId },
+                required: false,
+              },
+            ],
+          },
+        ],
+        where: {
+          [Op.or]: [
+            { manager_id: currentUserId },
+            // ĐK 2: Người dùng được giao việc trong dự án
+            // (Sử dụng cú pháp '$...$' để tham chiếu đến bảng đã join)
+            { "$tasks.assignments.user_id$": currentUserId },
+          ],
+        },
+        limit: 5,
         order: [["createdAt", "DESC"]],
+        distinct: true,
+        subQuery: false,
       }),
-      // Khởi tạo mảng để chứa các Promise
     ]);
     res.status(200).json({
       currentUser, // Thông tin người dùng hiện tại
@@ -147,7 +172,7 @@ const getDashboardData = async (req, res) => {
         // avgTimePerTask: "2h 15m",
         // onTimeCompletionRate: "92%"
       },
-      recentProjects, // Danh sách 3 dự án gần đây do người dùng quản lý
+      recentProjects, // Danh sách dự án gần đây do người dùng quản lý
     });
   } catch (erorr) {
     console.error("Lỗi khi lấy dữ liệu Dashboard:", erorr); // In ra lỗi nếu có

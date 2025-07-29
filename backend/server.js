@@ -20,6 +20,7 @@ const dotenv = require("dotenv");
 require("dotenv").config(); // Nạp biến môi trường từ file .env
 
 const connection = require("./src/config/db.config"); // Import cấu hình database
+const apiAdminRouter = require("./src/routers/admin"); // Import router admin
 const apiRouter = require("./src/routers/api"); // Import router web
 const db = require("./src/models/index.model"); // Import file index trung tâm của models
 const PORT = process.env.PORT || 3000; // Từ biến môi trường .env

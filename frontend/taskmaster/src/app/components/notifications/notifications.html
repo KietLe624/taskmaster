@@ -1,37 +1,62 @@
 <div class="container mx-auto max-w-4xl px-4 py-8">
-  <!-- Header Section -->
-  <div class="bg-white p-6 rounded-xl shadow-md mb-8 border border-gray-100">
-    <h1 class="text-2xl font-bold text-gray-900 mb-2 tracking-tight">Thông báo</h1>
-    <!-- <p class="text-gray-500 text-sm">Cập nhật mới nhất về công việc và dự án của bạn.</p> -->
-  </div>
-  <!-- Empty State -->
-  <div *ngIf="notifications.length === 0"
-    class="text-center py-12 bg-white rounded-xl shadow-md border border-gray-100">
-    <p class="text-gray-500 text-lg">Không có thông báo nào.</p>
+  <div class="flex justify-between items-center bg-white p-6 rounded-xl shadow-md mb-8 border border-gray-100">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Thông báo</h1>
+      <p class="text-gray-500 text-sm">Bạn có {{ unreadCount }} thông báo chưa đọc.</p>
+    </div>
   </div>
 
-  <!-- Notification List -->
-  <div *ngIf="notifications.length > 0" id="notificationList" class="space-y-4">
-    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300"
-      *ngFor="let notification of notifications">
-      <div class="flex items-center justify-between mb-3">
-        <span
-          class="text-xs font-medium px-2 py-1 rounded-full {{ notification.status_read ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100' }}">
-          {{ notification.status_read ? 'Đã đọc' : 'Chưa đọc' }}
-        </span>
-      </div>
-      <div class="flex items-start justify-between">
-        <div>
-          <span class="text-sm text-gray-400">{{ notification.created_at | date: 'dd/MM/yyyy HH:mm' }}</span>
-          <p class="text-lg font-semibold text-gray-900 mt-1">{{ notification.type }}</p>
-          <p class="text-gray-600 text-sm mt-1 {{ notification.status_read ? 'line-through' : '' }}">{{
-            notification.message }}</p>
-          <p class="text-gray-500 text-xs mt-1">{{ notification.link }}</p>
+  <div *ngIf="unreadNotifications.length === 0 && readNotifications.length === 0 && !isLoading"
+    class="text-center py-16 bg-white rounded-xl shadow-md border border-gray-100">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">Không có thông báo mới</h3>
+    <p class="mt-1 text-sm text-gray-500">Tất cả các thông báo sẽ được hiển thị ở đây.</p>
+  </div>
+
+  <div *ngIf="unreadNotifications.length > 0" class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Chưa đọc</h2>
+    <div class="space-y-3">
+      <div *ngFor="let notification of unreadNotifications"
+           class="notification-card unread"
+           (click)="markAsRead(notification)">
+        <div class="notification-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
         </div>
-        <label class="flex items-center">
-          <input type="checkbox" [checked]="notification.status_read" (change)="markAsRead(notification)"
-            class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-        </label>
+        <div class="notification-content">
+          <p class="title">{{ notification.type }}</p>
+          <p class="message">{{ notification.message }}</p>
+          <p class="timestamp">{{ notification.created_at | date: 'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+        <div class="notification-actions">
+           <button (click)="deleteNotification(notification.id, false); $event.stopPropagation()" class="action-btn delete-btn" aria-label="Xóa thông báo">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="readNotifications.length > 0">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Đã đọc</h2>
+    <div class="space-y-3">
+      <div *ngFor="let notification of readNotifications"
+           class="notification-card read"
+           (click)="markAsRead(notification)">
+        <div class="notification-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        </div>
+        <div class="notification-content">
+          <p class="title">{{ notification.type }}</p>
+          <p class="message">{{ notification.message }}</p>
+          <p class="timestamp">{{ notification.created_at | date: 'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+        <div class="notification-actions">
+          <button (click)="deleteNotification(notification.id, true); $event.stopPropagation()" class="action-btn delete-btn" aria-label="Xóa thông báo">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
       </div>
     </div>
   </div>

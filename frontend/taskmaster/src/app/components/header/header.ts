@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SidebarService } from '../../services/sidebar/sidebar';
-import { Notification } from '../../services/notification/notification';
+import { NotificationService } from '../../services/notification/notification';
 import { Observable } from 'rxjs';
 import { Auth } from '../../services/auth/auth';
 
@@ -15,7 +15,7 @@ export class Header implements OnInit {
 
   constructor(
     private sidebarService: SidebarService,
-    private notificationService: Notification,
+    private notificationService: NotificationService,
     private authService: Auth
   ) {
     this.isLoggedIn$ = this.authService.isLoggedIn$;

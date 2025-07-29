@@ -34,81 +34,69 @@
     background-position: -100% 0;
   }
 }
-
-.schedule-container {
-  overflow-x: auto; /* Cho phép cuộn ngang */
-  padding-bottom: 10px; /* Thêm chút không gian cho thanh cuộn */
-}
-
-/* SỬA LẠI CLASS NÀY: Đặt chiều rộng tối thiểu lớn hơn để kích hoạt thanh cuộn */
-.schedule-grid {
+.calendar-grid {
   display: grid;
-  grid-template-columns: 60px 1fr;
-  row-gap: 8px;
-  min-width: 1200px; /* Chiều rộng tối thiểu để nội dung không bị co lại */
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
 }
 
-/* SỬA LẠI CLASS NÀY: Mở rộng lưới ra 48 cột (24 giờ x 2 cột/giờ) */
-.day-row {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(48, 1fr); /* 24 giờ * 2 cột/giờ = 48 cột */
-  height: 50px;
-  background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px);
-  background-size: calc(100% / 24) 100%; /* Đường kẻ mỗi 2 cột (mỗi giờ) */
-}
-
-/* SỬA LẠI CLASS NÀY: Căn chỉnh lại các mốc thời gian */
-.time-row {
-  grid-column: 2;
-  display: grid;
-  grid-template-columns: repeat(24, 1fr); /* Hiển thị 24 mốc giờ */
-  padding-top: 8px;
-  border-top: 1px solid #e5e7eb;
-}
-
-
-.day-label {
-  font-weight: 600;
-  color: #6b7280; /* text-gray-500 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.task-block {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  border-radius: 8px;
-  margin: 4px 0;
-  border-left-width: 4px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  padding: 0 8px;
-}
-
-.time-marker {
-  color: #6b7280; /* text-gray-500 */
-  font-size: 0.875rem; /* text-sm */
+.weekday-header {
   text-align: center;
+  font-weight: 600;
+  color: #6b7280;
+  padding-bottom: 8px;
+  font-size: 0.875rem;
 }
 
-.time-label-placeholder {
-  grid-column: 1;
+.day-cell {
+  position: relative; /* Bắt buộc phải có để định vị dấu chấm */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border-radius: 9999px;
+  font-weight: 500;
 }
 
-/* Định nghĩa các biến màu cho project */
-:root {
-  --color-purple: #8b5cf6;
-  --color-purple-dark: #7c3aed;
-  --color-green: #22c55e;
-  --color-green-dark: #16a34a;
-  --color-orange: #f97316;
-  --color-orange-dark: #ea580c;
-  --color-default: #6b7280;
-  --color-default-dark: #4b5563;
+.day-cell.other-month {
+  color: #d1d5db;
+}
+.day-cell.today {
+  font-weight: 700; /* Làm đậm số của ngày hôm nay */
+}
+.day-cell.today span {
+  background-color: #3b82f6; /* bg-blue-500 */
+  color: white;
+  border-radius: 50%; /* Bo tròn thành hình tròn */
+
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-dot {
+  position: absolute; /* Bắt buộc phải có */
+  bottom: 4px;
+  width: 6px;
+  height: 6px;
+  background-color: #f59e0b; /* Màu vàng */
+  border-radius: 9999px;
+}
+
+/* Hiệu ứng mờ dần khi tải trang */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.dashboard-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
 }

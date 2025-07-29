@@ -37,3 +37,14 @@ export interface User {
   user_id: number;
   full_name: string;
 }
+
+export interface TaskNotification {
+  id: number;
+  message: string;
+  status_read: boolean;
+  created_at: string;
+  recipient: {
+    full_name: string;
+    email: string;
+  };
+}
