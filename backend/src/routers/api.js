@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const cors = require("cors");
 const bodyParser = require("body-parser");
- 
+
 /* --------------------------------------------Controllers--------------------------------------------- */
 // UserController
 const {
@@ -40,6 +40,8 @@ const {
   updateStatusTask,
   updateTask,
   deleteTask,
+  getNotificationsForTask,
+  getTasksInMonth,
 } = require("../controllers/tasks.controller");
 
 // NotificationController
@@ -48,7 +50,8 @@ const {
   getUserNotifications,
   markAsRead,
 } = require("../controllers/notifications.controller");
-
+// ReportController
+const { getOverviewReport } = require("../controllers/report.controller");
 
 /* 
 -------------------------------------Middleware--------------------------------------
@@ -60,7 +63,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 
 // Dashboard Routes
 router.get("/", authenticateToken, getDashboardData); // Get dashboard data
-router.get("/dashboard", authenticateToken, getDashboardData); // Get dashboard data (alias)
+router.get("/dashboard", authenticateToken, getDashboardData); // Get dashboard data
 
 // User Routes
 router.get("/users/all", getAllUsers); // Get all users
@@ -85,13 +88,18 @@ router.patch("/auth/changePassword", authenticateToken, changePassword); // Upda
 // Task Routes
 router.get("/tasks", authenticateToken, getTasks); // Get tasks
 router.post("/tasks", authenticateToken, createTask); // Create new task
-router.patch("/taskStatus/:id", authenticateToken, updateStatusTask); // Update task status
+router.patch("/tasks/taskStatus/:id", authenticateToken, updateStatusTask); // Update task status
 router.put("/tasks/:id", authenticateToken, updateTask); // Update task
 router.delete("/tasks/:id", authenticateToken, deleteTask); // Delete task
+router.get("/tasks/activity/:year/:month", authenticateToken, getTasksInMonth); // Get tasks in month
+router.get("/tasks/:id/notifications", authenticateToken, getNotificationsForTask); // Get notifications for task
 
 // Notification Routes
 router.post("/notifications", authenticateToken, createNotification); // Create notification
 router.get("/notifications", authenticateToken, getUserNotifications); // Get user notifications
 router.patch("/notifications/:id", authenticateToken, markAsRead); // Mark notification as read
+
+// Report Routes
+router.get("/reports/overview", authenticateToken, getOverviewReport);
 
 module.exports = router;

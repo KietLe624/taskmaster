@@ -51,12 +51,12 @@ module.exports = (sequelize, DataTypes) => {
       as: "taskAssignments",
     });
     // Thiết lập mối quan hệ nhiều-nhiều với Role qua bảng UserRole
-    // User.belongsToMany(models.Role, {
-    //   through: "user_roles", 
-    //   foreignKey: "user_id",
-    //   otherKey: "role_id",
-    //   as: 'roles'
-    // });
+    User.belongsToMany(models.Role, {
+      through: models.UserRole,
+      foreignKey: "user_id",
+      otherKey: "role_id",
+      as: "roles",
+    });
   };
   return User;
 };

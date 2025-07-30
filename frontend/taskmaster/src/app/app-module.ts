@@ -34,6 +34,7 @@ import { FilterPipe } from './services/filter/filer';
 import { BellModule } from './components/bell-module/bell-module';
 import { TaskDetailModal } from './components/task-detail-modal/task-detail-modal';
 import { AddMemberModal } from './components/add-member-modal/add-member-modal';
+import { Admin } from './admin/component/admin/admin';
 
 @NgModule({
   declarations: [
@@ -57,6 +58,7 @@ import { AddMemberModal } from './components/add-member-modal/add-member-modal';
     BellModule,
     TaskDetailModal,
     AddMemberModal,
+    Admin,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule, CommonModule, FilterPipe, ReactiveFormsModule],
 

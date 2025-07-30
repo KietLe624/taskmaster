@@ -32,12 +32,8 @@ db.sequelize.sync({ force: false }).then(() => {
 
 // Sử dụng file route chính của bạn
 app.use("/api", apiRouter);
+app.use("/api/admin/", apiAdminRouter); // Sử dụng router admin
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 }); // Lắng nghe cổng và in ra thông báo khi server đã sẵn sàng
-
-// Một route đơn giản để kiểm tra
-app.get("api/message", (req, res) => {
-  res.json({ message: "Chào mừng đến với TaskMaster API." });
-});

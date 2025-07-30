@@ -93,7 +93,7 @@ const getTasks = async (req, res) => {
     if (taskIds.length === 0) {
       return res.status(200).json([]);
     }
-    whereCondition.id = { [Op.in]: taskIds }; // Sửa: sử dụng `id` thay vì `task_id` cho bảng `tasks`
+    whereCondition.task_id = { [Op.in]: taskIds }; // Sửa: sử dụng `id` thay vì `task_id` cho bảng `tasks`
 
     const tasks = await Task.findAll({
       where: whereCondition,
@@ -490,6 +490,7 @@ const getNotificationsForTask = async (req, res) => {
     res.status(500).send({ message: "Lỗi server khi lấy lịch sử thông báo." });
   }
 };
+
 module.exports = {
   getAllTasks,
   getTasks,

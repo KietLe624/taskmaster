@@ -3,10 +3,6 @@ const Task = db.Task;
 const Project = db.Project;
 const { Sequelize } = db;
 
-/**
- * Lấy dữ liệu tổng quan cho trang báo cáo.
- * Bao gồm phân bổ trạng thái công việc và số lượng công việc theo dự án.
- */
 const getOverviewReport = async (req, res) => {
     try {
         const currentUserId = req.user.user_id; // Lấy ID người dùng từ token đã xác thực

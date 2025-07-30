@@ -13,7 +13,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
       },
-    
     },
     {
       tableName: "roles", // Chỉ định rõ tên bảng
@@ -24,8 +23,8 @@ module.exports = (sequelize, DataTypes) => {
   Role.associate = (models) => {
     // Thiết lập mối quan hệ nhiều-nhiều với User
     Role.belongsToMany(models.User, {
-      through: "user_roles",
-      foreignKey: "role_id", // Khóa ngoại trong bảng trung gian trỏ đến Role
+      through: models.UserRole,
+      foreignKey: "role_id",
       otherKey: "user_id",
     });
   };
