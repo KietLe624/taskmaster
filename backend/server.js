@@ -32,7 +32,7 @@ db.sequelize.sync({ force: false }).then(() => {
 
 // Sử dụng file route chính của bạn
 app.use("/api", apiRouter);
-app.use("/api/admin/", apiAdminRouter); // Sử dụng router admin
+app.use("/admin", apiAdminRouter); // Sử dụng router admin
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

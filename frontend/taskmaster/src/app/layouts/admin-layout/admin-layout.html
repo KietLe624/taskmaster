@@ -1,0 +1,96 @@
+<aside id="sidebar"
+  class="w-64 bg-white shadow-lg p-6 flex flex-col justify-between fixed h-screen top-0 left-0 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+  <div>
+    <div class="flex items-center mb-10">
+      <h1 class="text-3xl font-extrabold text-gray-900">TaskMaster</h1>
+    </div>
+    <nav class="space-y-4">
+      <a href="/admin/dashboards"
+        class="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors duration-200 p-3 rounded-md hover:bg-gray-100">
+        <i class="fas fa-chart-line text-lg w-6"></i>
+        <span class="font-medium">Tổng quan</span>
+      </a>
+      <a href="/admin/list-users"
+        class="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors duration-200 p-3 rounded-md hover:bg-gray-100">
+        <i class="fas fa-users text-lg w-6"></i>
+        <span class="font-medium">Quản lý người dùng</span>
+      </a>
+    </nav>
+  </div>
+  <div class="mt-auto">
+    <hr class="my-6 border-gray-200">
+    <div
+      class="flex items-center space-x-3 p-3 rounded-md text-gray-700 hover:text-red-500 transition-colors duration-200 cursor-pointer hover:bg-gray-100 group">
+      <div class="relative w-6 h-6 flex items-center justify-center">
+        <i
+          class="fas fa-sign-out-alt text-xl absolute transition-opacity duration-500 ease-in-out group-hover:opacity-0"></i>
+        <i
+          class="fas fa-person-walking text-2xl absolute opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100"></i>
+      </div>
+      <span class="font-medium">Đăng xuất</span>
+    </div>
+  </div>
+</aside>
+
+<aside id="sidebar" [ngClass]="{'transform -translate-x-full': !isSidebarOpen}"
+  class="w-64 bg-white shadow-lg p-6 flex flex-col justify-between fixed h-screen top-0 left-0 z-50 md:translate-x-0 transition-transform duration-300 ease-in-out">
+  <div>
+    <div class="flex items-center mb-10">
+      <h1 class="text-3xl font-extrabold text-gray-900">TaskMaster</h1>
+    </div>
+    <nav class="space-y-4">
+      <a href="/admin/dashboards"
+        class="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors duration-200 p-3 rounded-md hover:bg-gray-100">
+        <i class="fas fa-chart-line text-lg w-6"></i>
+        <span class="font-medium">Tổng quan</span>
+      </a>
+      <a href="/admin/list-users"
+        class="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors duration-200 p-3 rounded-md hover:bg-gray-100">
+        <i class="fas fa-users text-lg w-6"></i>
+        <span class="font-medium">Quản lý người dùng</span>
+      </a>
+    </nav>
+  </div>
+  <div class="mt-auto">
+    <hr class="my-6 border-gray-200">
+    <div
+      class="flex items-center space-x-3 p-3 rounded-md text-gray-700 hover:text-red-500 transition-colors duration-200 cursor-pointer hover:bg-gray-100 group">
+      <div class="relative w-6 h-6 flex items-center justify-center">
+        <i
+          class="fas fa-sign-out-alt text-xl absolute transition-opacity duration-500 ease-in-out group-hover:opacity-0"></i>
+        <i
+          class="fas fa-person-walking text-2xl absolute opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100"></i>
+      </div>
+      <span class="font-medium">Đăng xuất</span>
+    </div>
+  </div>
+</aside>
+
+<div id="backdrop" (click)="closeSidebar()" [ngClass]="{'hidden': !isSidebarOpen}"
+  class="fixed inset-0 bg-gray-900 bg-opacity-50 z-40 md:hidden">
+</div>
+
+<div class="flex-1 md:ml-64 flex flex-col min-h-screen bg-gray-100">
+  <header class="bg-white shadow-sm py-6 px-8 flex justify-between items-center z-40 sticky top-0">
+    <div class="flex items-center space-x-4">
+      <button id="menu-button" (click)="toggleSidebar()"
+        class="md:hidden text-gray-700 hover:text-blue-600 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <span class="text-xl font-semibold md:hidden">TaskMaster</span>
+    </div>
+    <div class="flex items-center space-x-4">
+      <span class="text-gray-700 font-semibold">Chào, Admin</span>
+    </div>
+  </header>
+
+  <main class="flex-grow p-8">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="bg-white py-4 text-center text-gray-500 text-sm border-t border-gray-200 mt-auto">
+    © 2025 TaskMaster. All rights reserved.
+  </footer>
+</div>

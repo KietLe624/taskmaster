@@ -27,8 +27,13 @@ export class Login {
           sessionStorage.setItem('auth_token', token);
           sessionStorage.setItem('user_info', JSON.stringify(response.user || response));
           this.authService.loggedIn.next(true);
-          this.router.navigate(['/app/dashboards']);
-          console.log(`[LOGIN] Đăng nhập thành công với username: ${this.credentials.login}`);
+          if(this.authService.hasRole('admin')) {
+            this.router.navigate(['/admin/dashboards']);
+            console.log(`[LOGIN] Đăng nhập thành công với username: ${this.credentials.login}`);
+          } else {
+            this.router.navigate(['/app/dashboards']);
+            console.log(`[LOGIN] Đăng nhập thành công với username: ${this.credentials.login}`);
+          }
         } else {
           console.error('[LOGIN] No token in response:', response);
           this.errorMessage = 'Không nhận được token từ server. Response:', JSON.stringify(response);

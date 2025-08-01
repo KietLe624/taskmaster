@@ -38,7 +38,6 @@ export class Dashboard implements OnInit {
         this.isLoading = false;
       }
     });
-
     this.loadCalendarData();
   }
 

@@ -41,9 +41,62 @@ const register = async (req, res) => {
 };
 
 // func login
+// const login = async (req, res) => {
+//   const { User } = db; // Import model User từ index.model
+//   const { Op } = require("sequelize"); // Import Op từ sequelize để sử dụng trong truy vấn
+//   try {
+//     const { login, password } = req.body;
+//     console.log(`[AUTH DEBUG] Đang thử đăng nhập cho: ${login}`);
+//     // Tìm người dùng theo email hoặc tên đăng nhập
+//     const user = await User.findOne({
+//       where: {
+//         [Op.or]: [{ email: login }, { username: login }],
+//       },
+//     });
+//     // Kiểm tra xem người dùng có tồn tại không
+//     if (!user) {
+//       console.log(`[AUTH DEBUG] Không tìm thấy người dùng.`);
+//       return res.status(404).json({ message: "Người dùng không tồn tại" });
+//     }
+//     console.log(`[AUTH DEBUG] Đã tìm thấy người dùng: ${user.email}`); // LOG 3
+//     console.log(`[AUTH DEBUG] Mật khẩu đã mã hóa trong DB: ${user.password}`); // LOG 4
+//     // Kiểm tra mật khẩu
+//     const isPasswordValid = await bcrypt.compare(password, user.password);
+//     console.log(`[AUTH DEBUG] Kết quả so sánh mật khẩu: ${isPasswordValid}`); // LOG 5
+//     if (!isPasswordValid) {
+//       return res.status(401).json({ message: "Mật khẩu không đúng" });
+//     }
+//     // Thời gian hết hạn của token
+//     const options = {
+//       expiresIn: "1h", // Token hết hạn sau 1h
+//       algorithm: "HS256", // Thuật toán mã hóa (mặc định)
+//     };
+//     // Tạo token
+//     const token = jwt.sign(
+//       { user_id: user.user_id },
+//       process.env.JWT_SECRET,
+//       options
+//     );
+//     // Trả về thông tin người dùng và token
+//     res.status(200).json({
+//       message: "Đăng nhập thành công",
+//       user: {
+//         user_id: user.user_id,
+//         username: user.username,
+//         email: user.email,
+//         full_name: user.full_name,
+//       },
+//       token: token,
+//     });
+//   } catch (error) {
+//     res
+//       .status(500)
+//       .send({ message: "Lỗi khi đăng nhập", error: error.message });
+//   }
+// };
+
 const login = async (req, res) => {
-  const { User } = db; // Import model User từ index.model
-  const { Op } = require("sequelize"); // Import Op từ sequelize để sử dụng trong truy vấn
+  const { User, Role } = db; // Import model User và Role từ index.model
   try {
     const { login, password } = req.body;
     console.log(`[AUTH DEBUG] Đang thử đăng nhập cho: ${login}`);
@@ -52,28 +105,44 @@ const login = async (req, res) => {
       where: {
         [Op.or]: [{ email: login }, { username: login }],
       },
+      // Thêm include để tải các vai trò của người dùng
+      include: [
+        {
+          model: Role,
+          as: "roles", // Bí danh phải khớp với alias trong User model
+          attributes: ["name"], // Chỉ lấy tên vai trò
+          through: { attributes: [] }, // Không lấy thông tin từ bảng trung gian UserRole
+        },
+      ],
     });
     // Kiểm tra xem người dùng có tồn tại không
     if (!user) {
       console.log(`[AUTH DEBUG] Không tìm thấy người dùng.`);
       return res.status(404).json({ message: "Người dùng không tồn tại" });
     }
-    console.log(`[AUTH DEBUG] Đã tìm thấy người dùng: ${user.email}`); // LOG 3
-    console.log(`[AUTH DEBUG] Mật khẩu đã mã hóa trong DB: ${user.password}`); // LOG 4
+    console.log(`[AUTH DEBUG] Đã tìm thấy người dùng: ${user.email}`);
+    console.log(`[AUTH DEBUG] Mật khẩu đã mã hóa trong DB: ${user.password}`);
     // Kiểm tra mật khẩu
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log(`[AUTH DEBUG] Kết quả so sánh mật khẩu: ${isPasswordValid}`); // LOG 5
+    console.log(`[AUTH DEBUG] Kết quả so sánh mật khẩu: ${isPasswordValid}`);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Mật khẩu không đúng" });
     }
+
+    // Trích xuất tên các vai trò
+    const userRoles = user.roles.map((role) => role.name); // user.roles là một mảng các đối tượng Role
+
     // Thời gian hết hạn của token
     const options = {
       expiresIn: "1h", // Token hết hạn sau 1h
       algorithm: "HS256", // Thuật toán mã hóa (mặc định)
     };
-    // Tạo token
+    // Tạo token với user_id VÀ roles
     const token = jwt.sign(
-      { user_id: user.user_id },
+      {
+        user_id: user.user_id,
+        roles: userRoles,
+      },
       process.env.JWT_SECRET,
       options
     );
@@ -85,6 +154,7 @@ const login = async (req, res) => {
         username: user.username,
         email: user.email,
         full_name: user.full_name,
+        roles: userRoles,
       },
       token: token,
     });

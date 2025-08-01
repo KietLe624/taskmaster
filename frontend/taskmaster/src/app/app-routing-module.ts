@@ -7,7 +7,6 @@ import { AuthLayout } from './layouts/auth-layout/auth-layout';
 import { PublicLayout } from './layouts/public-layout/public-layout';
 import { authInterceptor } from './interceptor/auth-interceptor'; // Import interceptor dạng hàm của bạn
 
-
 // Define the routes for the application
 import { Dashboard } from './components/dashboard/dashboard';
 import { Projects } from './components/projects/projects';
@@ -18,8 +17,26 @@ import { Profile } from './components/profile/profile';
 import { Notifications } from './components/notifications/notifications';
 import { Login } from './components/login/login';
 import { Register } from './components/register/register';
+import { AdminLayout } from './layouts/admin-layout/admin-layout';
+import { AdminDashboard } from './admin/component/admin-dashboard/admin-dashboard';
+import { AdminGuard } from './guards/admin-guard-guard';
+import { ListUsers } from './admin/component/list-users/list-users';
+import { UserDetail } from './admin/component/user-detail/user-detail';
 
 const routes: Routes = [
+  // Admin routes
+  {
+    path: 'admin',
+    component: AdminLayout,
+    canActivate: [AuthGuard, AdminGuard],
+    children: [
+      { path: '', redirectTo: 'dashboards', pathMatch: 'full' },
+      { path: 'dashboards', component: AdminDashboard, title: 'TaskMaster - Admin Dashboard' },
+      { path: 'list-users', component: ListUsers, title: 'TaskMaster - Quản lý người dùng' },
+      { path: 'users/:id', component: UserDetail, title: 'TaskMaster - Chi tiết người dùng' },
+    ],
+  },
+
   // Public routes
   {
     path: '',

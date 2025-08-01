@@ -9,7 +9,7 @@ import { TaskDetailData, TaskForm, User, Project, TaskNotification } from '../..
 export class TaskService {
 
   private apiUrl = 'http://localhost:3000/api/tasks'; // URL cho lấy danh sách công việc
-  private apiUrlTasks = 'http://localhost:3000/api/taskStatus'; // URL cho lấy trạng thái công việc
+  private apiUrlTasks = 'http://localhost:3000/api/tasks/taskStatus'; // URL cho lấy trạng thái công việc
 
   constructor(private http: HttpClient) { }
   // Phương thức mới để lấy Projects

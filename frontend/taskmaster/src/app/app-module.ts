@@ -34,7 +34,10 @@ import { FilterPipe } from './services/filter/filer';
 import { BellModule } from './components/bell-module/bell-module';
 import { TaskDetailModal } from './components/task-detail-modal/task-detail-modal';
 import { AddMemberModal } from './components/add-member-modal/add-member-modal';
-import { Admin } from './admin/component/admin/admin';
+import { AdminLayout } from './layouts/admin-layout/admin-layout';
+import { AdminDashboard } from './admin/component/admin-dashboard/admin-dashboard';
+import { UserDetail } from './admin/component/user-detail/user-detail';
+import { ListUsers } from './admin/component/list-users/list-users';
 
 @NgModule({
   declarations: [
@@ -58,7 +61,10 @@ import { Admin } from './admin/component/admin/admin';
     BellModule,
     TaskDetailModal,
     AddMemberModal,
-    Admin,
+    AdminLayout,
+    AdminDashboard,
+    UserDetail,
+    ListUsers,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule, CommonModule, FilterPipe, ReactiveFormsModule],
 

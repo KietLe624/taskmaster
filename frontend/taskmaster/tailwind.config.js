@@ -9,7 +9,19 @@ module.exports = {
   },
   darkMode: false, // hoặc 'media' hoặc 'class'
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        "bounce-1": "bounce 1.5s infinite",
+        "bounce-2": "bounce 1.5s infinite 0.2s",
+        "bounce-3": "bounce 1.5s infinite 0.4s",
+      },
+      keyframes: {
+        bounce: {
+          "0%, 100%": { transform: "translateY(-25%)" },
+          "50%": { transform: "translateY(0)" },
+        },
+      },
+    },
   },
   variants: {
     extend: {},
