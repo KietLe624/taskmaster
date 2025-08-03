@@ -42,6 +42,7 @@ const {
   deleteTask,
   getNotificationsForTask,
   getTasksInMonth,
+  autoUpdateOverdueTasks,
 } = require("../controllers/tasks.controller");
 
 // NotificationController
@@ -49,6 +50,7 @@ const {
   createNotification,
   getUserNotifications,
   markAsRead,
+  deleteNotification,
 } = require("../controllers/notifications.controller");
 // ReportController
 const { getOverviewReport } = require("../controllers/report.controller");
@@ -92,13 +94,22 @@ router.patch("/tasks/taskStatus/:id", authenticateToken, updateStatusTask); // U
 router.put("/tasks/:id", authenticateToken, updateTask); // Update task
 router.delete("/tasks/:id", authenticateToken, deleteTask); // Delete task
 router.get("/tasks/activity/:year/:month", authenticateToken, getTasksInMonth); // Get tasks in month
-router.get("/tasks/:id/notifications", authenticateToken, getNotificationsForTask); // Get notifications for task
+router.get(
+  "/tasks/:id/notifications",
+  authenticateToken,
+  getNotificationsForTask
+); 
+router.get(
+  "/tasks/autoUpdateOverdue",
+  authenticateToken,
+  autoUpdateOverdueTasks
+); // Auto update overdue tasks
 
 // Notification Routes
 router.post("/notifications", authenticateToken, createNotification); // Create notification
 router.get("/notifications", authenticateToken, getUserNotifications); // Get user notifications
 router.patch("/notifications/:id", authenticateToken, markAsRead); // Mark notification as read
-
+router.delete("/notifications/:id", authenticateToken, deleteNotification); // Delete notification
 // Report Routes
 router.get("/reports/overview", authenticateToken, getOverviewReport);
 

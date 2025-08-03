@@ -12,7 +12,7 @@ import { TaskDetailData, TaskForm } from '../../models/tasks'; // Điều chỉn
 })
 export class ProjectService {
   private apiUrl = 'http://localhost:3000/api/projects';
-  private apiUrlTaskStatus = 'http://localhost:3000/api/taskStatus';
+  // private apiUrlTaskStatus = 'http://localhost:3000/api/taskStatus';
   private apiUrlTasks = 'http://localhost:3000/api/tasks';
 
   // Hàm tạo header động với token
@@ -63,7 +63,7 @@ export class ProjectService {
   }
 
   updateStatusTask(taskId: number, updateData: { status: string }): Observable<any> {
-    const url = `${this.apiUrlTaskStatus}/${taskId}`;
+    const url = `${this.apiUrlTasks}/taskStatus/${taskId}`;
     return this.http.patch(url, updateData, this.getAuthHeaders()).pipe(
       tap(_ => console.log(`Cập nhật trạng thái task ${taskId} thành công`)),
       catchError(this.handleError<any>(`updateTask id=${taskId}`))

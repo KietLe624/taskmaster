@@ -37,3 +37,16 @@ app.use("/admin", apiAdminRouter); // Sử dụng router admin
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 }); // Lắng nghe cổng và in ra thông báo khi server đã sẵn sàng
+
+const cron = require("node-cron");
+const {
+  autoUpdateOverdueTasks,
+} = require("./src/controllers/tasks.controller");
+
+// Lập lịch để chạy hàm autoUpdateOverdueTasks
+// Ví dụ: Chạy mỗi mỗi phút (* * * * *)
+// Bạn có thể thay đổi lịch trình phù hợp với nhu cầu của mình.
+cron.schedule("* * * * *", () => {
+  console.log("Bắt đầu cron job để cập nhật trạng thái công việc quá hạn.");
+  autoUpdateOverdueTasks();
+});

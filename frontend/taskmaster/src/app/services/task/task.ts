@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { TaskDetailData, TaskForm, User, Project, TaskNotification } from '../../models/tasks';
+import { Task } from '../../models/project-detail';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { TaskDetailData, TaskForm, User, Project, TaskNotification } from '../..
 export class TaskService {
 
   private apiUrl = 'http://localhost:3000/api/tasks'; // URL cho lấy danh sách công việc
-  private apiUrlTasks = 'http://localhost:3000/api/tasks/taskStatus'; // URL cho lấy trạng thái công việc
+  // private apiUrlTasks = 'http://localhost:3000/api/tasks/taskStatus'; // URL cho lấy trạng thái công việc
 
   constructor(private http: HttpClient) { }
   // Phương thức mới để lấy Projects
@@ -35,7 +36,7 @@ export class TaskService {
     return this.http.post<{ message: string; data: TaskDetailData }>(this.apiUrl, taskData);
   }
   updateTaskStatus(taskId: number, newStatus: string): Observable<any> {
-    return this.http.patch(`${this.apiUrlTasks}/${taskId}`, { status: newStatus });
+    return this.http.patch(`${this.apiUrl}/taskStatus/${taskId}`, { status: newStatus });
   }
   // Phương thức để cập nhật công việc
   updateTask(taskId: number, taskData: TaskForm): Observable<TaskDetailData> {
@@ -61,6 +62,10 @@ export class TaskService {
   getNotificationsForTask(taskId: number): Observable<TaskNotification[]> {
     return this.http.get<TaskNotification[]>(`${this.apiUrl}/${taskId}/notifications`);
   }
+
+  // getTaskOverdue(): Observable<TaskDetailData[]> {
+  //   const token = sessionStorage.getItem('auth_token');
+
 
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {

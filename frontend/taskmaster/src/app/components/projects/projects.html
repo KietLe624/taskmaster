@@ -1,12 +1,13 @@
 <div class="container mx-auto p-4 font-sans">
   <!-- Tiêu đề và nút thêm -->
   <div class="flex justify-between items-center mb-6">
-    <h2 class="text-3xl font-bold text-gray-900">Quản Lý Dự Án</h2>
-    <button (click)="openCreateModal()" id="openCreateProjectModal" class="px-5 py-2.5 text-black font-semibold rounded-lg
-               flex items-center text-sm
-               border border-gray-300
-               transform transition-all duration-200
-               hover:shadow-md hover:-translate-y-0.5 hover:text-blue-600 hover:border-blue-300">
+    <h2 class="text-3xl font-semibold text-black  bg-clip-text text-transparent">
+      Quản Lý Dự Án
+    </h2>
+    <button (click)="openCreateModal()" id="openCreateProjectModal" class="px-5 py-2.5 text-white font-semibold rounded-lg flex items-center text-sm
+             bg-gradient-to-r from-blue-500 to-purple-500
+             transform transition-all duration-200
+             hover:from-blue-600 hover:to-purple-600 hover:shadow-lg hover:-translate-y-0.5">
       <i class="fas fa-plus mr-2"></i>
       <span class="hidden md:inline">Thêm Dự Án Mới</span>
     </button>
@@ -16,12 +17,12 @@
   <div *ngIf="isLoading" class="text-center p-10">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <!-- Skeleton Card -->
-      <div *ngFor="let i of [1,2,3,4]" class="bg-white p-6 rounded-xl shadow-md">
+      <div *ngFor="let i of [1, 2, 3, 4]" class="bg-gray-100 p-6 rounded-xl shadow-md">
         <div class="animate-pulse flex flex-col space-y-4">
-          <div class="h-6 bg-gray-200 rounded w-3/4"></div>
-          <div class="h-4 bg-gray-200 rounded"></div>
-          <div class="h-4 bg-gray-200 rounded w-5/6"></div>
-          <div class="h-10 bg-gray-200 rounded mt-4"></div>
+          <div class="h-6 bg-gradient-to-r from-gray-300 to-gray-400 rounded w-3/4"></div>
+          <div class="h-4 bg-gradient-to-r from-gray-300 to-gray-400 rounded"></div>
+          <div class="h-4 bg-gradient-to-r from-gray-300 to-gray-400 rounded w-5/6"></div>
+          <div class="h-10 bg-gradient-to-r from-gray-300 to-gray-400 rounded mt-4"></div>
         </div>
       </div>
     </div>
@@ -30,27 +31,24 @@
   <!-- Danh sách dự án -->
   <div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
     <!-- Card dự án -->
-    <!--
-      UPDATED: Removed border classes and added hover:-translate-y-1 for a lifting effect.
-    -->
-    <div *ngFor="let project of projects"
-      class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl hover:scale-105 hover:-translate-y-1 transition-all duration-300 relative flex flex-col">
-
+    <div *ngFor="let project of projects" class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl hover:scale-105 hover:-translate-y-1 transition-all duration-300 relative flex flex-col
+             border border-gray-100 hover:border-blue-200">
       <!-- Nút chỉnh sửa và xóa -->
       <div class="absolute top-4 right-4 flex space-x-2">
         <button (click)="openEditModal(project)"
-          class="text-gray-400 hover:text-blue-600 text-lg focus:outline-none transition-colors">
+          class="text-gray-500 hover:text-blue-600 text-lg focus:outline-none transition-colors">
           <i class="fas fa-edit"></i>
         </button>
         <button (click)="deleteProject(project.id)"
-          class="text-gray-400 hover:text-red-600 focus:outline-none transition-colors">
+          class="text-gray-500 hover:text-red-600 focus:outline-none transition-colors">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
 
       <!-- Tiêu đề dự án -->
       <div class="pr-16">
-        <h2 class="text-xl font-semibold text-gray-900 mb-2 truncate" title="{{ project.name || 'Chưa có tên' }}">
+        <h2 class="text-xl font-semibold text-gray-900 mb-2 truncate" title="{{ project.name || 'Chưa có tên' }}"
+          style="color: #2d3748;">
           {{ project.name || 'Chưa có tên' }}
         </h2>
       </div>
@@ -60,9 +58,18 @@
 
       <!-- Thông tin dự án -->
       <div class="text-gray-700 text-sm space-y-2 mb-6">
-        <p><span class="font-medium text-gray-900">Quản lý:</span> {{ project.manager.full_name || 'Chưa có' }}</p>
-        <p><span class="font-medium text-gray-900">Bắt đầu:</span> {{ project.start_date | date: 'dd/MM/yyyy' }}</p>
-        <p><span class="font-medium text-gray-900">Kết thúc:</span> {{ project.end_date | date: 'dd/MM/yyyy' }}</p>
+        <p>
+          <span class="font-medium text-gray-900">Quản lý: </span>
+          <span class="text-blue-600">{{ project.manager.full_name || 'Chưa có' }}</span>
+        </p>
+        <p>
+          <span class="font-medium text-gray-900">Bắt đầu: </span>
+          <span class="text-green-600">{{ project.start_date | date: 'dd/MM/yyyy' }}</span>
+        </p>
+        <p>
+          <span class="font-medium text-gray-900">Kết thúc: </span>
+          <span class="text-red-600">{{ project.end_date | date: 'dd/MM/yyyy' }}</span>
+        </p>
       </div>
 
       <!-- Thanh tiến độ -->
@@ -71,8 +78,8 @@
         <div class="w-full bg-gray-200 rounded-full h-2.5">
           <div class="h-2.5 rounded-full transition-all duration-500" [style.width]="(project.progress || 0) + '%'"
             [ngClass]="{
-              'bg-green-500': (project.progress || 0) === 100,
-              'bg-blue-500': (project.progress || 0) < 100
+              'bg-gradient-to-r from-green-400 to-green-600': (project.progress || 0) === 100,
+              'bg-gradient-to-r from-blue-400 to-blue-600': (project.progress || 0) < 100
             }"></div>
         </div>
       </div>
@@ -81,7 +88,7 @@
       <div class="mt-auto flex justify-between items-end">
         <!-- Nút xem chi tiết -->
         <a [routerLink]="['/app/projects', project.id]" (click)="viewProjectDetails(project)"
-          class="text-blue-600 text-sm font-medium flex items-center hover:underline">
+          class="text-blue-600 text-sm font-medium flex items-center hover:text-blue-800 hover:underline">
           Xem chi tiết
           <i class="fas fa-arrow-right ml-1.5 text-xs"></i>
         </a>
@@ -90,7 +97,7 @@
         <div class="flex items-center -space-x-2">
           <div *ngFor="let member of project.members.slice(0, 2)" class="relative group">
             <div
-              class="w-8 h-8 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-bold border-2 border-white cursor-pointer select-none">
+              class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 text-purple-800 flex items-center justify-center font-bold border-2 border-white cursor-pointer select-none">
               {{ member.full_name.charAt(0).toUpperCase() }}
             </div>
             <div
@@ -100,7 +107,7 @@
           </div>
 
           <div *ngIf="project.members.length > 2"
-            class="w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-bold border-2 border-white select-none">
+            class="w-8 h-8 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 text-gray-700 flex items-center justify-center text-xs font-bold border-2 border-white select-none">
             +{{ project.members.length - 2 }}
           </div>
         </div>
@@ -110,6 +117,5 @@
 
   <!-- Form tạo mới -->
   <app-create-project [show]="showModal" [isEditMode]="isEditMode" [projectToEdit]="projectToEdit"
-    (save)="onSaveProject($event)" (close)="closeModal()">
-  </app-create-project>
+    (save)="onSaveProject($event)" (close)="closeModal()"></app-create-project>
 </div>

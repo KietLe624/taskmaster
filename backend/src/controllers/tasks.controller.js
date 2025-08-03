@@ -491,6 +491,49 @@ const getNotificationsForTask = async (req, res) => {
   }
 };
 
+// Hàm tự động cập nhật trạng thái các công việc đã quá hạn
+const autoUpdateOverdueTasks = async () => {
+  try {
+    const now = new Date();
+    console.log("Đang kiểm tra và cập nhật các công việc quá hạn...");
+
+    const overdueTasks = await Task.findAll({
+      where: {
+        status: {
+          [Op.ne]: "completed", // Trạng thái không phải là đã hoàn thành
+        },
+        due_date: {
+          [Op.lt]: now, // Ngày hết hạn nhỏ hơn thời gian hiện tại
+        },
+      },
+    });
+
+    if (overdueTasks.length === 0) {
+      console.log("Không có công việc nào cần cập nhật.");
+      return;
+    }
+
+    console.log(`Tìm thấy ${overdueTasks.length} công việc đã quá hạn. Đang cập nhật trạng thái...`);
+
+    // Sử dụng transaction để đảm bảo toàn vẹn dữ liệu
+    const transaction = await sequelize.transaction();
+    try {
+      for (const task of overdueTasks) {
+        await task.update({ status: "overdue" }, { transaction });
+        console.log(`Công việc #${task.task_id} đã được cập nhật thành 'overdue'.`);
+      }
+      await transaction.commit();
+      console.log("Cập nhật trạng thái thành công cho tất cả các công việc quá hạn.");
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+
+  } catch (error) {
+    console.error("Lỗi khi tự động cập nhật công việc quá hạn:", error);
+  }
+};
+
 module.exports = {
   getAllTasks,
   getTasks,
@@ -500,4 +543,5 @@ module.exports = {
   deleteTask,
   getTasksInMonth,
   getNotificationsForTask,
+  autoUpdateOverdueTasks,
 };
