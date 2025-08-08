@@ -38,6 +38,7 @@ import { AdminLayout } from './layouts/admin-layout/admin-layout';
 import { AdminDashboard } from './admin/component/admin-dashboard/admin-dashboard';
 import { UserDetail } from './admin/component/user-detail/user-detail';
 import { ListUsers } from './admin/component/list-users/list-users';
+import { EditUserModal } from './admin/component/edit-user-modal/edit-user-modal';
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import { ListUsers } from './admin/component/list-users/list-users';
     AdminDashboard,
     UserDetail,
     ListUsers,
+    EditUserModal,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule, CommonModule, FilterPipe, ReactiveFormsModule],
 

@@ -148,9 +148,9 @@
               class="group bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex justify-between items-center transition-all duration-300 hover:shadow-md hover:border-blue-500 hover:scale-105">
               <div class="flex-grow">
                 <h3 class="font-bold text-gray-800">{{ project.name }}</h3>
-                <p class="text-sm text-gray-500 mt-1 overflow-hidden"
-                  style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;">{{
-                  project.description }}</p>
+                <p class="text-sm text-gray-500 mt-1 truncate max-w-xs">
+                  {{ project.description }}
+                </p>
               </div>
               <a [routerLink]="['/app/projects', project.id]"
                 class="w-8 h-8 flex-shrink-0 ml-4 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-all duration-300 group-hover:bg-blue-500 group-hover:text-white">

@@ -1,7 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { AdminService } from '../../service/admin'; // Adjust the import path as necessary
 import { AdminDashboardStats } from '../../model/admin-dashboard'; // Adjust the import path as necessary
-
 @Component({
   selector: 'app-admin-dashboard',
   standalone: false,
@@ -34,5 +33,4 @@ export class AdminDashboard implements OnInit {
       },
     });
   }
-
 }

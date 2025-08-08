@@ -54,7 +54,9 @@
       </div>
 
       <!-- Mô tả -->
-      <p class="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow">{{ project.description || 'Chưa có mô tả' }}</p>
+      <div class="text-gray-600 text-sm mb-4 truncate " title="{{ project.description || 'Chưa có mô tả' }}">
+        {{ project.description || 'Chưa có mô tả' }}
+      </div>
 
       <!-- Thông tin dự án -->
       <div class="text-gray-700 text-sm space-y-2 mb-6">

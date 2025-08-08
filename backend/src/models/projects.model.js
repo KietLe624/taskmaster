@@ -23,16 +23,19 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Project.associate = (models) => {
+
     // Truy cập thông tin người quản lý dự án thông qua bí danh 'manager', khoá ngoại là 'manager_id'
     Project.belongsTo(models.User, {
       foreignKey: "manager_id",
       as: "manager",
     });
+
     // Quan hệ với bảng Project Member
     Project.hasMany(models.ProjectMember, {
       foreignKey: "project_id",
       as: "members",
     });
+    
     // Quan hệ với bảng Task
     Project.hasMany(models.Task, {
       foreignKey: "project_id",

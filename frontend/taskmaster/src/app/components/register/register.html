@@ -1,55 +1,75 @@
-<div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-  <div class="text-center mb-6">
-    <h1 class="text-blue-600 font-bold text-4xl mb-2">TaskMaster</h1>
-    <p class="text-gray-600">Quản lý công việc hiệu quả</p>
+<div
+  class="bg-white p-8 md:p-12 rounded-2xl shadow-xl max-w-lg w-full transform transition-all duration-300 hover:scale-105">
+  <!-- Logo và tiêu đề -->
+  <div class="text-center mb-8">
+    <div class="flex items-center justify-center space-x-2 mb-2">
+      <i class="fa-solid fa-clipboard-check text-indigo-600 text-3xl"></i>
+      <h1 class="text-3xl font-bold text-gray-800">TaskMaster</h1>
+    </div>
+    <p class="text-gray-500 text-sm">Quản lý công việc hiệu quả</p>
   </div>
 
-  <form (ngSubmit)="onRegister()" #registerForm="ngForm" class="space-y-4">
+  <form (ngSubmit)="onRegister()" #registerForm="ngForm" class="space-y-6">
+    <!-- Tên người dùng -->
     <div>
-      <label for="username" class="block text-gray-700 text-sm font-semibold mb-2">Tên người dùng</label>
+      <label for="username" class="block text-gray-700 text-sm font-medium mb-2">Tên người dùng</label>
       <input type="text" id="username" name="username" required [(ngModel)]="userData.username"
-        class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all duration-200"
         placeholder="Tên của bạn" />
     </div>
+
+    <!-- Họ và tên -->
     <div>
-      <label for="fullName" class="block text-gray-700 text-sm font-semibold mb-2">Họ và tên</label>
+      <label for="fullName" class="block text-gray-700 text-sm font-medium mb-2">Họ và tên</label>
       <input type="text" id="fullName" name="fullName" required [(ngModel)]="userData.full_name"
-        class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all duration-200"
         placeholder="Họ và tên đầy đủ" />
     </div>
+
+    <!-- Địa chỉ Email -->
     <div>
-      <label for="email" class="block text-gray2-700 text-sm font-semibold mb-2">Địa chỉ Email</label>
+      <label for="email" class="block text-gray-700 text-sm font-medium mb-2">Địa chỉ Email</label>
       <input type="email" id="email" name="email" required [(ngModel)]="userData.email"
-        class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all duration-200"
         placeholder="email@example.com" />
     </div>
+
+    <!-- Mật khẩu -->
     <div>
-      <label for="password" class="block text-gray-700 text-sm font-semibold mb-2">Mật khẩu</label>
+      <label for="password" class="block text-gray-700 text-sm font-medium mb-2">Mật khẩu</label>
       <input type="password" id="password" name="password" required [(ngModel)]="userData.password"
-        class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="********" />
+        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all duration-200"
+        placeholder="********" />
     </div>
+
+    <!-- Xác nhận mật khẩu -->
     <div>
-      <label for="confirmPassword" class="block text-gray-700 text-sm font-semibold mb-2">Xác nhận mật khẩu</label>
+      <label for="confirmPassword" class="block text-gray-700 text-sm font-medium mb-2">Xác nhận mật khẩu</label>
       <input type="password" id="confirmPassword" name="confirmPassword" required [(ngModel)]="userData.confirmPassword"
-        class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="********" />
+        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all duration-200"
+        placeholder="********" />
     </div>
+
     <!-- Hiển thị thông báo lỗi hoặc thành công -->
-      <div *ngIf="errorMessage" class="mt-4 p-3 text-sm text-red-700 bg-red-100 rounded-md">
-        {{ errorMessage }}
-      </div>
-      <div *ngIf="successMessage" class="mt-4 p-3 text-sm text-green-700 bg-green-100 rounded-md">
-        {{ successMessage }}
-      </div>
+    <div *ngIf="errorMessage" class="mt-4 p-3 text-sm text-red-700 bg-red-100 rounded-xl">
+      {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="mt-4 p-3 text-sm text-green-700 bg-green-100 rounded-xl">
+      {{ successMessage }}
+    </div>
+
+    <!-- Nút Đăng ký -->
     <button type="submit" [disabled]="!registerForm.form.valid"
-      class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-semibold">
+      class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200 transform hover:scale-105 shadow-md hover:shadow-lg">
       Đăng ký
     </button>
   </form>
 
-  <div class="mt-6 text-center text-gray-600">
-    <p>
-      Đã có tài khoản?
-      <a routerLink="/login" class="text-blue-600 hover:underline font-semibold">Đăng nhập</a>
+  <!-- Đã có tài khoản? -->
+  <div class="mt-6 text-center text-sm">
+    <p class="text-gray-600">Đã có tài khoản?
+      <a routerLink="/login"
+        class="text-indigo-600 font-medium hover:text-indigo-800 transition-colors duration-200">Đăng nhập</a>
     </p>
   </div>
 </div>

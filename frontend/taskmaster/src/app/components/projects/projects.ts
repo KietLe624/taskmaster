@@ -20,7 +20,7 @@ export class Projects implements OnInit {
   constructor(
     private projectService: ProjectService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.projectService.getProjects().subscribe({
@@ -78,8 +78,9 @@ export class Projects implements OnInit {
             this.closeModal(); // Đóng modal ngay cả khi có lỗi
             alert(
               'Cập nhật dự án thất bại: ' +
-                (err.error?.message || 'Lỗi không xác định')
+              (err.error?.message || 'Lỗi không xác định')
             );
+            this.cdr.detectChanges();
           },
         });
     } else {
@@ -96,6 +97,7 @@ export class Projects implements OnInit {
             err.error?.message || 'Đã có lỗi không xác định xảy ra.';
           alert(errorMessage);
           this.closeModal(); // Đóng modal ngay cả khi có lỗi
+          this.cdr.detectChanges();
         },
       });
     }

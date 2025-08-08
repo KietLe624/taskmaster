@@ -72,7 +72,7 @@ router.get("/users/all", getAllUsers); // Get all users
 router.get("/users/:user_id", authenticateToken, getUserInfo); // Get user by ID
 router.get("/users/:id/countManagedProjects", getManagedProjectCount); // Count managed projects
 router.put("/users/:id", authenticateToken, updateUser); // Update user info
-
+router.patch("/users/:user_id", authenticateToken, updateUser); // Update user info
 // Project Routes
 router.get("/projects/all", getAllProjects); // Get all projects
 router.get("/projects", authenticateToken, getProjects); // Get user projects

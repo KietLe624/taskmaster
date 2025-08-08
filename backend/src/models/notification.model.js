@@ -11,14 +11,16 @@ module.exports = (sequelize, DataTypes) => {
       type: { type: DataTypes.STRING, allowNull: false }, // Loại thông báo
       message: { type: DataTypes.TEXT, allowNull: false }, // Nội dung thông báo
       status_read: { type: DataTypes.BOOLEAN, defaultValue: false }, // Trạng thái đã đọc
-      created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-      updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+      created_at: { type: DataTypes.DATE, allowNull: false }, // Xóa defaultValue để khớp với schema
+      updated_at: { type: DataTypes.DATE, allowNull: false }, // Xóa defaultValue để khớp với schema
     },
     {
       tableName: "notifications",
       underscored: true,
+      timestamps: true, // Bật timestamps để Sequelize quản lý created_at và updated_at
     }
   );
+
   Notification.associate = (models) => {
     // Một Notification thuộc về một User
     Notification.belongsTo(models.User, {
@@ -31,5 +33,6 @@ module.exports = (sequelize, DataTypes) => {
       as: "task",
     });
   };
+
   return Notification;
 };
