@@ -44,7 +44,7 @@ npm install
 Tạo file `.env` trong thư mục `backend/`:
 
 ```env
-PORT=5000
+PORT=3000
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=yourpassword
@@ -70,22 +70,9 @@ Khi backend khởi chạy lần đầu, Sequelize sẽ tự tạo bảng dựa t
 
 ### Frontend
 
-* **Chạy development mode**:
-
-```bash
-npm start
-```
-
 * **Build production**:
-
-```bash
-npm run build
-```
-
-* **Chạy SSR (Server-Side Rendering)**:
-
-```bash
-npm run serve:ssr:taskmaster
+```bask
+ng server
 ```
 
 ### Backend
@@ -93,10 +80,11 @@ npm run serve:ssr:taskmaster
 * **Chạy server**:
 
 ```bash
-npm start
+node file_name 
+** server.js or app.js ** 
 ```
 
-Server mặc định chạy ở: [http://localhost:5000](http://localhost:5000)
+Server mặc định chạy ở: [http://localhost:3000](http://localhost:3000)
 
 ---
 
@@ -105,7 +93,7 @@ Server mặc định chạy ở: [http://localhost:5000](http://localhost:5000)
 ### Frontend
 
 * **Angular 20** – Frontend chính
-* **TailwindCSS 2.2** – CSS utility-first
+* **TailwindCSS 2.2.19 – CSS utility-first
 * **Chart.js 4.5** – Vẽ biểu đồ
 * **RxJS** – Reactive programming
 * **Angular SSR** – Render server
@@ -152,11 +140,3 @@ taskmaster/
 * Cấu hình **CORS** để bảo vệ kết nối từ frontend
 
 ---
-
-## 🛠 Phát triển & Đóng góp
-
-1. Fork dự án
-2. Tạo branch mới (`git checkout -b feature/ten-tinh-nang`)
-3. Commit thay đổi (`git commit -m 'Thêm tính năng ...'`)
-4. Push branch (`git push origin feature/ten-tinh-nang`)
-5. Tạo Pull Request
