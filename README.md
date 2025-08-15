@@ -93,7 +93,7 @@ Server mặc định chạy ở: [http://localhost:3000](http://localhost:3000)
 ### Frontend
 
 * **Angular 20** – Frontend chính
-* **TailwindCSS 2.2.19 – CSS utility-first
+* **TailwindCSS 2.2.19** – CSS utility-first
 * **Chart.js 4.5** – Vẽ biểu đồ
 * **RxJS** – Reactive programming
 * **Angular SSR** – Render server
