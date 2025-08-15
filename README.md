@@ -111,26 +111,6 @@ Server mặc định chạy ở: [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 📁 Cấu trúc thư mục gợi ý
-
-```
-taskmaster/
- ├── frontend/               # Angular SSR App
- │    ├── src/
- │    ├── dist/taskmaster/
- │    ├── tailwind.config.js
- │    └── package.json
- ├── backend/                # Node.js API
- │    ├── config/
- │    ├── controllers/
- │    ├── models/
- │    ├── routes/
- │    ├── middlewares/
- │    ├── server.js
- │    └── package.json
- └── README.md
-```
-
 ---
 
 ## 🔒 Bảo mật
