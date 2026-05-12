@@ -1,6 +1,6 @@
 # Taskmaster – Fullstack Application
 
-Taskmaster là ứng dụng quản lý công việc fullstack gồm **Frontend** (Angular 20 + SSR) và **Backend** (Node.js + Express + MySQL). Ứng dụng hỗ trợ hiển thị biểu đồ với Chart.js, sử dụng TailwindCSS cho UI và JWT để xác thực.
+Taskmaster là ứng dụng quản lý công việc fullstack gồm **Frontend** (Angular 20) và **Backend** (Node.js + Express + MySQL). Ứng dụng hỗ trợ hiển thị biểu đồ với Chart.js, sử dụng TailwindCSS cho UI và JWT để xác thực.
 
 ---
 
